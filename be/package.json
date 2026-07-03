@@ -1,0 +1,20 @@
+{
+  "name": "backend-root",
+  "version": "1.0.0",
+  "description": "Root package to manage Express and Directus services",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm run install:express",
+    "install:express": "cd express && npm install",
+    "start:express": "cd express && npm start",
+    "start:directus": "cd directus && docker compose up -d",
+    "start": "concurrently -c \"cyan,magenta\" -n \"EXPRESS,DIRECTUS\" \"npm run start:express\" \"npm run start:directus\"",
+    "dev:express": "cd express && npm run dev",
+    "dev:directus": "cd directus && docker compose up",
+    "dev": "concurrently -c \"cyan,magenta\" -n \"EXPRESS,DIRECTUS\" \"npm run dev:express\" \"npm run dev:directus\"",
+    "stop": "cd directus && docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
