@@ -19,6 +19,7 @@ export interface PersonFull extends PersonLite {
 
   // TODO: Update types after the backend API is ready
   shortBio: string;
+  longBio: string;
   degrees: string[];
   researchAreas: string[];
   teachingAssistants: string[];
