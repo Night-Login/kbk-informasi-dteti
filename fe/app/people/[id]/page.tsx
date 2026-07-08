@@ -6,34 +6,35 @@ type ListSection = {
 };
 
 const jsonDummyData = {
-  id: "budi-santoso",
-  fullName: "Dr. Budi Santoso, M.Sc.",
-  position: "Associate Professor",
+  id: "leonardo-da-vinci",
+  fullName: "Prof. Leonardo da Vinci, S.Kom., M.Cs., Ph.D.",
+  position: "Professor of Artificial Intelligence & Robotics",
   isSupervisorAvailable: true,
-  profilePictureUrl: "/placeholder.jpg",
+  profilePictureUrl: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Leonardo-da-vinci-posible-autorretrato-del-artista-galeria-de-los-uffizi-florencia_1c92d9d7_2.png",
   contact: {
-    labName: "Lab XYZ",
+    labName: "Laboratorium Komputasi Cerdas dan Robotika (Intelligence Computation and Robotics Lab)",
     phone: "(+62)81234567890",
-    email: "budi.santoso@mail.ugm.ac.id",
+    email: "davinci.leo@ugm.ac.id",
   },
   shortBio:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula malesuada ipsum, sit amet congue erat dapibus vel. Aliquam at porta arcu, sed tincidunt elit. Nullam velit neque, tempor sed consectetur at, molestie nec enim.",
+    "La sperienza non fallisce mai, ma solo falliscono i nostri giudizi, promettendosi di lei cose che non sono in sua podestà. Sforzati di ritrarre le cose nel modo in cui la natura le ha create, poiché la natura è la fonte di ogni vera scienza.",
   degrees: [
-    "Gelar Ph.D. (Information Technology, Gadjah Mada University)",
-    "Gelar M.Sc. (Computer Science, Gadjah Mada University)",
-    "Gelar S.Kom. (Informatics, Gadjah Mada University)",
+    "Ph.D. in Computer Science - Massachusetts Institute of Technology (MIT), USA",
+    "M.Sc. in Mechano-Informatics - The University of Tokyo, Japan",
+    "Sarjana Teknologi Informasi - Universitas Gadjah Mada",
   ],
   researchAreas: [
-    "Artificial Intelligence",
-    "Machine Learning",
-    "Natural Language Processing",
+    "Computer Vision & Generative Art",
+    "Biomimetic Robotics & Flight Simulation",
+    "Neural Networks for Anatomical Analysis",
+    "Computational Geometry"
   ],
-  teachingAssistants: ["Andi Saputra", "Rina Melati"],
-  advisees: ["Reza Rahadian", "Chelsea Islan", "Iqbaal Ramadhan"],
+  teachingAssistants: ["Gian Giacomo Caprotti", "Francesco Melzi"],
+  advisees: ["Niccolò Machiavelli", "Ludovico Sforza", "Cesare Borgia"],
   academicLinks: {
-    sinta: "https://sinta.kemdikbud.go.id/authors/profile/12345",
-    scopus: "https://www.scopus.com/authid/detail.uri?authorId=12345",
-    scholar: "https://scholar.google.com/citations?user=12345",
+    sinta: "https://sinta.kemdikbud.go.id/authors/profile/1452",
+    scopus: "https://www.scopus.com/authid/detail.uri?authorId=1452",
+    scholar: "https://scholar.google.com/citations?user=1452",
   },
 };
 
@@ -55,7 +56,7 @@ export default function Profile({ params }: { params: { id: string } }) {
       {/* PROFILE */}
       <div className="flex flex-col gap-8">
         {/* PROFILE HEAD*/}
-        <div className="flex flex-col gap-8 bg-primary-500 p-6 lg:flex-row lg:items-stretch lg:p-10">
+        <div className="flex flex-col gap-8 bg-primary-500 lg:flex-row lg:items-stretch">
           {/* HEAD IMAGE */}
           <img
             src={personData.profilePictureUrl}
