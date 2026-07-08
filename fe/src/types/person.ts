@@ -1,8 +1,6 @@
-
 export interface PersonLite {
-  
   // TODO: Update types after the backend API is ready
-  id: string; 
+  id: string;
   fullName: string;
   position: string;
   isSupervisorAvailable: boolean;
@@ -16,7 +14,6 @@ export interface PersonLite {
 }
 
 export interface PersonFull extends PersonLite {
-
   // TODO: Update types after the backend API is ready
   shortBio: string;
   longBio: string;

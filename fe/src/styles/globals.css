@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+:root {
+  --background: oklch(1 0 0);
+  --surface: oklch(0.965 0 0);
+  --surface-strong: oklch(0.83 0 0);
+  --ink: oklch(0.16 0 0);
+  --muted: oklch(0.39 0 0);
+  --line: oklch(0.76 0 0);
+  --focus: oklch(0.3 0 0);
+  --z-sticky: 40;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-focus: var(--focus);
+  --font-sans: var(--font-public-sans);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 4rem;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--ink);
+  font-family: var(--font-public-sans), Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::selection {
+  background: oklch(0.8 0 0);
+  color: var(--ink);
+}
+
+.page-container {
+  width: min(100% - 2rem, 108rem);
+  margin-inline: auto;
+}
+
+.section-space {
+  padding-block: clamp(4rem, 7vw, 6rem);
+}
+
+.site-header {
+  z-index: var(--z-sticky);
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-160%);
+  border-radius: 0.25rem;
+  background: var(--ink);
+  padding: 0.75rem 1rem;
+  color: white;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.nav-link {
+  position: relative;
+  padding-block: 0.5rem;
+}
+
+.nav-link::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: right;
+  background: var(--ink);
+  content: "";
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+@media (min-width: 640px) {
+  .page-container {
+    width: min(100% - 3rem, 108rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-container {
+    width: min(100% - 8rem, 108rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
