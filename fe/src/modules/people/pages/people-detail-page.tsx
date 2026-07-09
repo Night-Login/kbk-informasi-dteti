@@ -1,17 +1,22 @@
-import type { PersonFull } from "@/types/person";
+import { PersonFull } from "@/types/person";
+import {
+  GraduationCap,
+  Link2,
+  Mail,
+  MapPin,
+  Phone,
+  Search,
+} from "lucide-react";
+import type { ReactNode } from "react";
 
-type ListSection = {
+type PersonInfoItem = {
   title: string;
-  items: string[];
+  items?: string[];
+  value?: string;
+  icon?: ReactNode;
 };
 
-type ContactItem = {
-  label: string;
-  value: string;
-  icon: string;
-};
-
-const dummyPerson: PersonFull = {
+const jsonDummyData = {
   id: "leonardo-da-vinci",
   fullName: "Prof. Leonardo da Vinci, S.Kom., M.Cs., Ph.D.",
   position: "Professor of Artificial Intelligence & Robotics",
@@ -39,132 +44,259 @@ const dummyPerson: PersonFull = {
     "Neural Networks for Anatomical Analysis",
     "Computational Geometry",
   ],
-  teachingAssistants: ["Gian Giacomo Caprotti", "Francesco Melzi"],
+  teachingAssistants: [
+    {
+      fullName: "Gian Giacomo Caprotti",
+      profilePictureUrl: "https://example.com/caprotti.jpg",
+      contact: {
+        phone: "(+62)81234567891",
+        email: "caprotti.gian@ugm.ac.id",
+      },
+    },
+    {
+      fullName: "Francesco Melzi",
+      profilePictureUrl: "https://example.com/melzi.jpg",
+      contact: {
+        phone: "(+62)81234567892",
+        email: "melzi.francesco@ugm.ac.id",
+      },
+    },
+  ],
   advisees: ["Niccolò Machiavelli", "Ludovico Sforza", "Cesare Borgia"],
   academicLinks: {
     sinta: "https://sinta.kemdikbud.go.id/authors/profile/1452",
     scopus: "https://www.scopus.com/authid/detail.uri?authorId=1452",
     scholar: "https://scholar.google.com/citations?user=1452",
   },
+  publications: [
+    {
+      title: "A Novel Approach to Biomimetic Robotics",
+      link: "https://example.com/publication1",
+      type: "Journal Article",
+      date: "2023-01-01",
+      peopleInvolved: ["Prof. Leonardo da Vinci"],
+      tags: ["Robotics", "Biomimetics"],
+    },
+  ],
+  awards: [
+    "Best Paper Award at International Conference on Robotics 2022",
+    "Outstanding Researcher Award from the International Society of Artificial Intelligence 2021",
+  ],
 };
 
-export default async function PeopleDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  await params;
-  const personData = dummyPerson;
+export default function Profile({ params }: { params: { id: string } }) {
+  const { id } = params;
 
-  const listSections: ListSection[] = [
+  // TODO: Replace with actual data fetching logic
+  const personData: PersonFull = jsonDummyData;
+  const listSections: PersonInfoItem[] = [
     { title: "Research Areas", items: personData.researchAreas },
-    { title: "Teaching Assistants", items: personData.teachingAssistants },
+    {
+      title: "Teaching Assistants",
+      items: personData.teachingAssistants.map(
+        (assistant) => assistant.fullName,
+      ),
+    },
     { title: "Advisees", items: personData.advisees },
   ];
 
-  const contactItems: ContactItem[] = [
-    { label: "Email", value: personData.contact.email, icon: "E" },
-    { label: "Phone", value: personData.contact.phone, icon: "P" },
-    { label: "Office", value: personData.contact.labName, icon: "O" },
+  const contactInfo = personData.contact;
+  const contactItems: PersonInfoItem[] = [
+    { title: "Email", value: contactInfo.email, icon: <Mail size={14} /> },
+    { title: "Phone", value: contactInfo.phone, icon: <Phone size={14} /> },
+    { title: "Office", value: contactInfo.labName, icon: <MapPin size={14} /> },
   ];
 
-  const academicLinkItems: ContactItem[] = [
-    { label: "Sinta", value: personData.academicLinks.sinta, icon: "S" },
-    { label: "Scopus", value: personData.academicLinks.scopus, icon: "SC" },
+  const academicLinks = personData.academicLinks;
+  const academicLinkItems: PersonInfoItem[] = [
     {
-      label: "Google Scholar",
-      value: personData.academicLinks.scholar,
-      icon: "GS",
+      title: "Sinta",
+      value: academicLinks.sinta,
+      icon: <GraduationCap size={14} />,
+    },
+    { title: "Scopus", value: academicLinks.scopus, icon: <Link2 size={14} /> },
+    {
+      title: "Google Scholar",
+      value: academicLinks.scholar,
+      icon: <Search size={14} />,
     },
   ];
 
   return (
-    <main id="main-content" className="min-h-screen bg-white px-4 pb-16 pt-28 text-ink sm:px-6 lg:px-10">
-      <div className="page-container">
-        <section>
-          <div className="flex flex-col gap-8 bg-surface-strong lg:flex-row lg:items-stretch">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={personData.profilePictureUrl}
-              alt={`${personData.fullName}'s profile picture`}
-              className="h-56 w-full object-cover grayscale lg:h-auto lg:w-72 lg:flex-none"
-            />
+    <div className="flex min-h-screen flex-col bg-[#ffffff] px-4 py-8 text-black sm:px-6 lg:px-10">
+      {/* REMOVE TEMP CLASSES (Bg text) AFTER INTEGRATION */}
 
-            <div className="flex flex-1 flex-col justify-center gap-4 px-6 pb-6 lg:px-2 lg:py-8">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-semibold tracking-tight">
-                  {personData.fullName}
-                </h1>
-                <p className="text-lg">{personData.position}</p>
-                <p className="text-sm font-medium">
-                  Supervisor {personData.isSupervisorAvailable ? "Available" : "Not Available"}
-                </p>
-              </div>
+      {/* PROFILE */}
+      <div className="flex flex-col">
+        {/* PROFILE HEAD*/}
+        <div className="flex flex-col gap-8 bg-primary-500 lg:flex-row lg:items-stretch">
+          {/* HEAD IMAGE */}
+          <img
+            src={personData.profilePictureUrl}
+            alt={`${personData.fullName}'s profile picture`}
+            className="h-56 w-full object-cover lg:h-auto lg:w-72 lg:flex-none"
+          />
 
-              <p className="max-w-2xl text-justify text-sm leading-6">
-                {personData.shortBio}
+          {/* HEAD BIO */}
+          <div className="flex flex-1 flex-col justify-center gap-4 lg:px-2">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-semibold tracking-tight">
+                {personData.fullName}
+              </h1>
+              <p className="text-lg ">{personData.position}</p>
+              <p className="text-sm font-medium">
+                Supervisor{" "}
+                {personData.isSupervisorAvailable
+                  ? "Available"
+                  : "Not Available"}
               </p>
-
-              <ul className="space-y-2 text-sm leading-6">
-                {personData.degrees.map((degree) => (
-                  <li key={degree}>{degree}</li>
-                ))}
-              </ul>
             </div>
 
-            <div className="flex flex-col justify-center gap-6 bg-white/25 p-6 lg:w-80 lg:flex-none">
-              {listSections.map((section) => (
-                <div key={section.title}>
-                  <h2 className="text-sm font-semibold uppercase tracking-[0.14em]">
-                    {section.title}
-                  </h2>
-                  <ul className="mt-3 space-y-2 text-sm leading-6">
-                    {section.items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
+            <p className="max-w-2xl text-sm leading-6 text-justify">
+              {personData.shortBio}
+            </p>
+
+            <ul className="space-y-2 text-sm leading-6 list-none">
+              {personData.degrees.map((degree) => (
+                <li key={degree}>{degree}</li>
               ))}
-            </div>
+            </ul>
           </div>
 
-          <div className="flex flex-col bg-surface-strong lg:flex-row lg:items-stretch">
-            <div className="flex min-h-56 flex-col p-4 lg:w-72 lg:flex-none">
-              <ul className="space-y-3 text-sm">
+          {/* HEAD ACADEMIC INFO */}
+          <div className="flex flex-col justify-center gap-6 bg-white/10 p-6 lg:w-80 lg:flex-none">
+            {listSections.map((section) => (
+              <div key={section.title}>
+                <h2 className="text-sm font-semibold uppercase tracking-[0.2em]">
+                  {section.title}
+                </h2>
+                <ul className="mt-3 space-y-1 text-sm leading-6 list-none">
+                  {section.title === "Teaching Assistants"
+                    ? personData.teachingAssistants.map((assistant) => (
+                        <li key={assistant.fullName} className="mt-2">
+                          <p className="font-medium">{assistant.fullName}</p>
+                          <p className="text-xs leading-5">
+                            {assistant.contact.email}
+                          </p>
+                          <p className="text-xs leading-5">
+                            {assistant.contact.phone}
+                          </p>
+                        </li>
+                      ))
+                    : section.items?.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* PROFILE BODY */}
+        <div className="flex flex-col bg-primary-500 lg:flex-row lg:items-stretch">
+          {/* BODY SUMMARY & CONTACT */}
+          <div className="flex min-h-56 flex-col bg-primary-500 p-4 lg:w-72 lg:flex-none">
+            <div className="flex-1">
+              {/* CONTACT INFO */}
+              <ul className="text-sm">
                 {contactItems.map((item) => (
-                  <li key={item.label} className="grid grid-cols-[1.5rem_1fr] items-start gap-3">
-                    <span className="flex size-5 items-center justify-center rounded-full border border-ink/30 text-[0.6rem] font-semibold">
+                  <li
+                    key={item.title}
+                    className="grid grid-cols-[1.5rem_1fr] items-start gap-3"
+                  >
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center text-primary-100">
                       {item.icon}
                     </span>
-                    <span className="break-words font-medium">{item.value}</span>
+                    <span className="font-medium text-justify">
+                      {item.value}
+                    </span>
                   </li>
                 ))}
               </ul>
-              <ul className="mt-4 space-y-3 text-sm">
+              {/* ACADEMIC LINKS */}
+              <ul className="mt-3 text-sm">
                 {academicLinkItems.map((item) => (
-                  <li key={item.label} className="grid grid-cols-[1.5rem_1fr] items-start gap-3">
-                    <span className="flex size-5 items-center justify-center rounded-full border border-ink/30 text-[0.55rem] font-semibold">
+                  <li
+                    key={item.title}
+                    className="grid grid-cols-[1.5rem_1fr] items-start gap-3"
+                  >
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center text-primary-100">
                       {item.icon}
                     </span>
                     <a
                       href={item.value}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium underline"
+                      className="font-medium text-justify text-primary-1000 underline"
                     >
-                      {item.label}
+                      {item.title}
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
-
-            <div className="flex-1 bg-white p-8">
-              <p className="text-justify leading-7">{personData.longBio}</p>
-            </div>
           </div>
-        </section>
+
+          {/* BODY LONG BIO*/}
+          <div className="flex bg-[#ffffff] p-8">
+            <p className="text-justify leading-6">{personData.longBio}</p>
+          </div>
+        </div>
       </div>
-    </main>
+      {/* PUBLICATIONS */}
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Publications</h1>
+        {personData.publications.length > 0 ? (
+          <ul className="mt-3 space-y-2 text-sm leading-6 list-none">
+            {personData.publications.map((publication) => (
+              <li key={publication.title} className="pb-2">
+                <a
+                  href={publication.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary-1000 underline decoration-primary-1000/40 underline-offset-2"
+                >
+                  {publication.title}
+                </a>
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-primary-800">
+                  <span>{publication.date}</span>
+                  <span aria-hidden="true">•</span>
+                  <span>{publication.type}</span>
+                  <span aria-hidden="true">•</span>
+                  <span>{publication.peopleInvolved.join(", ")}</span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {publication.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center rounded border border-primary-1000 px-2 py-1 text-xs leading-none text-primary-800"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm ">No publications found.</p>
+        )}
+      </div>
+      {/* AWARDS */}
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Awards & Honors
+        </h1>
+        {personData.awards.length > 0 ? (
+          <ul className="mt-3 space-y-2 text-sm leading-6 list-none">
+            {personData.awards.map((award) => (
+              <li key={award} className="pb-2">
+                <p className="font-medium text-primary-1000">{award}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm ">No awards found.</p>
+        )}
+      </div>
+    </div>
   );
 }
