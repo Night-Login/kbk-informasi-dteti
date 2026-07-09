@@ -20,6 +20,7 @@ export interface publication {
 export interface PersonLite {
   // TODO: Update types after the backend API is ready
   id: string;
+  id: string;
   fullName: string;
   position: string;
   isSupervisorAvailable: boolean;
@@ -50,3 +51,4 @@ export interface PersonFull extends PersonLite {
   publications: publication[];
   awards: string[];
 }
+
