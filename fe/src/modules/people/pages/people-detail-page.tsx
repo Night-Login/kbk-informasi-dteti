@@ -123,13 +123,11 @@ export default function Profile({ params }: { params: { id: string } }) {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#ffffff] px-4 py-8 text-black sm:px-6 lg:px-10">
-      {/* REMOVE TEMP CLASSES (Bg text) AFTER INTEGRATION */}
-
+    <div className="flex min-h-screen flex-col bg-white px-4 py-8 text-ink sm:px-6 lg:px-10">
       {/* PROFILE */}
       <div className="flex flex-col">
         {/* PROFILE HEAD*/}
-        <div className="flex flex-col gap-8 bg-primary-500 lg:flex-row lg:items-stretch">
+        <div className="flex flex-col gap-8 bg-surface-strong lg:flex-row lg:items-stretch">
           {/* HEAD IMAGE */}
           <img
             src={personData.profilePictureUrl}
@@ -140,11 +138,11 @@ export default function Profile({ params }: { params: { id: string } }) {
           {/* HEAD BIO */}
           <div className="flex flex-1 flex-col justify-center gap-4 lg:px-2">
             <div className="space-y-2">
-              <h1 className="text-3xl font-semibold tracking-tight">
+              <h1 className="text-3xl font-semibold tracking-tight text-ink">
                 {personData.fullName}
               </h1>
-              <p className="text-lg ">{personData.position}</p>
-              <p className="text-sm font-medium">
+              <p className="text-lg text-muted">{personData.position}</p>
+              <p className="text-sm font-medium text-muted">
                 Supervisor{" "}
                 {personData.isSupervisorAvailable
                   ? "Available"
@@ -152,11 +150,11 @@ export default function Profile({ params }: { params: { id: string } }) {
               </p>
             </div>
 
-            <p className="max-w-2xl text-sm leading-6 text-justify">
+            <p className="max-w-2xl text-sm leading-6 text-justify text-ink">
               {personData.shortBio}
             </p>
 
-            <ul className="space-y-2 text-sm leading-6 list-none">
+            <ul className="space-y-2 text-sm leading-6 list-none text-ink">
               {personData.degrees.map((degree) => (
                 <li key={degree}>{degree}</li>
               ))}
@@ -164,13 +162,13 @@ export default function Profile({ params }: { params: { id: string } }) {
           </div>
 
           {/* HEAD ACADEMIC INFO */}
-          <div className="flex flex-col justify-center gap-6 bg-white/10 p-6 lg:w-80 lg:flex-none">
+          <div className="flex flex-col justify-center gap-6 p-6 lg:w-80 lg:flex-none">
             {listSections.map((section) => (
               <div key={section.title}>
-                <h2 className="text-sm font-semibold uppercase tracking-[0.2em]">
+                <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-ink">
                   {section.title}
                 </h2>
-                <ul className="mt-3 space-y-1 text-sm leading-6 list-none">
+                <ul className="mt-3 space-y-1 text-sm leading-6 list-none text-ink">
                   {section.title === "Teaching Assistants"
                     ? personData.teachingAssistants.map((assistant) => (
                         <li key={assistant.fullName} className="mt-2">
@@ -191,18 +189,18 @@ export default function Profile({ params }: { params: { id: string } }) {
         </div>
 
         {/* PROFILE BODY */}
-        <div className="flex flex-col bg-primary-500 lg:flex-row lg:items-stretch">
+        <div className="flex flex-col bg-surface lg:flex-row lg:items-stretch">
           {/* BODY SUMMARY & CONTACT */}
-          <div className="flex min-h-56 flex-col bg-primary-500 p-4 lg:w-72 lg:flex-none">
+          <div className="flex min-h-56 flex-col bg-surface-strong p-4 lg:w-72 lg:flex-none">
             <div className="flex-1">
               {/* CONTACT INFO */}
-              <ul className="text-sm">
+              <ul className="text-sm text-ink">
                 {contactItems.map((item) => (
                   <li
                     key={item.title}
                     className="grid grid-cols-[1.5rem_1fr] items-start gap-3"
                   >
-                    <span className="flex h-4 w-4 shrink-0 items-center justify-center text-primary-100">
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center text-ink">
                       {item.icon}
                     </span>
                     <span className="font-medium text-justify">
@@ -212,20 +210,20 @@ export default function Profile({ params }: { params: { id: string } }) {
                 ))}
               </ul>
               {/* ACADEMIC LINKS */}
-              <ul className="mt-3 text-sm">
+              <ul className="mt-3 text-sm text-ink">
                 {academicLinkItems.map((item) => (
                   <li
                     key={item.title}
                     className="grid grid-cols-[1.5rem_1fr] items-start gap-3"
                   >
-                    <span className="flex h-4 w-4 shrink-0 items-center justify-center text-primary-100">
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center text-ink">
                       {item.icon}
                     </span>
                     <a
                       href={item.value}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium text-justify text-primary-1000 underline"
+                      className="font-medium text-justify text-ink underline"
                     >
                       {item.title}
                     </a>
@@ -236,14 +234,18 @@ export default function Profile({ params }: { params: { id: string } }) {
           </div>
 
           {/* BODY LONG BIO*/}
-          <div className="flex bg-[#ffffff] p-8">
-            <p className="text-justify leading-6">{personData.longBio}</p>
+          <div className="flex bg-white p-8 text-ink">
+            <p className="text-justify leading-6 text-ink">
+              {personData.longBio}
+            </p>
           </div>
         </div>
       </div>
       {/* PUBLICATIONS */}
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Publications</h1>
+      <div className="bg-white py-8 text-ink">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">
+          Publications
+        </h1>
         {personData.publications.length > 0 ? (
           <ul className="mt-3 space-y-2 text-sm leading-6 list-none">
             {personData.publications.map((publication) => (
@@ -252,11 +254,11 @@ export default function Profile({ params }: { params: { id: string } }) {
                   href={publication.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-medium text-primary-1000 underline decoration-primary-1000/40 underline-offset-2"
+                  className="font-medium text-ink underline decoration-ink/40 underline-offset-2"
                 >
                   {publication.title}
                 </a>
-                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-primary-800">
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-muted">
                   <span>{publication.date}</span>
                   <span aria-hidden="true">•</span>
                   <span>{publication.type}</span>
@@ -267,7 +269,7 @@ export default function Profile({ params }: { params: { id: string } }) {
                   {publication.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center rounded border border-primary-1000 px-2 py-1 text-xs leading-none text-primary-800"
+                      className="inline-flex items-center rounded border border-ink/10 px-2 py-1 text-xs leading-none text-ink"
                     >
                       {tag}
                     </span>
@@ -277,11 +279,11 @@ export default function Profile({ params }: { params: { id: string } }) {
             ))}
           </ul>
         ) : (
-          <p className="text-sm ">No publications found.</p>
+          <p className="text-sm text-muted">No publications found.</p>
         )}
       </div>
       {/* AWARDS */}
-      <div>
+      <div className="py-8 text-ink">
         <h1 className="text-2xl font-semibold tracking-tight">
           Awards & Honors
         </h1>
@@ -289,12 +291,12 @@ export default function Profile({ params }: { params: { id: string } }) {
           <ul className="mt-3 space-y-2 text-sm leading-6 list-none">
             {personData.awards.map((award) => (
               <li key={award} className="pb-2">
-                <p className="font-medium text-primary-1000">{award}</p>
+                <p className="font-medium text-ink">{award}</p>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-sm ">No awards found.</p>
+          <p className="text-sm text-muted">No awards found.</p>
         )}
       </div>
     </div>
