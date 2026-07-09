@@ -123,7 +123,7 @@ export default function Profile({ params }: { params: { id: string } }) {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-white px-4 py-8 text-ink sm:px-6 lg:px-10">
+    <main className="flex min-h-screen flex-col bg-white px-4 pb-16 pt-16 text-ink sm:px-6 lg:px-10">
       {/* PROFILE */}
       <div className="flex flex-col">
         {/* PROFILE HEAD*/}
@@ -299,6 +299,6 @@ export default function Profile({ params }: { params: { id: string } }) {
           <p className="text-sm text-muted">No awards found.</p>
         )}
       </div>
-    </div>
+    </main>
   );
 }
