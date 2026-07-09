@@ -1,14 +1,10 @@
 import { PersonFull } from "@/types/person";
 
-type ListSection = {
+type PersonInfoItem = {
   title: string;
-  items: string[];
-};
-
-type ContactItem = {
-  label: string;
-  value: string;
-  icon: string;
+  items?: string[];
+  value?: string;
+  icon?: string;
 };
 
 const jsonDummyData = {
@@ -39,13 +35,44 @@ const jsonDummyData = {
     "Neural Networks for Anatomical Analysis",
     "Computational Geometry",
   ],
-  teachingAssistants: ["Gian Giacomo Caprotti", "Francesco Melzi"],
+  teachingAssistants: [
+    {
+      fullName: "Gian Giacomo Caprotti",
+      profilePictureUrl: "https://example.com/caprotti.jpg",
+      contact: {
+        phone: "(+62)81234567891",
+        email: "caprotti.gian@ugm.ac.id",
+      },
+    },
+    {
+      fullName: "Francesco Melzi",
+      profilePictureUrl: "https://example.com/melzi.jpg",
+      contact: {
+        phone: "(+62)81234567892",
+        email: "melzi.francesco@ugm.ac.id",
+      },
+    },
+  ],
   advisees: ["Niccolò Machiavelli", "Ludovico Sforza", "Cesare Borgia"],
   academicLinks: {
     sinta: "https://sinta.kemdikbud.go.id/authors/profile/1452",
     scopus: "https://www.scopus.com/authid/detail.uri?authorId=1452",
     scholar: "https://scholar.google.com/citations?user=1452",
   },
+  publications: [
+    {
+      title: "A Novel Approach to Biomimetic Robotics",
+      link: "https://example.com/publication1",
+      type: "Journal Article",
+      date: "2023-01-01",
+      peopleInvolved: ["Prof. Leonardo da Vinci"],
+      tags: ["Robotics", "Biomimetics"],
+    },
+  ],
+  awards: [
+    "Best Paper Award at International Conference on Robotics 2022",
+    "Outstanding Researcher Award from the International Society of Artificial Intelligence 2021",
+  ],
 };
 
 export default function Profile({ params }: { params: { id: string } }) {
@@ -53,24 +80,29 @@ export default function Profile({ params }: { params: { id: string } }) {
 
   // TODO: Replace with actual data fetching logic
   const personData: PersonFull = jsonDummyData;
-  const listSections: ListSection[] = [
+  const listSections: PersonInfoItem[] = [
     { title: "Research Areas", items: personData.researchAreas },
-    { title: "Teaching Assistants", items: personData.teachingAssistants },
+    {
+      title: "Teaching Assistants",
+      items: personData.teachingAssistants.map(
+        (assistant) => assistant.fullName,
+      ),
+    },
     { title: "Advisees", items: personData.advisees },
   ];
 
   const contactInfo = personData.contact;
-  const contactItems: ContactItem[] = [
-    { label: "Email", value: contactInfo.email, icon: "E" },
-    { label: "Phone", value: contactInfo.phone, icon: "P" },
-    { label: "Office", value: contactInfo.labName, icon: "O" },
+  const contactItems: PersonInfoItem[] = [
+    { title: "Email", value: contactInfo.email, icon: "E" },
+    { title: "Phone", value: contactInfo.phone, icon: "P" },
+    { title: "Office", value: contactInfo.labName, icon: "O" },
   ];
 
   const academicLinks = personData.academicLinks;
-  const academicLinkItems: ContactItem[] = [
-    { label: "Sinta", value: academicLinks.sinta, icon: "S" },
-    { label: "Scopus", value: academicLinks.scopus, icon: "SC" },
-    { label: "Google Scholar", value: academicLinks.scholar, icon: "GS" },
+  const academicLinkItems: PersonInfoItem[] = [
+    { title: "Sinta", value: academicLinks.sinta, icon: "S" },
+    { title: "Scopus", value: academicLinks.scopus, icon: "SC" },
+    { title: "Google Scholar", value: academicLinks.scholar, icon: "GS" },
   ];
 
   return (
@@ -121,10 +153,20 @@ export default function Profile({ params }: { params: { id: string } }) {
                 <h2 className="text-sm font-semibold uppercase tracking-[0.2em]">
                   {section.title}
                 </h2>
-                <ul className="mt-3 space-y-2 text-sm leading-6 list-none">
-                  {section.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
+                <ul className="mt-3 space-y-1 text-sm leading-6 list-none">
+                  {section.title === "Teaching Assistants"
+                    ? personData.teachingAssistants.map((assistant) => (
+                        <li key={assistant.fullName} className="mt-2">
+                          <p className="font-medium">{assistant.fullName}</p>
+                          <p className="text-xs leading-5">
+                            {assistant.contact.email}
+                          </p>
+                          <p className="text-xs leading-5">
+                            {assistant.contact.phone}
+                          </p>
+                        </li>
+                      ))
+                    : section.items?.map((item) => <li key={item}>{item}</li>)}
                 </ul>
               </div>
             ))}
@@ -140,7 +182,7 @@ export default function Profile({ params }: { params: { id: string } }) {
               <ul className="text-sm">
                 {contactItems.map((item) => (
                   <li
-                    key={item.label}
+                    key={item.title}
                     className="grid grid-cols-[1.5rem_1fr] items-start gap-3"
                   >
                     <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary-100/30 text-[0.65rem] font-semibold uppercase text-primary-100">
@@ -156,7 +198,7 @@ export default function Profile({ params }: { params: { id: string } }) {
               <ul className="mt-3 text-sm">
                 {academicLinkItems.map((item) => (
                   <li
-                    key={item.label}
+                    key={item.title}
                     className="grid grid-cols-[1.5rem_1fr] items-start gap-3"
                   >
                     <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary-100/30 text-[0.65rem] font-semibold uppercase text-primary-100">
@@ -168,7 +210,7 @@ export default function Profile({ params }: { params: { id: string } }) {
                       rel="noopener noreferrer"
                       className="font-medium text-justify text-primary-1000 underline"
                     >
-                      {item.label}
+                      {item.title}
                     </a>
                   </li>
                 ))}
@@ -178,14 +220,64 @@ export default function Profile({ params }: { params: { id: string } }) {
 
           {/* BODY LONG BIO*/}
           <div className="flex bg-[#ffffff] p-8">
-              <p className="text-justify leading-6">{personData.longBio}</p>
+            <p className="text-justify leading-6">{personData.longBio}</p>
           </div>
         </div>
       </div>
       {/* PUBLICATIONS */}
-      <div></div>
-      {/* Awards */}
-      <div></div>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Publications</h1>
+        {personData.publications.length > 0 ? (
+          <ul className="mt-3 space-y-2 text-sm leading-6 list-none">
+            {personData.publications.map((publication) => (
+              <li key={publication.title} className="pb-2">
+                <a
+                  href={publication.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary-1000 underline decoration-primary-1000/40 underline-offset-2"
+                >
+                  {publication.title}
+                </a>
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5 text-primary-800">
+                  <span>{publication.date}</span>
+                  <span aria-hidden="true">•</span>
+                  <span>{publication.type}</span>
+                  <span aria-hidden="true">•</span>
+                  <span>{publication.peopleInvolved.join(", ")}</span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {publication.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center rounded border border-primary-1000 px-2 py-1 text-xs leading-none text-primary-800"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm ">No publications found.</p>
+        )}
+      </div>
+      {/* AWARDS */}
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Awards & Honors</h1>
+        {personData.awards.length > 0 ? (
+          <ul className="mt-3 space-y-2 text-sm leading-6 list-none">
+            {personData.awards.map((award) => (
+              <li key={award} className="pb-2">
+                <p className="font-medium text-primary-1000">{award}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm ">No awards found.</p>
+        )}
+      </div>
     </div>
   );
 }
