@@ -1,17 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: oklch(1 0 0);
-  --surface: oklch(0.965 0 0);
-  --surface-strong: oklch(0.83 0 0);
-  --ink: oklch(0.16 0 0);
-  --muted: oklch(0.39 0 0);
-  --line: oklch(0.76 0 0);
-  --focus: oklch(0.3 0 0);
+  --ugm-blue: oklch(0.3989 0.0884 238);
+  --ugm-blue-deep: oklch(0.319 0.075 238);
+  --ugm-blue-soft: oklch(0.945 0.018 238);
+  --ugm-blue-muted: oklch(0.88 0.025 238);
+  --ugm-yellow: oklch(0.8799 0.1805 94.4);
+  --ugm-yellow-soft: oklch(0.965 0.08 94.4);
+  --ugm-black: oklch(0.3004 0.0105 27.4);
+  --background: oklch(0.99 0.002 238);
+  --surface: oklch(0.965 0.004 238);
+  --surface-strong: oklch(0.9 0.006 238);
+  --ink: var(--ugm-black);
+  --muted: oklch(0.43 0.02 238);
+  --line: oklch(0.82 0.012 238);
+  --focus: var(--ugm-blue);
   --z-sticky: 40;
 }
 
 @theme inline {
+  --color-ugm-blue: var(--ugm-blue);
+  --color-ugm-blue-deep: var(--ugm-blue-deep);
+  --color-ugm-blue-soft: var(--ugm-blue-soft);
+  --color-ugm-blue-muted: var(--ugm-blue-muted);
+  --color-ugm-yellow: var(--ugm-yellow);
+  --color-ugm-yellow-soft: var(--ugm-yellow-soft);
+  --color-ugm-black: var(--ugm-black);
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-strong: var(--surface-strong);
@@ -44,17 +58,32 @@ a {
 }
 
 ::selection {
-  background: oklch(0.8 0 0);
-  color: var(--ink);
+  background: var(--ugm-yellow);
+  color: var(--ugm-black);
 }
 
 .page-container {
-  width: min(100% - 2rem, 108rem);
+  width: min(calc(100% - 2rem), 108rem);
   margin-inline: auto;
 }
 
 .section-space {
   padding-block: clamp(4rem, 7vw, 6rem);
+}
+
+.wireframe-checker {
+  background-color: oklch(0.98 0 0);
+  background-image:
+    linear-gradient(45deg, oklch(0.93 0 0) 25%, transparent 25%),
+    linear-gradient(-45deg, oklch(0.93 0 0) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, oklch(0.93 0 0) 75%),
+    linear-gradient(-45deg, transparent 75%, oklch(0.93 0 0) 75%);
+  background-position:
+    0 0,
+    0 1.5rem,
+    1.5rem -1.5rem,
+    -1.5rem 0;
+  background-size: 3rem 3rem;
 }
 
 .site-header {
@@ -68,7 +97,7 @@ a {
   z-index: 100;
   transform: translateY(-160%);
   border-radius: 0.25rem;
-  background: var(--ink);
+  background: var(--ugm-blue);
   padding: 0.75rem 1rem;
   color: white;
   font-weight: 700;
@@ -88,10 +117,10 @@ a {
   right: 0;
   bottom: 0;
   left: 0;
-  height: 1px;
+  height: 2px;
   transform: scaleX(0);
   transform-origin: right;
-  background: var(--ink);
+  background: var(--ugm-yellow);
   content: "";
   transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -102,15 +131,19 @@ a {
   transform-origin: left;
 }
 
+.nav-link.low-fi::after {
+  background: var(--ink);
+}
+
 @media (min-width: 640px) {
   .page-container {
-    width: min(100% - 3rem, 108rem);
+    width: min(calc(100% - 3rem), 108rem);
   }
 }
 
 @media (min-width: 1024px) {
   .page-container {
-    width: min(100% - 8rem, 108rem);
+    width: min(calc(100% - 8rem), 108rem);
   }
 }
 
