@@ -31,7 +31,7 @@ function LargeWireframeLink({
 
 export default function AcademicPage() {
   return (
-    <main id="main-content" className="bg-white pt-16 text-ink">
+    <main id="main-content" className="bg-white pt-16 text-ink sm:pt-20">
       <div className="page-container py-6">
         <Breadcrumbs
           items={[
@@ -122,7 +122,7 @@ export default function AcademicPage() {
             For general academic program inquiries, contact the department / KBK.
           </p>
           <Link
-            href="/#contact"
+            href="/contact"
             className="mt-2 inline-flex min-h-8 items-center gap-2 rounded-md border border-ink px-3 text-xs font-bold text-ink hover:bg-[oklch(0.94_0_0)]"
           >
             Contact us

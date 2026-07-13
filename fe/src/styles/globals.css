@@ -1,24 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --ugm-blue: oklch(0.3989 0.0884 238);
-  --ugm-blue-deep: oklch(0.319 0.075 238);
-  --ugm-blue-soft: oklch(0.945 0.018 238);
-  --ugm-blue-muted: oklch(0.88 0.025 238);
-  --ugm-yellow: oklch(0.8799 0.1805 94.4);
-  --ugm-yellow-soft: oklch(0.965 0.08 94.4);
-  --ugm-black: oklch(0.3004 0.0105 27.4);
-  --background: oklch(0.99 0.002 238);
-  --surface: oklch(0.965 0.004 238);
-  --surface-strong: oklch(0.9 0.006 238);
-  --ink: var(--ugm-black);
-  --muted: oklch(0.43 0.02 238);
-  --line: oklch(0.82 0.012 238);
-  --focus: var(--ugm-blue);
+  --dteti-blue: oklch(0.425 0.0871 246.2);
+  --dteti-blue-deep: oklch(0.3549 0.077 248.9);
+  --dteti-blue-soft: oklch(0.94 0.018 246.2);
+  --dteti-blue-muted: oklch(0.78 0.045 246.2);
+  --dteti-yellow: oklch(0.8258 0.1668 79.1);
+  --dteti-yellow-soft: oklch(0.95 0.08 79.1);
+  --dteti-ink: oklch(0.3136 0.0494 255.9);
+  --ugm-blue: var(--dteti-blue);
+  --ugm-blue-deep: var(--dteti-blue-deep);
+  --ugm-blue-soft: var(--dteti-blue-soft);
+  --ugm-blue-muted: var(--dteti-blue-muted);
+  --ugm-yellow: var(--dteti-yellow);
+  --ugm-yellow-soft: var(--dteti-yellow-soft);
+  --ugm-black: var(--dteti-ink);
+  --background: oklch(0.99 0.002 246.2);
+  --surface: oklch(0.965 0.004 246.2);
+  --surface-strong: oklch(0.9 0.006 246.2);
+  --ink: var(--dteti-ink);
+  --muted: oklch(0.43 0.02 246.2);
+  --line: oklch(0.82 0.012 246.2);
+  --focus: var(--dteti-yellow);
   --z-sticky: 40;
 }
 
 @theme inline {
+  --color-dteti-blue: var(--dteti-blue);
+  --color-dteti-blue-deep: var(--dteti-blue-deep);
+  --color-dteti-blue-soft: var(--dteti-blue-soft);
+  --color-dteti-blue-muted: var(--dteti-blue-muted);
+  --color-dteti-yellow: var(--dteti-yellow);
+  --color-dteti-yellow-soft: var(--dteti-yellow-soft);
+  --color-dteti-ink: var(--dteti-ink);
   --color-ugm-blue: var(--ugm-blue);
   --color-ugm-blue-deep: var(--ugm-blue-deep);
   --color-ugm-blue-soft: var(--ugm-blue-soft);

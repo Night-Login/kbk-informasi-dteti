@@ -1,35 +1,21 @@
-"use client";
-
 import { Mail, MapPin } from "lucide-react";
-import { usePathname } from "next/navigation";
 import BrandMark from "@/components/global/brand-mark";
 
-const socialLinks = ["IG", "in", "f", "GH", "TT"];
+const socialLinks = [
+  { label: "Instagram", short: "IG" },
+  { label: "LinkedIn", short: "in" },
+  { label: "Facebook", short: "f" },
+  { label: "GitHub", short: "GH" },
+  { label: "TikTok", short: "TT" },
+];
 
 export default function Footer() {
-  const pathname = usePathname();
-  const isWireframeRoute = [
-    "/academic",
-    "/research",
-    "/research-areas",
-    "/tag-research-areas",
-  ].some((route) => pathname === route || pathname.startsWith(`${route}/`));
-
   return (
-    <footer
-      id="contact"
-      className={isWireframeRoute ? "bg-[oklch(0.86_0_0)] text-ink" : "bg-ugm-blue text-white"}
-    >
+    <footer id="contact" className="bg-dteti-blue text-white">
       <div className="page-container grid gap-12 py-14 md:grid-cols-[1fr_0.9fr] md:gap-24">
-        <div className="max-w-sm">
-          <div
-            className={`inline-flex bg-white px-5 py-4 ${
-              isWireframeRoute ? "grayscale" : ""
-            }`}
-          >
-            <BrandMark />
-          </div>
-          <p className={`mt-6 text-xs leading-5 ${isWireframeRoute ? "text-ink" : "text-white"}`}>
+        <div className="max-w-md">
+          <BrandMark />
+          <p className="mt-6 text-xs leading-5 text-white/90">
             About us: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             Pellentesque fringilla nisl elit, sit amet fermentum nisi consequat
             et. Nam sit amet metus in sem mollis hendrerit eget nec tellus.
@@ -38,35 +24,25 @@ export default function Footer() {
         </div>
 
         <div>
-          <h2 className={`text-2xl font-bold ${isWireframeRoute ? "text-ink" : "text-white"}`}>
-            Social Media
-          </h2>
+          <h2 className="text-2xl font-bold text-white">Social Media</h2>
           <div className="mt-5 flex flex-wrap gap-4" aria-label="Media sosial">
-            {socialLinks.map((label) => (
+            {socialLinks.map(({ label, short }) => (
               <a
                 key={label}
                 href="#contact"
                 aria-label={label}
-                className={`grid size-9 place-items-center rounded-full text-[0.65rem] font-bold ${
-                  isWireframeRoute
-                    ? "bg-ink text-white hover:bg-muted"
-                    : "bg-white text-ugm-blue hover:bg-ugm-yellow hover:text-ugm-black"
-                }`}
+                className="grid size-9 place-items-center rounded-full text-sm font-extrabold text-white transition-colors duration-200 hover:bg-white/10 hover:text-dteti-yellow"
               >
-                {label}
+                {short}
               </a>
             ))}
           </div>
 
-          <h2 className={`mt-8 text-2xl font-bold ${isWireframeRoute ? "text-ink" : "text-white"}`}>
-            Contact Us
-          </h2>
-          <div className={`mt-4 space-y-4 text-sm ${isWireframeRoute ? "text-ink" : "text-white"}`}>
+          <h2 className="mt-8 text-2xl font-bold text-white">Contact Us</h2>
+          <div className="mt-4 space-y-4 text-sm text-white/90">
             <a
               href="mailto:KBKDTETI@mail.ugm.ac.id"
-              className={`flex items-center gap-3 hover:underline ${
-                isWireframeRoute ? "hover:text-ink" : "hover:text-ugm-yellow"
-              }`}
+              className="flex items-center gap-3 hover:text-dteti-yellow hover:underline"
             >
               <Mail size={18} aria-hidden="true" />
               KBKDTETI@mail.ugm.ac.id

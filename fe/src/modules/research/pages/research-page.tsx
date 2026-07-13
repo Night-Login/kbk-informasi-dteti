@@ -28,7 +28,7 @@ function ResearchLandingCard({
 
 export default function ResearchPage() {
   return (
-    <main id="main-content" className="bg-white pt-16 text-ink">
+    <main id="main-content" className="bg-white pt-16 text-ink sm:pt-20">
       <div className="page-container py-6">
         <Breadcrumbs
           items={[

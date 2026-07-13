@@ -8,10 +8,10 @@ const baseClass =
   "inline-flex min-h-10 items-center justify-center gap-2 rounded-md font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
 
 const variantClass: Record<ButtonVariant, string> = {
-  solid: "bg-ugm-blue text-white hover:bg-ugm-blue-deep",
+  solid: "bg-dteti-yellow text-dteti-ink hover:bg-dteti-yellow/85",
   outline:
-    "border border-ugm-blue bg-white text-ugm-blue hover:bg-ugm-blue-soft",
-  ghost: "bg-transparent text-ugm-blue hover:bg-ugm-blue-soft",
+    "border border-dteti-blue bg-white text-dteti-blue hover:bg-dteti-blue-soft",
+  ghost: "bg-transparent text-dteti-blue hover:bg-dteti-blue-soft",
 };
 
 const sizeClass: Record<ButtonSize, string> = {

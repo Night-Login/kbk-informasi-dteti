@@ -121,7 +121,7 @@ export default function Profile() {
   ];
 
   return (
-    <main className="flex min-h-screen flex-col bg-white px-4 pb-16 pt-16 text-ink sm:px-6 lg:px-10">
+    <main className="flex min-h-screen flex-col bg-white px-4 pb-16 pt-16 text-ink sm:px-6 sm:pt-20 lg:px-10">
       {/* PROFILE */}
       <div className="flex flex-col">
         {/* PROFILE HEAD*/}

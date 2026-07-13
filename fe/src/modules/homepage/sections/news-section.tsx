@@ -8,7 +8,7 @@ export default function NewsSection() {
   return (
     <section id="news" className="section-space bg-white">
       <div className="page-container">
-        <h2 className="text-center text-2xl font-extrabold text-ugm-blue">
+        <h2 className="text-center text-2xl font-extrabold text-dteti-blue">
           Latest News
         </h2>
 
@@ -16,7 +16,7 @@ export default function NewsSection() {
           {newsItems.map((item, index) => (
             <article
               key={`${item.title}-${index}`}
-              className="overflow-hidden rounded-xl border border-line bg-white transition-colors duration-200 hover:border-ugm-blue/45"
+              className="overflow-hidden rounded-xl border border-line bg-white shadow-[0_4px_8px_rgb(0_0_0_/_0.18)] transition-colors duration-200 hover:border-dteti-blue/45"
             >
               <div className="relative h-52 bg-surface-strong">
                 <Image
@@ -28,8 +28,8 @@ export default function NewsSection() {
                 />
               </div>
               <div className="p-4">
-                <h3 className="text-base font-extrabold leading-5 text-ink">
-                  <Link href="#news" className="hover:text-ugm-blue hover:underline">
+                <h3 className="text-base font-extrabold leading-5 text-dteti-blue">
+                  <Link href="#news" className="hover:underline">
                     {item.title}
                   </Link>
                 </h3>

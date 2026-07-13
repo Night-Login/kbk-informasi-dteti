@@ -7,19 +7,19 @@ type BrandMarkProps = {
 
 export default function BrandMark({ compact = false }: BrandMarkProps) {
   const logoSize = compact
-    ? { width: 192, height: 36 }
-    : { width: 300, height: 56 };
+    ? { width: 184, height: 80 }
+    : { width: 360, height: 156 };
 
   return (
     <Link
       href="/"
-      aria-label="Universitas Gadjah Mada, kembali ke beranda"
+      aria-label="Departemen Teknik Elektro dan Teknologi Informasi, kembali ke beranda"
       className={`inline-flex shrink-0 items-center ${
-        compact ? "h-10 w-44 sm:w-48" : "h-16 w-72"
+        compact ? "h-12 w-32 sm:h-14 sm:w-40" : "h-28 w-64 sm:w-80"
       }`}
     >
       <Image
-        src="/images/logo-ugm.svg"
+        src="/images/logo-dteti.png"
         alt=""
         width={logoSize.width}
         height={logoSize.height}

@@ -6,7 +6,7 @@ export default function EventsSection() {
   return (
     <section id="events" className="bg-white pb-[clamp(4rem,7vw,6rem)]">
       <div className="page-container">
-        <h2 className="text-center text-2xl font-extrabold text-ugm-blue">
+        <h2 className="text-center text-2xl font-extrabold text-dteti-blue">
           Events
         </h2>
 
@@ -14,20 +14,20 @@ export default function EventsSection() {
           {events.map((event, index) => (
             <article
               key={`${event.title}-${index}`}
-              className="grid grid-cols-[70px_1fr] items-center gap-5 border border-line bg-surface px-5 py-4"
+              className="grid grid-cols-[70px_1fr] items-center gap-5 bg-dteti-blue px-5 py-4 text-white"
             >
-              <time className="grid h-16 place-items-center bg-ugm-blue text-center text-base font-extrabold leading-5 text-white">
+              <time className="grid h-16 place-items-center bg-dteti-yellow text-center text-base font-extrabold leading-5 text-dteti-ink">
                 <span>
                   {event.day}
                   <br />
-                  <span className="text-ugm-yellow">{event.month}</span>
+                  {event.month}
                 </span>
               </time>
               <div>
-                <h3 className="text-base font-extrabold text-ink">
+                <h3 className="text-base font-extrabold text-white">
                   {event.title}
                 </h3>
-                <p className="mt-4 text-xs text-ink">
+                <p className="mt-4 text-xs text-white/90">
                   {event.time} <span aria-hidden="true">|</span>{" "}
                   {event.location}
                 </p>
