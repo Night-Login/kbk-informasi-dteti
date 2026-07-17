@@ -21,7 +21,7 @@ function ResearchCard({
         sizes="(min-width: 1024px) 320px, 100vw"
         className="object-cover grayscale transition-transform duration-300 group-hover:scale-[1.02]"
       />
-      <span className="absolute inset-x-0 bottom-0 bg-white/88 px-2 py-1.5 text-sm font-extrabold text-ink">
+      <span className="absolute inset-x-0 bottom-0 bg-white/92 px-2 py-1.5 text-sm font-extrabold text-dteti-ink">
         {item.title}
       </span>
     </Link>
@@ -30,13 +30,13 @@ function ResearchCard({
 
 export default function ResearchSection() {
   return (
-    <section id="research" className="section-space bg-[oklch(0.79_0_0)]">
+    <section id="research" className="section-space bg-dteti-blue">
       <div className="page-container grid gap-12 lg:grid-cols-[0.8fr_1.35fr] lg:items-center">
         <div className="max-w-md">
-          <h2 className="text-2xl font-extrabold tracking-[-0.02em] text-ink">
+          <h2 className="text-2xl font-extrabold tracking-[-0.02em] text-dteti-yellow">
             Highlight Research Areas
           </h2>
-          <p className="mt-5 text-sm leading-5 text-ink">
+          <p className="mt-5 text-sm leading-5 text-white/90">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             Pellentesque fringilla nisl elit, sit amet fermentum nisi consequat
             et. Nam sit amet metus in sem mollis hendrerit eget nec tellus.

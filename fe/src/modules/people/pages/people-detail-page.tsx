@@ -7,6 +7,7 @@ import {
   Phone,
   Search,
 } from "lucide-react";
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 type PersonInfoItem = {
@@ -21,8 +22,7 @@ const jsonDummyData = {
   fullName: "Prof. Leonardo da Vinci, S.Kom., M.Cs., Ph.D.",
   position: "Professor of Artificial Intelligence & Robotics",
   isSupervisorAvailable: true,
-  profilePictureUrl:
-    "https://upload.wikimedia.org/wikipedia/commons/0/0c/Leonardo-da-vinci-posible-autorretrato-del-artista-galeria-de-los-uffizi-florencia_1c92d9d7_2.png",
+  profilePictureUrl: "/images/news-students.jpg",
   contact: {
     labName:
       "Laboratorium Komputasi Cerdas dan Robotika (Intelligence Computation and Robotics Lab)",
@@ -84,9 +84,7 @@ const jsonDummyData = {
   ],
 };
 
-export default function Profile({ params }: { params: { id: string } }) {
-  const { id } = params;
-
+export default function Profile() {
   // TODO: Replace with actual data fetching logic
   const personData: PersonFull = jsonDummyData;
   const listSections: PersonInfoItem[] = [
@@ -123,17 +121,21 @@ export default function Profile({ params }: { params: { id: string } }) {
   ];
 
   return (
-    <main className="flex min-h-screen flex-col bg-white px-4 pb-16 pt-16 text-ink sm:px-6 lg:px-10">
+    <main className="flex min-h-screen flex-col bg-white px-4 pb-16 pt-16 text-ink sm:px-6 sm:pt-20 lg:px-10">
       {/* PROFILE */}
       <div className="flex flex-col">
         {/* PROFILE HEAD*/}
         <div className="flex flex-col gap-8 bg-surface-strong lg:flex-row lg:items-stretch">
           {/* HEAD IMAGE */}
-          <img
-            src={personData.profilePictureUrl}
-            alt={`${personData.fullName}'s profile picture`}
-            className="h-56 w-full object-cover lg:h-auto lg:w-72 lg:flex-none"
-          />
+          <div className="relative h-56 w-full lg:h-auto lg:min-h-80 lg:w-72 lg:flex-none">
+            <Image
+              src={personData.profilePictureUrl ?? "/images/news-students.jpg"}
+              alt={`${personData.fullName}'s profile picture`}
+              fill
+              sizes="(min-width: 1024px) 18rem, 100vw"
+              className="object-cover"
+            />
+          </div>
 
           {/* HEAD BIO */}
           <div className="flex flex-1 flex-col justify-center gap-4 lg:px-2">

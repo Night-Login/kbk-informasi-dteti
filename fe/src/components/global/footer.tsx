@@ -1,15 +1,21 @@
 import { Mail, MapPin } from "lucide-react";
 import BrandMark from "@/components/global/brand-mark";
 
-const socialLinks = ["IG", "in", "f", "GH", "TT"];
+const socialLinks = [
+  { label: "Instagram", short: "IG" },
+  { label: "LinkedIn", short: "in" },
+  { label: "Facebook", short: "f" },
+  { label: "GitHub", short: "GH" },
+  { label: "TikTok", short: "TT" },
+];
 
 export default function Footer() {
   return (
-    <footer id="contact" className="bg-surface-strong">
+    <footer id="contact" className="bg-dteti-blue text-white">
       <div className="page-container grid gap-12 py-14 md:grid-cols-[1fr_0.9fr] md:gap-24">
-        <div className="max-w-sm">
+        <div className="max-w-md">
           <BrandMark />
-          <p className="mt-6 text-xs leading-5 text-ink">
+          <p className="mt-6 text-xs leading-5 text-white/90">
             About us: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             Pellentesque fringilla nisl elit, sit amet fermentum nisi consequat
             et. Nam sit amet metus in sem mollis hendrerit eget nec tellus.
@@ -18,25 +24,25 @@ export default function Footer() {
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold text-ink">Social Media</h2>
+          <h2 className="text-2xl font-bold text-white">Social Media</h2>
           <div className="mt-5 flex flex-wrap gap-4" aria-label="Media sosial">
-            {socialLinks.map((label) => (
+            {socialLinks.map(({ label, short }) => (
               <a
                 key={label}
                 href="#contact"
                 aria-label={label}
-                className="grid size-9 place-items-center rounded-full bg-ink text-[0.65rem] font-bold text-white hover:bg-muted"
+                className="grid size-9 place-items-center rounded-full text-sm font-extrabold text-white transition-colors duration-200 hover:bg-white/10 hover:text-dteti-yellow"
               >
-                {label}
+                {short}
               </a>
             ))}
           </div>
 
-          <h2 className="mt-8 text-2xl font-bold text-ink">Contact Us</h2>
-          <div className="mt-4 space-y-4 text-sm text-ink">
+          <h2 className="mt-8 text-2xl font-bold text-white">Contact Us</h2>
+          <div className="mt-4 space-y-4 text-sm text-white/90">
             <a
               href="mailto:KBKDTETI@mail.ugm.ac.id"
-              className="flex items-center gap-3 hover:underline"
+              className="flex items-center gap-3 hover:text-dteti-yellow hover:underline"
             >
               <Mail size={18} aria-hidden="true" />
               KBKDTETI@mail.ugm.ac.id
