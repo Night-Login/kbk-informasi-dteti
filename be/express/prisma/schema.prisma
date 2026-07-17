@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+}
+
+model ResearchCluster {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  slug        String        @unique
+  description String?
+  sort_order  Int?
+  tags        ResearchTag[]
+
+  @@map("research_clusters")
+}
+
+model ResearchTag {
+  id          String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  slug        String                @unique
+  cluster_id  String                @db.Uuid
+  description String?
+  is_active   Boolean               @default(true)
+  cluster     ResearchCluster       @relation(fields: [cluster_id], references: [id])
+  lecturers   LecturerResearchTag[]
+
+  @@map("research_tags")
+}
+
+model LecturerResearchTag {
+  lecturer_id String      @db.Uuid
+  tag_id      String      @db.Uuid
+  is_primary  Boolean     @default(false)
+  lecturer    Lecturer    @relation(fields: [lecturer_id], references: [id], onDelete: Cascade)
+  tag         ResearchTag @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([lecturer_id, tag_id])
+  @@map("lecturer_research_tags")
+}
+
+model Lecturer {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name           String
+  academic_title      String?
+  slug                String                @unique
+  nip_or_staff_id     String
+  email               String?
+  sinta_id            String                @unique
+  scopus_author_id    String?
+  google_scholar_url  String?
+  google_scholar_id   String?
+  orcid_id            String?
+  openalex_author_id  String?
+  semantic_scholar_id String?
+  supervision_status  String?
+  is_active           Boolean               @default(true)
+  source_csv_row_ref  String?
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @updatedAt
+  metrics             LecturerMetric?
+  publications        LecturerPublication[]
+  research_tags       LecturerResearchTag[]
+
+  @@map("lecturers")
+}
+
+model LecturerMetric {
+  lecturer_id     String   @id @db.Uuid
+  h_index         Int      @default(0)
+  total_citations Int      @default(0)
+  sinta_score     Float?
+  source          String?
+  fetched_at      DateTime @default(now())
+  lecturer        Lecturer @relation(fields: [lecturer_id], references: [id], onDelete: Cascade)
+
+  @@map("lecturer_metrics")
+}
+
+model Publication {
+  id               String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title            String
+  slug             String
+  year             Int
+  publication_date String?
+  authors_text     String?
+  venue            String?
+  publication_type String?
+  doi              String?               @unique
+  url              String?
+  abstract         String?
+  citation_count   Int                   @default(0)
+  source           String                @default("OPENALEX")
+  external_ids     Json?
+  verified_status  String                @default("NEEDS_REVIEW")
+  fetch_batch_id   String?
+  created_at       DateTime              @default(now())
+  updated_at       DateTime              @updatedAt
+  lecturers        LecturerPublication[]
+
+  @@map("publications")
+}
+
+model LecturerPublication {
+  lecturer_id    String      @db.Uuid
+  publication_id String      @db.Uuid
+  author_order   Int?
+  lecturer       Lecturer    @relation(fields: [lecturer_id], references: [id], onDelete: Cascade)
+  publication    Publication @relation(fields: [publication_id], references: [id], onDelete: Cascade)
+
+  @@id([lecturer_id, publication_id])
+  @@map("lecturer_publications")
+}
