@@ -6,6 +6,8 @@
   "scripts": {
     "postinstall": "npm run install:express",
     "install:express": "cd express && npm install",
+    "build:express": "cd express && npm run build",
+    "build": "npm run build:express",
     "start:express": "cd express && npm start",
     "start:directus": "cd directus && docker compose up -d",
     "start": "concurrently -c \"cyan,magenta\" -n \"EXPRESS,DIRECTUS\" \"npm run start:express\" \"npm run start:directus\"",

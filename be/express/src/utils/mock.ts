@@ -1,4 +1,6 @@
-export const mockPublications = [
+import { Publication, Lecturer, Project } from "../types/index.js";
+
+export const mockPublications: Publication[] = [
     {
         id: "pub-1",
         title: "Deep Learning for Automated Medical Image Analysis",
@@ -14,8 +16,8 @@ export const mockPublications = [
     }
 ];
 
-export const mockLecturers = [
- {
+export const mockLecturers: Lecturer[] = [
+    {
         id: "a1b2c3d4",
         full_name: "Prof. Dr. Eng. Budi Santoso",
         academic_title: "Prof. Dr. Eng.",
@@ -29,9 +31,9 @@ export const mockLecturers = [
         is_active: true,
         research_tags: [{ id: "tag-1", name: "Machine Learning", slug: "machine-learning" }]
     }
-  ];
+];
 
-export const mockProjects = [
+export const mockProjects: Project[] = [
     {
         id: "proj-1",
         title: "AI in Healthcare",
