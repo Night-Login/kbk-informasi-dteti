@@ -3,6 +3,7 @@
 :root {
   --dteti-blue: oklch(0.425 0.0871 246.2);
   --dteti-blue-deep: oklch(0.3549 0.077 248.9);
+  --dteti-sky: oklch(0.6704 0.1094 247.16);
   --dteti-blue-soft: oklch(0.94 0.018 246.2);
   --dteti-blue-muted: oklch(0.78 0.045 246.2);
   --dteti-yellow: oklch(0.8258 0.1668 79.1);
@@ -22,12 +23,19 @@
   --muted: oklch(0.43 0.02 246.2);
   --line: oklch(0.82 0.012 246.2);
   --focus: var(--dteti-yellow);
+  --dteti-gradient: linear-gradient(
+    105deg,
+    var(--dteti-blue-deep) 0%,
+    var(--dteti-blue) 68%,
+    var(--dteti-sky) 100%
+  );
   --z-sticky: 40;
 }
 
 @theme inline {
   --color-dteti-blue: var(--dteti-blue);
   --color-dteti-blue-deep: var(--dteti-blue-deep);
+  --color-dteti-sky: var(--dteti-sky);
   --color-dteti-blue-soft: var(--dteti-blue-soft);
   --color-dteti-blue-muted: var(--dteti-blue-muted);
   --color-dteti-yellow: var(--dteti-yellow);
@@ -102,6 +110,11 @@ a {
 
 .site-header {
   z-index: var(--z-sticky);
+}
+
+.brand-gradient {
+  background-color: var(--dteti-blue);
+  background-image: var(--dteti-gradient);
 }
 
 .skip-link {

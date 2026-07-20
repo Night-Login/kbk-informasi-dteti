@@ -10,7 +10,7 @@ const navigation = [
   { label: "Research", href: "/research", dropdown: true },
   { label: "People", href: "/people" },
   { label: "Publication", href: "/publication" },
-  { label: "Academic", href: "/academic" },
+  { label: "Academic", href: "/academics" },
   { label: "Update", href: "/#news", dropdown: true },
   { label: "Contact", href: "/contact" },
 ];
@@ -20,7 +20,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="site-header fixed inset-x-0 top-0 border-b-2 border-dteti-yellow bg-dteti-blue">
+    <header className="site-header brand-gradient fixed inset-x-0 top-0 border-b-2 border-dteti-yellow">
       <div className="page-container flex h-16 items-center justify-between sm:h-20">
         <BrandMark compact />
 
@@ -63,7 +63,7 @@ export default function Navbar() {
 
       <nav
         id="mobile-navigation"
-        className={`${isOpen ? "block" : "hidden"} border-t border-white/15 bg-dteti-blue px-4 py-4 lg:hidden`}
+        className={`${isOpen ? "block" : "hidden"} brand-gradient border-t border-white/15 px-4 py-4 lg:hidden`}
         aria-label="Navigasi perangkat seluler"
       >
         <div className="page-container flex flex-col">

@@ -30,7 +30,7 @@ function ResearchCard({
 
 export default function ResearchSection() {
   return (
-    <section id="research" className="section-space bg-dteti-blue">
+    <section id="research" className="brand-gradient section-space">
       <div className="page-container grid gap-12 lg:grid-cols-[0.8fr_1.35fr] lg:items-center">
         <div className="max-w-md">
           <h2 className="text-2xl font-extrabold tracking-[-0.02em] text-dteti-yellow">

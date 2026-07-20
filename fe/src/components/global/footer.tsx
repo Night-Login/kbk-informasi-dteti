@@ -11,7 +11,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer id="contact" className="bg-dteti-blue text-white">
+    <footer id="contact" className="brand-gradient text-white">
       <div className="page-container grid gap-12 py-14 md:grid-cols-[1fr_0.9fr] md:gap-24">
         <div className="max-w-md">
           <BrandMark />
