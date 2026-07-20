@@ -75,6 +75,8 @@ model Project {
   partner_names    String?
   funding_source   String?
   visibility       Visibility?          @default(PUBLIC)
+  lead_lecturer_id String?              @db.Uuid
+  lead_lecturer    Lecturer?            @relation("ProjectLead", fields: [lead_lecturer_id], references: [id], onDelete: SetNull)
   created_at       DateTime             @default(now())
   updated_at       DateTime             @updatedAt
   deleted_at       DateTime?
