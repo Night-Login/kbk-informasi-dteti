@@ -532,3 +532,34 @@ export async function uploadPhoto(req: Request, res: Response, next: NextFunctio
         next(error);
     }
 }
+
+/*
+    Name           : Import lecturers CSV/JSON items controller
+    Description    : Batch imports or upserts lecturers from CSV or JSON items
+    Request params : items array
+    Action         : batch import or upsert lecturer data
+    Response       : success or error message with import summary
+*/
+export async function importLecturersCSV(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const items = req.body.items || req.body;
+
+        if (!items || !Array.isArray(items)) {
+            res.status(400).json({
+                success: false,
+                message: "Items array is required for batch import"
+            });
+            return;
+        }
+
+        const result = await lecturerService.importLecturersCSV(items);
+
+        res.status(200).json({
+            success: true,
+            message: "Lecturers import process completed",
+            data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+}

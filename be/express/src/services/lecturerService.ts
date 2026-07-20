@@ -515,3 +515,100 @@ export const updateLecturerPhoto = async (id: string, photoUrl: string): Promise
 
     return updated as unknown as Lecturer;
 };
+
+/**
+ * Batch import or upsert lecturers from CSV items or JSON array
+ */
+export const importLecturersCSV = async (
+    items?: any[] | any
+): Promise<{ imported: number; updated: number; errors: number } | boolean> => {
+    if (!items || !Array.isArray(items)) {
+        return true;
+    }
+
+    let imported = 0;
+    let updated = 0;
+    let errors = 0;
+
+    for (const item of items) {
+        try {
+            if (!item.full_name) {
+                errors++;
+                continue;
+            }
+
+            const slug = item.slug || item.full_name
+                .replace(/^(Dr\.|Prof\.|Ir\.)\s*/gi, "")
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-|-$/g, "");
+
+            const nipOrStaffId = item.nip_or_staff_id || item.nip || item.nidn || `staff-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+            const existing = await prisma.lecturer.findFirst({
+                where: {
+                    OR: [
+                        { slug },
+                        item.sinta_id ? { sinta_id: item.sinta_id } : { slug: "___never___" }
+                    ]
+                }
+            });
+
+            if (existing) {
+                await prisma.lecturer.update({
+                    where: { id: existing.id },
+                    data: {
+                        full_name: item.full_name || existing.full_name,
+                        slug: slug || existing.slug,
+                        academic_title: item.academic_title !== undefined ? item.academic_title : existing.academic_title,
+                        nip_or_staff_id: item.nip_or_staff_id || item.nip || existing.nip_or_staff_id,
+                        email: item.email !== undefined ? item.email : existing.email,
+                        photo_url: item.photo_url !== undefined ? item.photo_url : existing.photo_url,
+                        short_bio: item.short_bio !== undefined ? item.short_bio : existing.short_bio,
+                        bio: item.bio !== undefined ? item.bio : existing.bio,
+                        sinta_id: item.sinta_id !== undefined ? item.sinta_id : existing.sinta_id,
+                        scopus_author_id: item.scopus_author_id !== undefined ? item.scopus_author_id : existing.scopus_author_id,
+                        google_scholar_url: item.google_scholar_url !== undefined ? item.google_scholar_url : existing.google_scholar_url,
+                        google_scholar_id: item.google_scholar_id !== undefined ? item.google_scholar_id : existing.google_scholar_id,
+                        orcid_id: item.orcid_id !== undefined ? item.orcid_id : existing.orcid_id,
+                        openalex_author_id: item.openalex_author_id !== undefined ? item.openalex_author_id : existing.openalex_author_id,
+                        semantic_scholar_id: item.semantic_scholar_id !== undefined ? item.semantic_scholar_id : existing.semantic_scholar_id,
+                        supervision_status: item.supervision_status !== undefined ? item.supervision_status : existing.supervision_status,
+                        is_active: item.is_active !== undefined ? (item.is_active === "true" || item.is_active === true) : existing.is_active,
+                        deleted_at: null
+                    }
+                });
+                updated++;
+            } else {
+                const sintaId = item.sinta_id || `sinta-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+                await prisma.lecturer.create({
+                    data: {
+                        full_name: item.full_name,
+                        slug,
+                        academic_title: item.academic_title || null,
+                        nip_or_staff_id: nipOrStaffId,
+                        email: item.email || null,
+                        photo_url: item.photo_url || null,
+                        short_bio: item.short_bio || null,
+                        bio: item.bio || null,
+                        sinta_id: sintaId,
+                        scopus_author_id: item.scopus_author_id || null,
+                        google_scholar_url: item.google_scholar_url || null,
+                        google_scholar_id: item.google_scholar_id || null,
+                        orcid_id: item.orcid_id || null,
+                        openalex_author_id: item.openalex_author_id || null,
+                        semantic_scholar_id: item.semantic_scholar_id || null,
+                        supervision_status: item.supervision_status || "AVAILABLE",
+                        is_active: item.is_active !== undefined ? (item.is_active === "true" || item.is_active === true) : true
+                    }
+                });
+                imported++;
+            }
+        } catch (err) {
+            console.error("Error importing lecturer item:", err);
+            errors++;
+        }
+    }
+
+    return { imported, updated, errors };
+};
