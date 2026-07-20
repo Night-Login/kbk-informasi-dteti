@@ -12,6 +12,32 @@ import {
 import { Prisma } from "@prisma/client";
 
 /**
+ * Common include clause for ResearchCluster queries
+ */
+const clusterIncludeClause = {
+    tags: {
+        where: { deleted_at: null },
+        include: {
+            _count: {
+                select: { lecturers: true }
+            }
+        }
+    }
+};
+
+/**
+ * Common include clause for ResearchTag queries
+ */
+const tagIncludeClause = {
+    cluster: true,
+    lecturers: {
+        include: {
+            lecturer: true
+        }
+    }
+};
+
+/**
  * Get overall research summary and data (clusters, tags, statistics)
  * Keeps backward compatibility with getResearch() while providing complete research tree
  */
@@ -87,14 +113,7 @@ export const getResearchClusters = async (filters?: ResearchClusterFilters): Pro
         skip,
         orderBy: { sort_order: "asc" },
         include: {
-            tags: filters?.include_tags !== false ? {
-                where: { deleted_at: null },
-                include: {
-                    _count: {
-                        select: { lecturers: true }
-                    }
-                }
-            } : false
+            tags: filters?.include_tags !== false ? clusterIncludeClause.tags : false
         }
     });
 
@@ -107,16 +126,7 @@ export const getResearchClusters = async (filters?: ResearchClusterFilters): Pro
 export const getResearchClusterById = async (id: string): Promise<ResearchCluster | null> => {
     const cluster = await prisma.researchCluster.findFirst({
         where: { id, deleted_at: null },
-        include: {
-            tags: {
-                where: { deleted_at: null },
-                include: {
-                    _count: {
-                        select: { lecturers: true }
-                    }
-                }
-            }
-        }
+        include: clusterIncludeClause
     });
 
     return (cluster as unknown as ResearchCluster) || null;
@@ -128,16 +138,7 @@ export const getResearchClusterById = async (id: string): Promise<ResearchCluste
 export const getResearchClusterBySlug = async (slug: string): Promise<ResearchCluster | null> => {
     const cluster = await prisma.researchCluster.findFirst({
         where: { slug, deleted_at: null },
-        include: {
-            tags: {
-                where: { deleted_at: null },
-                include: {
-                    _count: {
-                        select: { lecturers: true }
-                    }
-                }
-            }
-        }
+        include: clusterIncludeClause
     });
 
     return (cluster as unknown as ResearchCluster) || null;
@@ -154,9 +155,7 @@ export const createResearchCluster = async (data: CreateResearchClusterDTO): Pro
             description: data.description,
             sort_order: data.sort_order
         },
-        include: {
-            tags: true
-        }
+        include: clusterIncludeClause
     });
 
     return cluster as unknown as ResearchCluster;
@@ -181,9 +180,7 @@ export const updateResearchCluster = async (id: string, data: UpdateResearchClus
             description: data.description,
             sort_order: data.sort_order
         },
-        include: {
-            tags: true
-        }
+        include: clusterIncludeClause
     });
 
     return cluster as unknown as ResearchCluster;
@@ -264,14 +261,7 @@ export const getResearchTags = async (filters?: ResearchTagFilters): Promise<Res
         take,
         skip,
         orderBy: { name: "asc" },
-        include: {
-            cluster: true,
-            lecturers: {
-                include: {
-                    lecturer: true
-                }
-            }
-        }
+        include: tagIncludeClause
     });
 
     return tags as unknown as ResearchTag[];
@@ -283,14 +273,7 @@ export const getResearchTags = async (filters?: ResearchTagFilters): Promise<Res
 export const getResearchTagById = async (id: string): Promise<ResearchTag | null> => {
     const tag = await prisma.researchTag.findFirst({
         where: { id, deleted_at: null, cluster: { deleted_at: null } },
-        include: {
-            cluster: true,
-            lecturers: {
-                include: {
-                    lecturer: true
-                }
-            }
-        }
+        include: tagIncludeClause
     });
 
     return (tag as unknown as ResearchTag) || null;
@@ -302,14 +285,7 @@ export const getResearchTagById = async (id: string): Promise<ResearchTag | null
 export const getResearchTagBySlug = async (slug: string): Promise<ResearchTag | null> => {
     const tag = await prisma.researchTag.findFirst({
         where: { slug, deleted_at: null, cluster: { deleted_at: null } },
-        include: {
-            cluster: true,
-            lecturers: {
-                include: {
-                    lecturer: true
-                }
-            }
-        }
+        include: tagIncludeClause
     });
 
     return (tag as unknown as ResearchTag) || null;
@@ -327,9 +303,7 @@ export const createResearchTag = async (data: CreateResearchTagDTO): Promise<Res
             description: data.description,
             is_active: data.is_active !== undefined ? data.is_active : true
         },
-        include: {
-            cluster: true
-        }
+        include: tagIncludeClause
     });
 
     return tag as unknown as ResearchTag;
@@ -355,9 +329,7 @@ export const updateResearchTag = async (id: string, data: UpdateResearchTagDTO):
             description: data.description,
             is_active: data.is_active
         },
-        include: {
-            cluster: true
-        }
+        include: tagIncludeClause
     });
 
     return tag as unknown as ResearchTag;

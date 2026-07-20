@@ -9,6 +9,53 @@ import {
 import { Prisma } from "@prisma/client";
 
 /**
+ * Common include clause for standard Lecturer queries
+ */
+const includeClause = {
+    metrics: true,
+    research_tags: {
+        where: { tag: { deleted_at: null } },
+        include: {
+            tag: true
+        }
+    },
+    publications: {
+        where: { publication: { deleted_at: null } },
+        include: {
+            publication: true
+        }
+    }
+};
+
+/**
+ * Detailed include clause for single Lecturer view (by slug)
+ */
+const detailedIncludeClause = {
+    metrics: true,
+    research_tags: {
+        where: { tag: { deleted_at: null } },
+        include: {
+            tag: {
+                include: {
+                    cluster: true
+                }
+            }
+        }
+    },
+    publications: {
+        where: { publication: { deleted_at: null } },
+        include: {
+            publication: true
+        },
+        orderBy: {
+            publication: {
+                year: "desc" as const
+            }
+        }
+    }
+};
+
+/**
  * Build Prisma where clause from filters
  */
 const buildWhereClause = (filters?: LecturerFilters): Prisma.LecturerWhereInput => {
@@ -114,21 +161,7 @@ export const getLecturers = async (filters?: LecturerFilters): Promise<Lecturer[
         orderBy: {
             [sortBy]: sortOrder
         },
-        include: {
-            metrics: true,
-            research_tags: {
-                where: { tag: { deleted_at: null } },
-                include: {
-                    tag: true
-                }
-            },
-            publications: {
-                where: { publication: { deleted_at: null } },
-                include: {
-                    publication: true
-                }
-            }
-        }
+        include: includeClause
     });
 
     return lecturers as unknown as Lecturer[];
@@ -154,21 +187,7 @@ export const getPaginatedLecturers = async (filters?: LecturerFilters): Promise<
             orderBy: {
                 [sortBy]: sortOrder
             },
-            include: {
-                metrics: true,
-                research_tags: {
-                    where: { tag: { deleted_at: null } },
-                    include: {
-                        tag: true
-                    }
-                },
-                publications: {
-                    where: { publication: { deleted_at: null } },
-                    include: {
-                        publication: true
-                    }
-                }
-            }
+            include: includeClause
         }),
         prisma.lecturer.count({ where })
     ]);
@@ -190,30 +209,7 @@ export const getPaginatedLecturers = async (filters?: LecturerFilters): Promise<
 export const getLecturerBySlug = async (slug: string): Promise<Lecturer | null> => {
     const lecturer = await prisma.lecturer.findFirst({
         where: { slug, deleted_at: null },
-        include: {
-            metrics: true,
-            research_tags: {
-                where: { tag: { deleted_at: null } },
-                include: {
-                    tag: {
-                        include: {
-                            cluster: true
-                        }
-                    }
-                }
-            },
-            publications: {
-                where: { publication: { deleted_at: null } },
-                include: {
-                    publication: true
-                },
-                orderBy: {
-                    publication: {
-                        year: "desc"
-                    }
-                }
-            }
-        }
+        include: detailedIncludeClause
     });
 
     return (lecturer as unknown as Lecturer) || null;
@@ -232,21 +228,7 @@ export const getLecturersBySlug = async (slug: string): Promise<Lecturer | null>
 export const getLecturerById = async (id: string): Promise<Lecturer | null> => {
     const lecturer = await prisma.lecturer.findFirst({
         where: { id, deleted_at: null },
-        include: {
-            metrics: true,
-            research_tags: {
-                where: { tag: { deleted_at: null } },
-                include: {
-                    tag: true
-                }
-            },
-            publications: {
-                where: { publication: { deleted_at: null } },
-                include: {
-                    publication: true
-                }
-            }
-        }
+        include: includeClause
     });
 
     return (lecturer as unknown as Lecturer) || null;
@@ -258,15 +240,7 @@ export const getLecturerById = async (id: string): Promise<Lecturer | null> => {
 export const getLecturerBySintaId = async (sintaId: string): Promise<Lecturer | null> => {
     const lecturer = await prisma.lecturer.findFirst({
         where: { sinta_id: sintaId, deleted_at: null },
-        include: {
-            metrics: true,
-            research_tags: {
-                where: { tag: { deleted_at: null } },
-                include: {
-                    tag: true
-                }
-            }
-        }
+        include: includeClause
     });
 
     return (lecturer as unknown as Lecturer) || null;
@@ -327,14 +301,7 @@ export const createLecturer = async (data: CreateLecturerDTO): Promise<Lecturer>
 
         return tx.lecturer.findUnique({
             where: { id: created.id },
-            include: {
-                metrics: true,
-                research_tags: {
-                    include: {
-                        tag: true
-                    }
-                }
-            }
+            include: includeClause
         });
     });
 
@@ -402,15 +369,7 @@ export const updateLecturer = async (id: string, data: UpdateLecturerDTO): Promi
 
         return tx.lecturer.findUnique({
             where: { id },
-            include: {
-                metrics: true,
-                research_tags: {
-                    where: { tag: { deleted_at: null } },
-                    include: {
-                        tag: true
-                    }
-                }
-            }
+            include: includeClause
         });
     });
 

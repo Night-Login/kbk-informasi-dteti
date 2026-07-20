@@ -9,6 +9,21 @@ import {
 import { Prisma } from "@prisma/client";
 
 /**
+ * Common include clause for Publication queries
+ */
+const includeClause = {
+    lecturers: {
+        where: { lecturer: { deleted_at: null } },
+        include: {
+            lecturer: true
+        },
+        orderBy: {
+            author_order: "asc" as const
+        }
+    }
+};
+
+/**
  * Build Prisma where clause from publication filters
  */
 const buildWhereClause = (filters?: PublicationFilters): Prisma.PublicationWhereInput => {
@@ -99,17 +114,7 @@ export const getPublications = async (filters?: PublicationFilters): Promise<Pub
         orderBy: {
             [sortBy]: sortOrder
         },
-        include: {
-            lecturers: {
-                where: { lecturer: { deleted_at: null } },
-                include: {
-                    lecturer: true
-                },
-                orderBy: {
-                    author_order: "asc"
-                }
-            }
-        }
+        include: includeClause
     });
 
     return publications as unknown as Publication[];
@@ -135,17 +140,7 @@ export const getPaginatedPublications = async (filters?: PublicationFilters): Pr
             orderBy: {
                 [sortBy]: sortOrder
             },
-            include: {
-                lecturers: {
-                    where: { lecturer: { deleted_at: null } },
-                    include: {
-                        lecturer: true
-                    },
-                    orderBy: {
-                        author_order: "asc"
-                    }
-                }
-            }
+            include: includeClause
         }),
         prisma.publication.count({ where })
     ]);
@@ -167,17 +162,7 @@ export const getPaginatedPublications = async (filters?: PublicationFilters): Pr
 export const getPublicationById = async (id: string): Promise<Publication | null> => {
     const publication = await prisma.publication.findFirst({
         where: { id, deleted_at: null },
-        include: {
-            lecturers: {
-                where: { lecturer: { deleted_at: null } },
-                include: {
-                    lecturer: true
-                },
-                orderBy: {
-                    author_order: "asc"
-                }
-            }
-        }
+        include: includeClause
     });
 
     return (publication as unknown as Publication) || null;
@@ -189,17 +174,7 @@ export const getPublicationById = async (id: string): Promise<Publication | null
 export const getPublicationBySlug = async (slug: string): Promise<Publication | null> => {
     const publication = await prisma.publication.findFirst({
         where: { slug, deleted_at: null },
-        include: {
-            lecturers: {
-                where: { lecturer: { deleted_at: null } },
-                include: {
-                    lecturer: true
-                },
-                orderBy: {
-                    author_order: "asc"
-                }
-            }
-        }
+        include: includeClause
     });
 
     return (publication as unknown as Publication) || null;
@@ -211,17 +186,7 @@ export const getPublicationBySlug = async (slug: string): Promise<Publication | 
 export const getPublicationByDoi = async (doi: string): Promise<Publication | null> => {
     const publication = await prisma.publication.findFirst({
         where: { doi, deleted_at: null },
-        include: {
-            lecturers: {
-                where: { lecturer: { deleted_at: null } },
-                include: {
-                    lecturer: true
-                },
-                orderBy: {
-                    author_order: "asc"
-                }
-            }
-        }
+        include: includeClause
     });
 
     return (publication as unknown as Publication) || null;
@@ -270,16 +235,7 @@ export const createPublication = async (data: CreatePublicationDTO): Promise<Pub
 
         return tx.publication.findUnique({
             where: { id: created.id },
-            include: {
-                lecturers: {
-                    include: {
-                        lecturer: true
-                    },
-                    orderBy: {
-                        author_order: "asc"
-                    }
-                }
-            }
+            include: includeClause
         });
     });
 
@@ -345,17 +301,7 @@ export const updatePublication = async (id: string, data: UpdatePublicationDTO):
 
         return tx.publication.findUnique({
             where: { id },
-            include: {
-                lecturers: {
-                    where: { lecturer: { deleted_at: null } },
-                    include: {
-                        lecturer: true
-                    },
-                    orderBy: {
-                        author_order: "asc"
-                    }
-                }
-            }
+            include: includeClause
         });
     });
 
