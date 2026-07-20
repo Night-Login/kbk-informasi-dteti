@@ -263,6 +263,7 @@ export const createLecturer = async (data: CreateLecturerDTO): Promise<Lecturer>
                 nip_or_staff_id: lecturerData.nip_or_staff_id,
                 email: lecturerData.email,
                 photo_url: lecturerData.photo_url,
+                short_bio: lecturerData.short_bio,
                 bio: lecturerData.bio,
                 sinta_id: lecturerData.sinta_id,
                 scopus_author_id: lecturerData.scopus_author_id,
