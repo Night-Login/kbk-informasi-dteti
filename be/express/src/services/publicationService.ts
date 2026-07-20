@@ -80,6 +80,83 @@ const buildWhereClause = (filters?: PublicationFilters): Prisma.PublicationWhere
         });
     }
 
+    if (filters.tag_id) {
+        conditions.push({
+            lecturers: {
+                some: {
+                    lecturer: {
+                        deleted_at: null,
+                        research_tags: {
+                            some: {
+                                tag_id: filters.tag_id,
+                                tag: { deleted_at: null }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else if (filters.tag_slug) {
+        conditions.push({
+            lecturers: {
+                some: {
+                    lecturer: {
+                        deleted_at: null,
+                        research_tags: {
+                            some: {
+                                tag: {
+                                    slug: filters.tag_slug,
+                                    deleted_at: null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    if (filters.cluster_id) {
+        conditions.push({
+            lecturers: {
+                some: {
+                    lecturer: {
+                        deleted_at: null,
+                        research_tags: {
+                            some: {
+                                tag: {
+                                    cluster_id: filters.cluster_id,
+                                    deleted_at: null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else if (filters.cluster_slug) {
+        conditions.push({
+            lecturers: {
+                some: {
+                    lecturer: {
+                        deleted_at: null,
+                        research_tags: {
+                            some: {
+                                tag: {
+                                    cluster: {
+                                        slug: filters.cluster_slug,
+                                        deleted_at: null
+                                    },
+                                    deleted_at: null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     if (filters.search) {
         conditions.push({
             OR: [
@@ -444,6 +521,39 @@ export const importPublicationsCSV = async (
                         deleted_at: null
                     }
                 });
+
+                if (item.lecturers && Array.isArray(item.lecturers)) {
+                    await prisma.lecturerPublication.deleteMany({
+                        where: { publication_id: existing.id }
+                    });
+                    if (item.lecturers.length > 0) {
+                        await Promise.all(
+                            item.lecturers.map((p: any, index: number) => {
+                                const lecturerId = typeof p === "string" ? p : p.lecturer_id;
+                                const authorOrder = typeof p === "string" ? index + 1 : (p.author_order !== undefined ? p.author_order : index + 1);
+                                return prisma.lecturerPublication.create({
+                                    data: {
+                                        publication_id: existing.id,
+                                        lecturer_id: lecturerId,
+                                        author_order: authorOrder
+                                    }
+                                });
+                            })
+                        );
+                    }
+                } else if (item.lecturer_id) {
+                    await prisma.lecturerPublication.deleteMany({
+                        where: { publication_id: existing.id }
+                    });
+                    await prisma.lecturerPublication.create({
+                        data: {
+                            publication_id: existing.id,
+                            lecturer_id: item.lecturer_id,
+                            author_order: item.author_order || 1
+                        }
+                    });
+                }
+
                 updated++;
             } else {
                 const created = await prisma.publication.create({
@@ -464,7 +574,21 @@ export const importPublicationsCSV = async (
                     }
                 });
 
-                if (item.lecturer_id) {
+                if (item.lecturers && Array.isArray(item.lecturers) && item.lecturers.length > 0) {
+                    await Promise.all(
+                        item.lecturers.map((p: any, index: number) => {
+                            const lecturerId = typeof p === "string" ? p : p.lecturer_id;
+                            const authorOrder = typeof p === "string" ? index + 1 : (p.author_order !== undefined ? p.author_order : index + 1);
+                            return prisma.lecturerPublication.create({
+                                data: {
+                                    publication_id: created.id,
+                                    lecturer_id: lecturerId,
+                                    author_order: authorOrder
+                                }
+                            });
+                        })
+                    );
+                } else if (item.lecturer_id) {
                     await prisma.lecturerPublication.create({
                         data: {
                             publication_id: created.id,
@@ -473,6 +597,7 @@ export const importPublicationsCSV = async (
                         }
                     });
                 }
+
                 imported++;
             }
         } catch (err) {

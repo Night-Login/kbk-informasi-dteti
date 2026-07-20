@@ -38,6 +38,9 @@ export interface PublicationFilters extends PaginationParams {
     lecturer_id?: string;
     lecturer_slug?: string;
     tag_id?: string;
+    tag_slug?: string;
+    cluster_id?: string;
+    cluster_slug?: string;
 }
 
 // Data Transfer Objects (DTOs) for creating/updating
