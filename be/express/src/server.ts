@@ -39,7 +39,6 @@ app.get("/", (req: Request, res: Response) => {
 
 // API Routes
 app.use("/api/v1", routes);
-app.use("/v1", routes);
 app.use("/api", routes);
 
 // Global Error Handler
