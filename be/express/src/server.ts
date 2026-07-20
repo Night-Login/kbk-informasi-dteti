@@ -6,6 +6,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import path from "path";
+import routes from "./routes/index.js";
 
 dotenv.config();
 
@@ -33,6 +34,22 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.get("/", (req: Request, res: Response) => {
     res.json({
         status: "running"
+    });
+});
+
+// API Routes
+app.use("/api/v1", routes);
+app.use("/v1", routes);
+app.use("/api", routes);
+
+// Global Error Handler
+app.use((err: any, req: Request, res: Response, next: any) => {
+    console.error("Error caught by global handler:", err);
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(status).json({
+        success: false,
+        message
     });
 });
 
