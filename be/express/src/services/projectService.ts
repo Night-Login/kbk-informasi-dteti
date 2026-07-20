@@ -549,6 +549,47 @@ export const importProjectsCSV = async (
                         deleted_at: null
                     }
                 });
+
+                if (item.participants && Array.isArray(item.participants)) {
+                    await prisma.lecturerProject.deleteMany({
+                        where: { project_id: existing.id }
+                    });
+                    if (item.participants.length > 0) {
+                        await Promise.all(
+                            item.participants.map((p: any) => {
+                                const lecturerId = typeof p === "string" ? p : p.lecturer_id;
+                                const role = typeof p === "string" ? null : p.role;
+                                return prisma.lecturerProject.create({
+                                    data: {
+                                        project_id: existing.id,
+                                        lecturer_id: lecturerId,
+                                        role: role || null
+                                    }
+                                });
+                            })
+                        );
+                    }
+                }
+
+                const tagIds = item.tag_ids || item.research_tags;
+                if (tagIds && Array.isArray(tagIds)) {
+                    await prisma.projectResearchTag.deleteMany({
+                        where: { project_id: existing.id }
+                    });
+                    if (tagIds.length > 0) {
+                        await Promise.all(
+                            tagIds.map((tagId: string) =>
+                                prisma.projectResearchTag.create({
+                                    data: {
+                                        project_id: existing.id,
+                                        tag_id: typeof tagId === "string" ? tagId : (tagId as any).id || (tagId as any).tag_id
+                                    }
+                                })
+                            )
+                        );
+                    }
+                }
+
                 updated++;
             } else {
                 const created = await prisma.project.create({
@@ -581,6 +622,21 @@ export const importProjectsCSV = async (
                         })
                     );
                 }
+
+                const tagIds = item.tag_ids || item.research_tags;
+                if (tagIds && Array.isArray(tagIds) && tagIds.length > 0) {
+                    await Promise.all(
+                        tagIds.map((tagId: string) =>
+                            prisma.projectResearchTag.create({
+                                data: {
+                                    project_id: created.id,
+                                    tag_id: typeof tagId === "string" ? tagId : (tagId as any).id || (tagId as any).tag_id
+                                }
+                            })
+                        )
+                    );
+                }
+
                 imported++;
             }
         } catch (err) {
