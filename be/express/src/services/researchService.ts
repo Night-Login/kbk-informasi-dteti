@@ -7,7 +7,8 @@ import {
     CreateResearchTagDTO,
     UpdateResearchTagDTO,
     ResearchClusterFilters,
-    ResearchTagFilters
+    ResearchTagFilters,
+    PaginatedResult
 } from "../types/index.js";
 import { Prisma } from "@prisma/client";
 
@@ -31,6 +32,7 @@ const clusterIncludeClause = {
 const tagIncludeClause = {
     cluster: true,
     lecturers: {
+        where: { lecturer: { deleted_at: null } },
         include: {
             lecturer: true
         }
@@ -42,13 +44,35 @@ const tagIncludeClause = {
  * Keeps backward compatibility with getResearch() while providing complete research tree
  */
 export const getResearch = async (filters?: any): Promise<any> => {
+    const clusterConditions: Prisma.ResearchClusterWhereInput[] = [{ deleted_at: null }];
+    if (filters?.search) {
+        clusterConditions.push({
+            OR: [
+                { name: { contains: filters.search, mode: "insensitive" } },
+                { description: { contains: filters.search, mode: "insensitive" } },
+                { slug: { contains: filters.search, mode: "insensitive" } }
+            ]
+        });
+    }
+    if (filters?.cluster_id) clusterConditions.push({ id: filters.cluster_id });
+    if (filters?.cluster_slug) clusterConditions.push({ slug: filters.cluster_slug });
+
+    const tagWhere: Prisma.ResearchTagWhereInput = { is_active: true, deleted_at: null };
+    if (filters?.search) {
+        tagWhere.OR = [
+            { name: { contains: filters.search, mode: "insensitive" } },
+            { description: { contains: filters.search, mode: "insensitive" } },
+            { slug: { contains: filters.search, mode: "insensitive" } }
+        ];
+    }
+
     const [clusters, totalTags, activeTags] = await Promise.all([
         prisma.researchCluster.findMany({
-            where: { deleted_at: null },
+            where: { AND: clusterConditions },
             orderBy: { sort_order: "asc" },
             include: {
                 tags: {
-                    where: { is_active: true, deleted_at: null },
+                    where: tagWhere,
                     include: {
                         _count: {
                             select: { lecturers: true }
@@ -118,6 +142,53 @@ export const getResearchClusters = async (filters?: ResearchClusterFilters): Pro
     });
 
     return clusters as unknown as ResearchCluster[];
+};
+
+/**
+ * Get paginated list of research clusters
+ */
+export const getPaginatedResearchClusters = async (filters?: ResearchClusterFilters): Promise<PaginatedResult<ResearchCluster>> => {
+    const conditions: Prisma.ResearchClusterWhereInput[] = [
+        { deleted_at: null }
+    ];
+
+    if (filters?.search) {
+        conditions.push({
+            OR: [
+                { name: { contains: filters.search, mode: "insensitive" } },
+                { description: { contains: filters.search, mode: "insensitive" } },
+                { slug: { contains: filters.search, mode: "insensitive" } }
+            ]
+        });
+    }
+
+    const where: Prisma.ResearchClusterWhereInput = { AND: conditions };
+    const page = filters?.page ? Number(filters.page) : 1;
+    const limit = filters?.limit ? Number(filters.limit) : 10;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+        prisma.researchCluster.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { sort_order: "asc" },
+            include: {
+                tags: filters?.include_tags !== false ? clusterIncludeClause.tags : false
+            }
+        }),
+        prisma.researchCluster.count({ where })
+    ]);
+
+    const total_pages = Math.ceil(total / limit);
+
+    return {
+        data: data as unknown as ResearchCluster[],
+        total,
+        page,
+        limit,
+        total_pages
+    };
 };
 
 /**
@@ -268,6 +339,66 @@ export const getResearchTags = async (filters?: ResearchTagFilters): Promise<Res
 };
 
 /**
+ * Get paginated list of research tags
+ */
+export const getPaginatedResearchTags = async (filters?: ResearchTagFilters): Promise<PaginatedResult<ResearchTag>> => {
+    const conditions: Prisma.ResearchTagWhereInput[] = [
+        { deleted_at: null },
+        { cluster: { deleted_at: null } }
+    ];
+
+    if (filters?.is_active !== undefined) {
+        conditions.push({ is_active: filters.is_active });
+    }
+
+    if (filters?.cluster_id) {
+        conditions.push({ cluster_id: filters.cluster_id });
+    } else if (filters?.cluster_slug) {
+        conditions.push({
+            cluster: {
+                slug: filters.cluster_slug
+            }
+        });
+    }
+
+    if (filters?.search) {
+        conditions.push({
+            OR: [
+                { name: { contains: filters.search, mode: "insensitive" } },
+                { description: { contains: filters.search, mode: "insensitive" } },
+                { slug: { contains: filters.search, mode: "insensitive" } }
+            ]
+        });
+    }
+
+    const where: Prisma.ResearchTagWhereInput = { AND: conditions };
+    const page = filters?.page ? Number(filters.page) : 1;
+    const limit = filters?.limit ? Number(filters.limit) : 10;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+        prisma.researchTag.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { name: "asc" },
+            include: tagIncludeClause
+        }),
+        prisma.researchTag.count({ where })
+    ]);
+
+    const total_pages = Math.ceil(total / limit);
+
+    return {
+        data: data as unknown as ResearchTag[],
+        total,
+        page,
+        limit,
+        total_pages
+    };
+};
+
+/**
  * Get single research tag by ID
  */
 export const getResearchTagById = async (id: string): Promise<ResearchTag | null> => {
@@ -365,4 +496,160 @@ export const restoreResearchTag = async (id: string): Promise<boolean> => {
         console.error(`Error restoring research tag ${id}:`, error);
         return false;
     }
+};
+
+/**
+ * Import or batch upsert research clusters (supports CSV parsed items or JSON arrays)
+ */
+export const importResearchClustersCSV = async (
+    items?: any[] | any
+): Promise<{ imported: number; updated: number; errors: number } | boolean> => {
+    if (!items || !Array.isArray(items)) {
+        return true;
+    }
+
+    let imported = 0;
+    let updated = 0;
+    let errors = 0;
+
+    for (const item of items) {
+        try {
+            if (!item.name) {
+                errors++;
+                continue;
+            }
+
+            const slug = item.slug || item.name
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-|-$/g, "");
+
+            const existing = await prisma.researchCluster.findFirst({
+                where: {
+                    OR: [
+                        { slug },
+                        { name: { equals: item.name, mode: "insensitive" } }
+                    ]
+                }
+            });
+
+            if (existing) {
+                await prisma.researchCluster.update({
+                    where: { id: existing.id },
+                    data: {
+                        name: item.name || existing.name,
+                        slug: slug || existing.slug,
+                        description: item.description !== undefined ? item.description : existing.description,
+                        sort_order: item.sort_order !== undefined ? Number(item.sort_order) : existing.sort_order,
+                        deleted_at: null
+                    }
+                });
+                updated++;
+            } else {
+                await prisma.researchCluster.create({
+                    data: {
+                        name: item.name,
+                        slug,
+                        description: item.description || null,
+                        sort_order: item.sort_order ? Number(item.sort_order) : null
+                    }
+                });
+                imported++;
+            }
+        } catch (err) {
+            console.error("Error importing research cluster item:", err);
+            errors++;
+        }
+    }
+
+    return { imported, updated, errors };
+};
+
+/**
+ * Import or batch upsert research tags (supports CSV parsed items or JSON arrays)
+ */
+export const importResearchTagsCSV = async (
+    items?: any[] | any
+): Promise<{ imported: number; updated: number; errors: number } | boolean> => {
+    if (!items || !Array.isArray(items)) {
+        return true;
+    }
+
+    let imported = 0;
+    let updated = 0;
+    let errors = 0;
+
+    for (const item of items) {
+        try {
+            if (!item.name || (!item.cluster_id && !item.cluster_slug)) {
+                errors++;
+                continue;
+            }
+
+            const slug = item.slug || item.name
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-|-$/g, "");
+
+            let clusterId = item.cluster_id;
+            if (!clusterId && item.cluster_slug) {
+                const cluster = await prisma.researchCluster.findFirst({
+                    where: { slug: item.cluster_slug, deleted_at: null }
+                });
+                if (cluster) {
+                    clusterId = cluster.id;
+                }
+            }
+
+            if (!clusterId) {
+                errors++;
+                continue;
+            }
+
+            const existing = await prisma.researchTag.findFirst({
+                where: {
+                    OR: [
+                        { slug },
+                        {
+                            AND: [
+                                { name: { equals: item.name, mode: "insensitive" } },
+                                { cluster_id: clusterId }
+                            ]
+                        }
+                    ]
+                }
+            });
+
+            if (existing) {
+                await prisma.researchTag.update({
+                    where: { id: existing.id },
+                    data: {
+                        name: item.name || existing.name,
+                        slug: slug || existing.slug,
+                        cluster_id: clusterId,
+                        description: item.description !== undefined ? item.description : existing.description,
+                        is_active: item.is_active !== undefined ? (item.is_active === "true" || item.is_active === true) : existing.is_active,
+                        deleted_at: null
+                    }
+                });
+                updated++;
+            } else {
+                await prisma.researchTag.create({
+                    data: {
+                        name: item.name,
+                        slug,
+                        cluster_id: clusterId,
+                        description: item.description || null,
+                        is_active: item.is_active !== undefined ? (item.is_active === "true" || item.is_active === true) : true
+                    }
+                });
+                imported++;
+            }
+        } catch (err) {
+            console.error("Error importing research tag item:", err);
+            errors++;
+        }
+    }
+
+    return { imported, updated, errors };
 };
