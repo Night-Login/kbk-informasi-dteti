@@ -17,3 +17,14 @@ export interface CreateAdminDTO {
 }
 
 export interface UpdateAdminDTO extends Partial<CreateAdminDTO> {}
+
+export interface LoginRequestDTO {
+    username: string;
+    password: string;
+}
+
+export interface LoginResponseDTO {
+    admin: Omit<Admin, "password">;
+    token?: string;
+}
+

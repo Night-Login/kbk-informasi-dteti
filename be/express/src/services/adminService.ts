@@ -1,6 +1,8 @@
 import prisma from "../prisma/client.js";
 import { Admin, CreateAdminDTO, UpdateAdminDTO, Role } from "../types/index.js";
 import { Prisma } from "@prisma/client";
+import bcrypt from "bcrypt";
+
 
 /**
  * Helper to strip sensitive fields
@@ -69,10 +71,11 @@ export const getAdminByUsername = async (
  * Create a new admin
  */
 export const createAdmin = async (data: CreateAdminDTO): Promise<Omit<Admin, "password">> => {
+    const hashedPassword = data.password ? await bcrypt.hash(data.password, 10) : "";
     const admin = await prisma.admin.create({
         data: {
             username: data.username,
-            password: data.password || "", // Note: controller layer should hash passwords using bcrypt/argon2
+            password: hashedPassword,
             role: data.role || "ADMIN"
         }
     });
@@ -94,7 +97,9 @@ export const updateAdmin = async (id: number, data: UpdateAdminDTO): Promise<Omi
     const updateData: Prisma.AdminUpdateInput = {};
 
     if (data.username !== undefined) updateData.username = data.username;
-    if (data.password !== undefined) updateData.password = data.password;
+    if (data.password !== undefined) {
+        updateData.password = data.password ? await bcrypt.hash(data.password, 10) : "";
+    }
     if (data.role !== undefined) updateData.role = data.role;
 
     const admin = await prisma.admin.update({
@@ -142,18 +147,16 @@ export const restoreAdmin = async (id: number): Promise<boolean> => {
  */
 export const authenticateAdmin = async (
     username: string,
-    passwordPlain: string
+    passsword: string
 ): Promise<Omit<Admin, "password"> | null> => {
     const admin = await prisma.admin.findFirst({
         where: { username, deletedAt: null }
     });
 
-    if (!admin) return null;
+    if (!admin || !admin.password) return null;
 
-    // Direct string match or fallback for when bcrypt is integrated in controllers
-    if (admin.password === passwordPlain) {
-        return omitPassword(admin) as Omit<Admin, "password">;
-    }
+    const isMatch = await bcrypt.compare(passsword, admin.password);
+    if (!isMatch) return null;
 
-    return null;
+    return omitPassword(admin) as Omit<Admin, "password">;
 };
