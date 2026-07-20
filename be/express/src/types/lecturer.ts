@@ -41,6 +41,7 @@ export interface Lecturer {
     source_csv_row_ref?: string | null;
     created_at?: Date | string;
     updated_at?: Date | string;
+    deleted_at?: Date | string | null;
     metrics?: LecturerMetric | null;
     publications?: LecturerPublication[] | any[];
     research_tags?: LecturerResearchTag[] | ResearchTag[] | any[];

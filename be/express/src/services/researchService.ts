@@ -18,10 +18,11 @@ import { Prisma } from "@prisma/client";
 export const getResearch = async (filters?: any): Promise<any> => {
     const [clusters, totalTags, activeTags] = await Promise.all([
         prisma.researchCluster.findMany({
+            where: { deleted_at: null },
             orderBy: { sort_order: "asc" },
             include: {
                 tags: {
-                    where: { is_active: true },
+                    where: { is_active: true, deleted_at: null },
                     include: {
                         _count: {
                             select: { lecturers: true }
@@ -30,8 +31,8 @@ export const getResearch = async (filters?: any): Promise<any> => {
                 }
             }
         }),
-        prisma.researchTag.count(),
-        prisma.researchTag.count({ where: { is_active: true } })
+        prisma.researchTag.count({ where: { deleted_at: null } }),
+        prisma.researchTag.count({ where: { is_active: true, deleted_at: null } })
     ]);
 
     return {
@@ -61,15 +62,21 @@ export const getResearch = async (filters?: any): Promise<any> => {
  * Get research clusters matching filters
  */
 export const getResearchClusters = async (filters?: ResearchClusterFilters): Promise<ResearchCluster[]> => {
-    const where: Prisma.ResearchClusterWhereInput = {};
+    const conditions: Prisma.ResearchClusterWhereInput[] = [
+        { deleted_at: null }
+    ];
 
     if (filters?.search) {
-        where.OR = [
-            { name: { contains: filters.search, mode: "insensitive" } },
-            { description: { contains: filters.search, mode: "insensitive" } },
-            { slug: { contains: filters.search, mode: "insensitive" } }
-        ];
+        conditions.push({
+            OR: [
+                { name: { contains: filters.search, mode: "insensitive" } },
+                { description: { contains: filters.search, mode: "insensitive" } },
+                { slug: { contains: filters.search, mode: "insensitive" } }
+            ]
+        });
     }
+
+    const where: Prisma.ResearchClusterWhereInput = { AND: conditions };
 
     const take = filters?.limit ? Number(filters.limit) : undefined;
     const skip = filters?.page && filters?.limit ? (Number(filters.page) - 1) * Number(filters.limit) : undefined;
@@ -81,6 +88,7 @@ export const getResearchClusters = async (filters?: ResearchClusterFilters): Pro
         orderBy: { sort_order: "asc" },
         include: {
             tags: filters?.include_tags !== false ? {
+                where: { deleted_at: null },
                 include: {
                     _count: {
                         select: { lecturers: true }
@@ -97,10 +105,11 @@ export const getResearchClusters = async (filters?: ResearchClusterFilters): Pro
  * Get single research cluster by ID
  */
 export const getResearchClusterById = async (id: string): Promise<ResearchCluster | null> => {
-    const cluster = await prisma.researchCluster.findUnique({
-        where: { id },
+    const cluster = await prisma.researchCluster.findFirst({
+        where: { id, deleted_at: null },
         include: {
             tags: {
+                where: { deleted_at: null },
                 include: {
                     _count: {
                         select: { lecturers: true }
@@ -117,10 +126,11 @@ export const getResearchClusterById = async (id: string): Promise<ResearchCluste
  * Get single research cluster by slug
  */
 export const getResearchClusterBySlug = async (slug: string): Promise<ResearchCluster | null> => {
-    const cluster = await prisma.researchCluster.findUnique({
-        where: { slug },
+    const cluster = await prisma.researchCluster.findFirst({
+        where: { slug, deleted_at: null },
         include: {
             tags: {
+                where: { deleted_at: null },
                 include: {
                     _count: {
                         select: { lecturers: true }
@@ -156,6 +166,13 @@ export const createResearchCluster = async (data: CreateResearchClusterDTO): Pro
  * Update an existing research cluster
  */
 export const updateResearchCluster = async (id: string, data: UpdateResearchClusterDTO): Promise<ResearchCluster> => {
+    const existing = await prisma.researchCluster.findFirst({
+        where: { id, deleted_at: null }
+    });
+    if (!existing) {
+        throw new Error(`Research cluster with id ${id} not found or deleted.`);
+    }
+
     const cluster = await prisma.researchCluster.update({
         where: { id },
         data: {
@@ -173,12 +190,13 @@ export const updateResearchCluster = async (id: string, data: UpdateResearchClus
 };
 
 /**
- * Delete a research cluster by ID
+ * Delete a research cluster by ID (soft delete)
  */
 export const deleteResearchCluster = async (id: string): Promise<boolean> => {
     try {
-        await prisma.researchCluster.delete({
-            where: { id }
+        await prisma.researchCluster.update({
+            where: { id },
+            data: { deleted_at: new Date() }
         });
         return true;
     } catch (error) {
@@ -188,10 +206,29 @@ export const deleteResearchCluster = async (id: string): Promise<boolean> => {
 };
 
 /**
+ * Restore a soft-deleted research cluster by ID
+ */
+export const restoreResearchCluster = async (id: string): Promise<boolean> => {
+    try {
+        await prisma.researchCluster.update({
+            where: { id },
+            data: { deleted_at: null }
+        });
+        return true;
+    } catch (error) {
+        console.error(`Error restoring research cluster ${id}:`, error);
+        return false;
+    }
+};
+
+/**
  * Get all research tags matching filters
  */
 export const getResearchTags = async (filters?: ResearchTagFilters): Promise<ResearchTag[]> => {
-    const conditions: Prisma.ResearchTagWhereInput[] = [];
+    const conditions: Prisma.ResearchTagWhereInput[] = [
+        { deleted_at: null },
+        { cluster: { deleted_at: null } }
+    ];
 
     if (filters?.is_active !== undefined) {
         conditions.push({ is_active: filters.is_active });
@@ -217,7 +254,7 @@ export const getResearchTags = async (filters?: ResearchTagFilters): Promise<Res
         });
     }
 
-    const where: Prisma.ResearchTagWhereInput = conditions.length > 0 ? { AND: conditions } : {};
+    const where: Prisma.ResearchTagWhereInput = { AND: conditions };
 
     const take = filters?.limit ? Number(filters.limit) : undefined;
     const skip = filters?.page && filters?.limit ? (Number(filters.page) - 1) * Number(filters.limit) : undefined;
@@ -244,8 +281,8 @@ export const getResearchTags = async (filters?: ResearchTagFilters): Promise<Res
  * Get single research tag by ID
  */
 export const getResearchTagById = async (id: string): Promise<ResearchTag | null> => {
-    const tag = await prisma.researchTag.findUnique({
-        where: { id },
+    const tag = await prisma.researchTag.findFirst({
+        where: { id, deleted_at: null, cluster: { deleted_at: null } },
         include: {
             cluster: true,
             lecturers: {
@@ -263,8 +300,8 @@ export const getResearchTagById = async (id: string): Promise<ResearchTag | null
  * Get single research tag by slug
  */
 export const getResearchTagBySlug = async (slug: string): Promise<ResearchTag | null> => {
-    const tag = await prisma.researchTag.findUnique({
-        where: { slug },
+    const tag = await prisma.researchTag.findFirst({
+        where: { slug, deleted_at: null, cluster: { deleted_at: null } },
         include: {
             cluster: true,
             lecturers: {
@@ -302,6 +339,13 @@ export const createResearchTag = async (data: CreateResearchTagDTO): Promise<Res
  * Update an existing research tag
  */
 export const updateResearchTag = async (id: string, data: UpdateResearchTagDTO): Promise<ResearchTag> => {
+    const existing = await prisma.researchTag.findFirst({
+        where: { id, deleted_at: null }
+    });
+    if (!existing) {
+        throw new Error(`Research tag with id ${id} not found or deleted.`);
+    }
+
     const tag = await prisma.researchTag.update({
         where: { id },
         data: {
@@ -320,16 +364,33 @@ export const updateResearchTag = async (id: string, data: UpdateResearchTagDTO):
 };
 
 /**
- * Delete a research tag by ID
+ * Delete a research tag by ID (soft delete)
  */
 export const deleteResearchTag = async (id: string): Promise<boolean> => {
     try {
-        await prisma.researchTag.delete({
-            where: { id }
+        await prisma.researchTag.update({
+            where: { id },
+            data: { deleted_at: new Date() }
         });
         return true;
     } catch (error) {
         console.error(`Error deleting research tag ${id}:`, error);
+        return false;
+    }
+};
+
+/**
+ * Restore a soft-deleted research tag by ID
+ */
+export const restoreResearchTag = async (id: string): Promise<boolean> => {
+    try {
+        await prisma.researchTag.update({
+            where: { id },
+            data: { deleted_at: null }
+        });
+        return true;
+    } catch (error) {
+        console.error(`Error restoring research tag ${id}:`, error);
         return false;
     }
 };

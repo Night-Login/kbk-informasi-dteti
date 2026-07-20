@@ -7,6 +7,7 @@ export interface ResearchCluster {
     slug: string;
     description?: string | null;
     sort_order?: number | null;
+    deleted_at?: Date | string | null;
     tags?: ResearchTag[];
     [key: string]: any;
 }
@@ -18,6 +19,7 @@ export interface ResearchTag {
     cluster_id?: string;
     description?: string | null;
     is_active?: boolean;
+    deleted_at?: Date | string | null;
     cluster?: ResearchCluster;
     lecturers?: LecturerResearchTag[];
     [key: string]: any;

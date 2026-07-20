@@ -3,7 +3,7 @@ import { Admin, CreateAdminDTO, UpdateAdminDTO, Role } from "../types/index.js";
 import { Prisma } from "@prisma/client";
 
 /**
- * Helper to strip sensitive fields (password)
+ * Helper to strip sensitive fields
  */
 const omitPassword = (admin: any): Omit<Admin, "password"> => {
     if (!admin) return admin;
@@ -15,7 +15,9 @@ const omitPassword = (admin: any): Omit<Admin, "password"> => {
  * Get all admins (excluding passwords)
  */
 export const getAdmins = async (filters?: { search?: string; role?: Role }): Promise<Omit<Admin, "password">[]> => {
-    const conditions: Prisma.AdminWhereInput[] = [];
+    const conditions: Prisma.AdminWhereInput[] = [
+        { deletedAt: null }
+    ];
 
     if (filters?.role) {
         conditions.push({ role: filters.role });
@@ -38,11 +40,11 @@ export const getAdmins = async (filters?: { search?: string; role?: Role }): Pro
 };
 
 /**
- * Get admin by ID (excluding password by default)
+ * Get admin by ID
  */
 export const getAdminById = async (id: number): Promise<Omit<Admin, "password"> | null> => {
-    const admin = await prisma.admin.findUnique({
-        where: { id }
+    const admin = await prisma.admin.findFirst({
+        where: { id, deletedAt: null }
     });
 
     return admin ? (omitPassword(admin) as Omit<Admin, "password">) : null;
@@ -55,8 +57,8 @@ export const getAdminByUsername = async (
     username: string,
     includePassword = false
 ): Promise<Admin | null> => {
-    const admin = await prisma.admin.findUnique({
-        where: { username }
+    const admin = await prisma.admin.findFirst({
+        where: { username, deletedAt: null }
     });
 
     if (!admin) return null;
@@ -82,6 +84,13 @@ export const createAdmin = async (data: CreateAdminDTO): Promise<Omit<Admin, "pa
  * Update an existing admin
  */
 export const updateAdmin = async (id: number, data: UpdateAdminDTO): Promise<Omit<Admin, "password">> => {
+    const existing = await prisma.admin.findFirst({
+        where: { id, deletedAt: null }
+    });
+    if (!existing) {
+        throw new Error(`Admin with id ${id} not found or deleted.`);
+    }
+
     const updateData: Prisma.AdminUpdateInput = {};
 
     if (data.username !== undefined) updateData.username = data.username;
@@ -101,12 +110,29 @@ export const updateAdmin = async (id: number, data: UpdateAdminDTO): Promise<Omi
  */
 export const deleteAdmin = async (id: number): Promise<boolean> => {
     try {
-        await prisma.admin.delete({
-            where: { id }
+        await prisma.admin.update({
+            where: { id },
+            data: { deletedAt: new Date() }
         });
         return true;
     } catch (error) {
         console.error(`Error deleting admin ${id}:`, error);
+        return false;
+    }
+};
+
+/**
+ * Restore a soft-deleted admin by ID
+ */
+export const restoreAdmin = async (id: number): Promise<boolean> => {
+    try {
+        await prisma.admin.update({
+            where: { id },
+            data: { deletedAt: null }
+        });
+        return true;
+    } catch (error) {
+        console.error(`Error restoring admin ${id}:`, error);
         return false;
     }
 };
@@ -118,8 +144,8 @@ export const authenticateAdmin = async (
     username: string,
     passwordPlain: string
 ): Promise<Omit<Admin, "password"> | null> => {
-    const admin = await prisma.admin.findUnique({
-        where: { username }
+    const admin = await prisma.admin.findFirst({
+        where: { username, deletedAt: null }
     });
 
     if (!admin) return null;

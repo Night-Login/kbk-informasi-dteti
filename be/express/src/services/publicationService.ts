@@ -12,9 +12,11 @@ import { Prisma } from "@prisma/client";
  * Build Prisma where clause from publication filters
  */
 const buildWhereClause = (filters?: PublicationFilters): Prisma.PublicationWhereInput => {
-    if (!filters) return {};
+    const conditions: Prisma.PublicationWhereInput[] = [
+        { deleted_at: null }
+    ];
 
-    const conditions: Prisma.PublicationWhereInput[] = [];
+    if (!filters) return { AND: conditions };
 
     if (filters.year !== undefined) {
         conditions.push({ year: filters.year });
@@ -45,7 +47,8 @@ const buildWhereClause = (filters?: PublicationFilters): Prisma.PublicationWhere
         conditions.push({
             lecturers: {
                 some: {
-                    lecturer_id: filters.lecturer_id
+                    lecturer_id: filters.lecturer_id,
+                    lecturer: { deleted_at: null }
                 }
             }
         });
@@ -54,7 +57,8 @@ const buildWhereClause = (filters?: PublicationFilters): Prisma.PublicationWhere
             lecturers: {
                 some: {
                     lecturer: {
-                        slug: filters.lecturer_slug
+                        slug: filters.lecturer_slug,
+                        deleted_at: null
                     }
                 }
             }
@@ -73,7 +77,7 @@ const buildWhereClause = (filters?: PublicationFilters): Prisma.PublicationWhere
         });
     }
 
-    return conditions.length > 0 ? { AND: conditions } : {};
+    return { AND: conditions };
 };
 
 /**
@@ -97,6 +101,7 @@ export const getPublications = async (filters?: PublicationFilters): Promise<Pub
         },
         include: {
             lecturers: {
+                where: { lecturer: { deleted_at: null } },
                 include: {
                     lecturer: true
                 },
@@ -132,6 +137,7 @@ export const getPaginatedPublications = async (filters?: PublicationFilters): Pr
             },
             include: {
                 lecturers: {
+                    where: { lecturer: { deleted_at: null } },
                     include: {
                         lecturer: true
                     },
@@ -159,10 +165,11 @@ export const getPaginatedPublications = async (filters?: PublicationFilters): Pr
  * Get a single publication by ID
  */
 export const getPublicationById = async (id: string): Promise<Publication | null> => {
-    const publication = await prisma.publication.findUnique({
-        where: { id },
+    const publication = await prisma.publication.findFirst({
+        where: { id, deleted_at: null },
         include: {
             lecturers: {
+                where: { lecturer: { deleted_at: null } },
                 include: {
                     lecturer: true
                 },
@@ -181,9 +188,10 @@ export const getPublicationById = async (id: string): Promise<Publication | null
  */
 export const getPublicationBySlug = async (slug: string): Promise<Publication | null> => {
     const publication = await prisma.publication.findFirst({
-        where: { slug },
+        where: { slug, deleted_at: null },
         include: {
             lecturers: {
+                where: { lecturer: { deleted_at: null } },
                 include: {
                     lecturer: true
                 },
@@ -201,10 +209,11 @@ export const getPublicationBySlug = async (slug: string): Promise<Publication | 
  * Get a single publication by DOI
  */
 export const getPublicationByDoi = async (doi: string): Promise<Publication | null> => {
-    const publication = await prisma.publication.findUnique({
-        where: { doi },
+    const publication = await prisma.publication.findFirst({
+        where: { doi, deleted_at: null },
         include: {
             lecturers: {
+                where: { lecturer: { deleted_at: null } },
                 include: {
                     lecturer: true
                 },
@@ -281,6 +290,13 @@ export const createPublication = async (data: CreatePublicationDTO): Promise<Pub
  * Update an existing publication
  */
 export const updatePublication = async (id: string, data: UpdatePublicationDTO): Promise<Publication> => {
+    const existing = await prisma.publication.findFirst({
+        where: { id, deleted_at: null }
+    });
+    if (!existing) {
+        throw new Error(`Publication with id ${id} not found or deleted.`);
+    }
+
     const { lecturers, ...pubData } = data;
 
     const publication = await prisma.$transaction(async (tx) => {
@@ -331,6 +347,7 @@ export const updatePublication = async (id: string, data: UpdatePublicationDTO):
             where: { id },
             include: {
                 lecturers: {
+                    where: { lecturer: { deleted_at: null } },
                     include: {
                         lecturer: true
                     },
@@ -346,16 +363,33 @@ export const updatePublication = async (id: string, data: UpdatePublicationDTO):
 };
 
 /**
- * Delete a publication by ID
+ * Delete a publication by ID (soft delete)
  */
 export const deletePublication = async (id: string): Promise<boolean> => {
     try {
-        await prisma.publication.delete({
-            where: { id }
+        await prisma.publication.update({
+            where: { id },
+            data: { deleted_at: new Date() }
         });
         return true;
     } catch (error) {
         console.error(`Error deleting publication ${id}:`, error);
+        return false;
+    }
+};
+
+/**
+ * Restore a soft-deleted publication by ID
+ */
+export const restorePublication = async (id: string): Promise<boolean> => {
+    try {
+        await prisma.publication.update({
+            where: { id },
+            data: { deleted_at: null }
+        });
+        return true;
+    } catch (error) {
+        console.error(`Error restoring publication ${id}:`, error);
         return false;
     }
 };
@@ -368,6 +402,11 @@ export const assignLecturersToPublication = async (
     lecturers: Array<{ lecturer_id: string; author_order?: number }>
 ): Promise<boolean> => {
     try {
+        const existing = await prisma.publication.findFirst({
+            where: { id: publicationId, deleted_at: null }
+        });
+        if (!existing) return false;
+
         await prisma.$transaction(async (tx) => {
             await tx.lecturerPublication.deleteMany({
                 where: { publication_id: publicationId }
@@ -455,7 +494,8 @@ export const importPublicationsCSV = async (
                         abstract: item.abstract !== undefined ? item.abstract : existing.abstract,
                         citation_count: item.citation_count !== undefined ? Number(item.citation_count) : existing.citation_count,
                         source: item.source || existing.source || "CSV_IMPORT",
-                        verified_status: item.verified_status || existing.verified_status
+                        verified_status: item.verified_status || existing.verified_status,
+                        deleted_at: null
                     }
                 });
                 updated++;

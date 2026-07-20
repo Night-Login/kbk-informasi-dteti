@@ -20,6 +20,7 @@ export interface Publication {
     fetch_batch_id?: string | null;
     created_at?: Date | string;
     updated_at?: Date | string;
+    deleted_at?: Date | string | null;
     lecturers?: LecturerPublication[] | any[];
     tags?: Array<{ name: string }>;
     [key: string]: any;

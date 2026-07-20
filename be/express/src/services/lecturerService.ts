@@ -12,9 +12,11 @@ import { Prisma } from "@prisma/client";
  * Build Prisma where clause from filters
  */
 const buildWhereClause = (filters?: LecturerFilters): Prisma.LecturerWhereInput => {
-    if (!filters) return {};
+    const conditions: Prisma.LecturerWhereInput[] = [
+        { deleted_at: null }
+    ];
 
-    const conditions: Prisma.LecturerWhereInput[] = [];
+    if (!filters) return { AND: conditions };
 
     if (filters.is_active !== undefined) {
         conditions.push({ is_active: filters.is_active });
@@ -32,7 +34,8 @@ const buildWhereClause = (filters?: LecturerFilters): Prisma.LecturerWhereInput 
         conditions.push({
             research_tags: {
                 some: {
-                    tag_id: filters.tag_id
+                    tag_id: filters.tag_id,
+                    tag: { deleted_at: null }
                 }
             }
         });
@@ -41,7 +44,8 @@ const buildWhereClause = (filters?: LecturerFilters): Prisma.LecturerWhereInput 
             research_tags: {
                 some: {
                     tag: {
-                        slug: filters.tag_slug
+                        slug: filters.tag_slug,
+                        deleted_at: null
                     }
                 }
             }
@@ -53,7 +57,8 @@ const buildWhereClause = (filters?: LecturerFilters): Prisma.LecturerWhereInput 
             research_tags: {
                 some: {
                     tag: {
-                        cluster_id: filters.cluster_id
+                        cluster_id: filters.cluster_id,
+                        deleted_at: null
                     }
                 }
             }
@@ -64,8 +69,10 @@ const buildWhereClause = (filters?: LecturerFilters): Prisma.LecturerWhereInput 
                 some: {
                     tag: {
                         cluster: {
-                            slug: filters.cluster_slug
-                        }
+                            slug: filters.cluster_slug,
+                            deleted_at: null
+                        },
+                        deleted_at: null
                     }
                 }
             }
@@ -85,7 +92,7 @@ const buildWhereClause = (filters?: LecturerFilters): Prisma.LecturerWhereInput 
         });
     }
 
-    return conditions.length > 0 ? { AND: conditions } : {};
+    return { AND: conditions };
 };
 
 /**
@@ -110,11 +117,13 @@ export const getLecturers = async (filters?: LecturerFilters): Promise<Lecturer[
         include: {
             metrics: true,
             research_tags: {
+                where: { tag: { deleted_at: null } },
                 include: {
                     tag: true
                 }
             },
             publications: {
+                where: { publication: { deleted_at: null } },
                 include: {
                     publication: true
                 }
@@ -148,11 +157,13 @@ export const getPaginatedLecturers = async (filters?: LecturerFilters): Promise<
             include: {
                 metrics: true,
                 research_tags: {
+                    where: { tag: { deleted_at: null } },
                     include: {
                         tag: true
                     }
                 },
                 publications: {
+                    where: { publication: { deleted_at: null } },
                     include: {
                         publication: true
                     }
@@ -177,11 +188,12 @@ export const getPaginatedLecturers = async (filters?: LecturerFilters): Promise<
  * Get a single lecturer by slug
  */
 export const getLecturerBySlug = async (slug: string): Promise<Lecturer | null> => {
-    const lecturer = await prisma.lecturer.findUnique({
-        where: { slug },
+    const lecturer = await prisma.lecturer.findFirst({
+        where: { slug, deleted_at: null },
         include: {
             metrics: true,
             research_tags: {
+                where: { tag: { deleted_at: null } },
                 include: {
                     tag: {
                         include: {
@@ -191,6 +203,7 @@ export const getLecturerBySlug = async (slug: string): Promise<Lecturer | null> 
                 }
             },
             publications: {
+                where: { publication: { deleted_at: null } },
                 include: {
                     publication: true
                 },
@@ -217,16 +230,18 @@ export const getLecturersBySlug = async (slug: string): Promise<Lecturer | null>
  * Get a single lecturer by ID
  */
 export const getLecturerById = async (id: string): Promise<Lecturer | null> => {
-    const lecturer = await prisma.lecturer.findUnique({
-        where: { id },
+    const lecturer = await prisma.lecturer.findFirst({
+        where: { id, deleted_at: null },
         include: {
             metrics: true,
             research_tags: {
+                where: { tag: { deleted_at: null } },
                 include: {
                     tag: true
                 }
             },
             publications: {
+                where: { publication: { deleted_at: null } },
                 include: {
                     publication: true
                 }
@@ -241,11 +256,12 @@ export const getLecturerById = async (id: string): Promise<Lecturer | null> => {
  * Get a single lecturer by SINTA ID
  */
 export const getLecturerBySintaId = async (sintaId: string): Promise<Lecturer | null> => {
-    const lecturer = await prisma.lecturer.findUnique({
-        where: { sinta_id: sintaId },
+    const lecturer = await prisma.lecturer.findFirst({
+        where: { sinta_id: sintaId, deleted_at: null },
         include: {
             metrics: true,
             research_tags: {
+                where: { tag: { deleted_at: null } },
                 include: {
                     tag: true
                 }
@@ -329,6 +345,13 @@ export const createLecturer = async (data: CreateLecturerDTO): Promise<Lecturer>
  * Update an existing lecturer
  */
 export const updateLecturer = async (id: string, data: UpdateLecturerDTO): Promise<Lecturer> => {
+    const existing = await prisma.lecturer.findFirst({
+        where: { id, deleted_at: null }
+    });
+    if (!existing) {
+        throw new Error(`Lecturer with id ${id} not found or deleted.`);
+    }
+
     const { metrics, tag_ids, ...lecturerData } = data;
 
     const lecturer = await prisma.$transaction(async (tx) => {
@@ -382,6 +405,7 @@ export const updateLecturer = async (id: string, data: UpdateLecturerDTO): Promi
             include: {
                 metrics: true,
                 research_tags: {
+                    where: { tag: { deleted_at: null } },
                     include: {
                         tag: true
                     }
@@ -394,16 +418,33 @@ export const updateLecturer = async (id: string, data: UpdateLecturerDTO): Promi
 };
 
 /**
- * Delete a lecturer by ID
+ * Delete a lecturer by ID (soft delete)
  */
 export const deleteLecturer = async (id: string): Promise<boolean> => {
     try {
-        await prisma.lecturer.delete({
-            where: { id }
+        await prisma.lecturer.update({
+            where: { id },
+            data: { deleted_at: new Date() }
         });
         return true;
     } catch (error) {
         console.error(`Error deleting lecturer ${id}:`, error);
+        return false;
+    }
+};
+
+/**
+ * Restore a soft-deleted lecturer by ID
+ */
+export const restoreLecturer = async (id: string): Promise<boolean> => {
+    try {
+        await prisma.lecturer.update({
+            where: { id },
+            data: { deleted_at: null }
+        });
+        return true;
+    } catch (error) {
+        console.error(`Error restoring lecturer ${id}:`, error);
         return false;
     }
 };
@@ -416,6 +457,11 @@ export const assignResearchTagsToLecturer = async (
     tags: Array<{ tag_id: string; is_primary?: boolean }>
 ): Promise<boolean> => {
     try {
+        const existing = await prisma.lecturer.findFirst({
+            where: { id: lecturerId, deleted_at: null }
+        });
+        if (!existing) return false;
+
         await prisma.$transaction(async (tx) => {
             await tx.lecturerResearchTag.deleteMany({
                 where: { lecturer_id: lecturerId }

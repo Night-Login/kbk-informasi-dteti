@@ -6,6 +6,7 @@ export interface Admin {
     password?: string;
     role?: Role;
     createdAt?: Date | string;
+    deletedAt?: Date | string | null;
 }
 
 // Data Transfer Objects (DTOs) for creating/updating
