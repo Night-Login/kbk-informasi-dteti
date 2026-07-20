@@ -125,6 +125,9 @@ model Lecturer {
   slug                String                @unique
   nip_or_staff_id     String
   email               String?
+  photo_url           String?
+  short_bio           String?
+  bio                 String?
   sinta_id            String                @unique
   scopus_author_id    String?
   google_scholar_url  String?

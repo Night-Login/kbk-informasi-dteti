@@ -66,6 +66,9 @@ export interface CreateLecturerDTO {
     slug: string;
     nip_or_staff_id: string;
     email?: string | null;
+    photo_url?: string | null;
+    short_bio?: string | null;
+    bio?: string | null;
     sinta_id: string;
     scopus_author_id?: string | null;
     google_scholar_url?: string | null;

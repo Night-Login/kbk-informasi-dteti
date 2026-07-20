@@ -7,6 +7,8 @@ import {
     PaginatedResult
 } from "../types/index.js";
 import { Prisma } from "@prisma/client";
+import fs from "fs";
+import path from "path";
 
 /**
  * Common include clause for standard Lecturer queries
@@ -260,6 +262,8 @@ export const createLecturer = async (data: CreateLecturerDTO): Promise<Lecturer>
                 slug: lecturerData.slug,
                 nip_or_staff_id: lecturerData.nip_or_staff_id,
                 email: lecturerData.email,
+                photo_url: lecturerData.photo_url,
+                bio: lecturerData.bio,
                 sinta_id: lecturerData.sinta_id,
                 scopus_author_id: lecturerData.scopus_author_id,
                 google_scholar_url: lecturerData.google_scholar_url,
@@ -476,4 +480,37 @@ export const upsertLecturerMetric = async (
             fetched_at: new Date()
         }
     });
+};
+
+/**
+ * Update profile photo for a lecturer and clean up old photo file from disk if applicable
+ */
+export const updateLecturerPhoto = async (id: string, photoUrl: string): Promise<Lecturer> => {
+    const existing = await prisma.lecturer.findFirst({
+        where: { id, deleted_at: null },
+        include: includeClause
+    });
+    if (!existing) {
+        throw new Error(`Lecturer with id ${id} not found or deleted.`);
+    }
+
+    // Clean up old photo file from local disk if it starts with /uploads/
+    if (existing.photo_url && existing.photo_url.startsWith("/uploads/")) {
+        try {
+            const oldFilePath = path.join(process.cwd(), existing.photo_url);
+            if (fs.existsSync(oldFilePath)) {
+                fs.unlinkSync(oldFilePath);
+            }
+        } catch (err) {
+            console.error(`Error removing old photo for lecturer ${id}:`, err);
+        }
+    }
+
+    const updated = await prisma.lecturer.update({
+        where: { id },
+        data: { photo_url: photoUrl },
+        include: includeClause
+    });
+
+    return updated as unknown as Lecturer;
 };
