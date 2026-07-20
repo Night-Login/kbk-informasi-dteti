@@ -10,21 +10,27 @@ import {
 function LargeWireframeLink({
   href,
   label,
-  tone = "gray",
+  tone = "gradient",
 }: {
   href: string;
   label: string;
-  tone?: "gray" | "white";
+  tone?: "gradient" | "white";
 }) {
   return (
     <Link
       href={href}
-      className={`mt-6 flex min-h-12 items-center justify-between px-8 text-base font-extrabold text-ink ${
-        tone === "white" ? "bg-white" : "bg-[oklch(0.86_0_0)]"
+      className={`group mt-6 flex min-h-12 items-center justify-between px-8 text-base font-extrabold transition-colors ${
+        tone === "white"
+          ? "bg-white text-dteti-blue-deep hover:bg-dteti-blue-soft"
+          : "brand-gradient text-white hover:brightness-105"
       }`}
     >
       <span>{label}</span>
-      <ArrowUpRight size={18} aria-hidden="true" />
+      <ArrowUpRight
+        className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+        size={18}
+        aria-hidden="true"
+      />
     </Link>
   );
 }
@@ -42,16 +48,16 @@ export default function AcademicPage() {
       </div>
 
       <section className="page-container pb-16 pt-2">
-        <h1 className="text-center text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold tracking-[-0.025em] text-ink">
+        <h1 className="text-center text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold tracking-[-0.025em] text-dteti-blue">
           Academic Programs and Scholarships
         </h1>
 
         <div className="mt-20">
-          <h2 className="text-2xl font-extrabold text-ink">Programs</h2>
+          <h2 className="text-2xl font-extrabold text-dteti-blue">Programs</h2>
           <div className="mx-auto mt-10 grid max-w-6xl gap-10 md:grid-cols-2">
             {academicPrograms.map((program) => (
               <article key={program.title} id={program.href.slice(1)}>
-                <h3 className="text-2xl font-extrabold text-ink">
+                <h3 className="text-2xl font-extrabold text-dteti-blue-deep">
                   {program.title}
                 </h3>
                 <p className="mt-2 text-sm text-ink">{program.overview}</p>
@@ -66,15 +72,17 @@ export default function AcademicPage() {
         </div>
 
         <div className="mt-12">
-          <h2 className="text-2xl font-extrabold text-ink">Scholarships</h2>
-          <div className="mt-6 grid gap-10 bg-[oklch(0.86_0_0)] px-8 py-12 md:grid-cols-2 md:px-24">
+          <h2 className="text-2xl font-extrabold text-dteti-blue">Scholarships</h2>
+          <div className="brand-gradient mt-6 grid gap-10 px-8 py-12 text-white md:grid-cols-2 md:px-24">
             {scholarships.map((scholarship) => (
               <article key={scholarship.title} id={scholarship.href.slice(1)}>
-                <h3 className="text-2xl font-extrabold text-ink">
+                <h3 className="text-2xl font-extrabold text-white">
                   {scholarship.title}
                 </h3>
-                <p className="mt-2 text-sm text-ink">{scholarship.overview}</p>
-                <p className="mt-4 text-sm text-ink">{scholarship.info}</p>
+                <p className="mt-2 text-sm text-white/90">
+                  {scholarship.overview}
+                </p>
+                <p className="mt-4 text-sm text-white/90">{scholarship.info}</p>
                 <LargeWireframeLink
                   href={scholarship.href}
                   label="View Program Information"
@@ -86,10 +94,10 @@ export default function AcademicPage() {
         </div>
 
         <section className="mt-8 max-w-3xl">
-          <h2 className="text-2xl font-extrabold text-ink">
+          <h2 className="text-2xl font-extrabold text-dteti-blue">
             Frequently Asked Questions (FAQs)
           </h2>
-          <h3 className="mt-6 text-2xl font-extrabold text-ink">
+          <h3 className="mt-6 text-2xl font-extrabold text-dteti-blue">
             How to contact a potential supervisor?
           </h3>
 
@@ -115,7 +123,7 @@ export default function AcademicPage() {
         </section>
 
         <section className="mt-28 max-w-2xl">
-          <h2 className="text-2xl font-extrabold text-ink">
+          <h2 className="text-2xl font-extrabold text-dteti-blue">
             Need more Information?
           </h2>
           <p className="mt-2 text-sm text-ink">

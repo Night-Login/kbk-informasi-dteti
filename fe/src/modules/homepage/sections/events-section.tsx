@@ -14,7 +14,7 @@ export default function EventsSection() {
           {events.map((event, index) => (
             <article
               key={`${event.title}-${index}`}
-              className="grid grid-cols-[70px_1fr] items-center gap-5 bg-dteti-blue px-5 py-4 text-white"
+              className="brand-gradient grid grid-cols-[70px_1fr] items-center gap-5 px-5 py-4 text-white"
             >
               <time className="grid h-16 place-items-center bg-dteti-yellow text-center text-base font-extrabold leading-5 text-dteti-ink">
                 <span>

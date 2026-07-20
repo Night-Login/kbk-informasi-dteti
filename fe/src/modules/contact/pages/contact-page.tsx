@@ -24,7 +24,7 @@ function Field({
         name={id}
         type={type}
         placeholder={placeholder}
-        className="min-h-10 border border-white/20 bg-white/18 px-3 text-white outline-none placeholder:text-white/85 focus:border-dteti-yellow"
+        className="min-h-10 border border-white/40 bg-dteti-blue px-3 text-white outline-none placeholder:text-white focus:border-dteti-yellow"
       />
     </label>
   );
@@ -39,13 +39,13 @@ export default function ContactPage() {
   return (
     <main id="main-content" className="bg-white pt-16 text-ink sm:pt-20">
       <section className="page-container pb-10 pt-12">
-        <h1 className="text-center text-[clamp(2rem,5vw,3rem)] font-extrabold tracking-[-0.03em] text-ink">
+        <h1 className="text-center text-[clamp(2rem,5vw,3rem)] font-extrabold tracking-[-0.03em] text-dteti-blue">
           Contact Us
         </h1>
 
         <div className="mx-auto mt-10 grid max-w-6xl gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
-          <form className="rounded-xl bg-dteti-blue px-6 py-8 text-white sm:px-12">
-            <h2 className="text-2xl font-bold">Send us message</h2>
+          <form className="brand-gradient rounded-xl px-6 py-8 text-white sm:px-12">
+            <h2 className="text-2xl font-bold">Send us a message</h2>
 
             <div className="mt-6 grid gap-6 sm:grid-cols-2">
               <Field id="name" label="Full name" placeholder="Name" />
@@ -66,7 +66,7 @@ export default function ContactPage() {
                 name="message"
                 placeholder="Message"
                 rows={6}
-                className="resize-y border border-white/20 bg-white/22 px-3 py-3 text-white outline-none placeholder:text-white/85 focus:border-dteti-yellow"
+                className="resize-y border border-white/40 bg-dteti-blue px-3 py-3 text-white outline-none placeholder:text-white focus:border-dteti-yellow"
               />
             </label>
 
@@ -84,14 +84,14 @@ export default function ContactPage() {
         </div>
 
         <div className="mx-auto mt-8 grid max-w-6xl gap-8 md:grid-cols-3">
-          <article className="grid min-h-72 place-items-center bg-dteti-blue p-8 text-center text-white">
+          <article className="brand-gradient grid min-h-72 place-items-center p-8 text-center text-white">
             <div>
               <EmailIcon className="mx-auto" size={46} aria-hidden="true" />
               <p className="mt-8 text-lg">{emailCard.value}</p>
             </div>
           </article>
 
-          <article className="grid min-h-72 place-items-center bg-dteti-blue p-8 text-center text-white">
+          <article className="brand-gradient grid min-h-72 place-items-center p-8 text-center text-white">
             <div>
               <AddressIcon className="mx-auto" size={46} aria-hidden="true" />
               <h2 className="mt-8 text-lg font-extrabold leading-tight">
@@ -105,7 +105,7 @@ export default function ContactPage() {
             </div>
           </article>
 
-          <article className="grid min-h-72 place-items-center bg-dteti-blue p-8 text-white">
+          <article className="brand-gradient grid min-h-72 place-items-center p-8 text-white">
             <div>
               <SocialIcon className="mx-auto" size={46} aria-hidden="true" />
               <ul className="mt-8 space-y-4 text-lg">
