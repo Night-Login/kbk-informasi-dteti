@@ -1,15 +1,16 @@
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { PersonLite } from "@/types/person";
 
 type LecturerCardProps = {
   lecturer: PersonLite;
+  priority?: boolean;
 };
 
-export default function LecturerCard({ lecturer }: LecturerCardProps) {
+export default function LecturerCard({ lecturer, priority = false }: LecturerCardProps) {
   return (
-    <article className="mx-auto flex w-full max-w-80 flex-col gap-5 bg-surface p-6">
+    <article className="mx-auto flex h-full w-full max-w-80 flex-col gap-5 bg-dteti-blue-soft p-6">
       <Link
         href={`/people/${lecturer.id}`}
         className="relative mx-auto aspect-square w-full overflow-hidden rounded-full bg-surface-strong"
@@ -23,6 +24,7 @@ export default function LecturerCard({ lecturer }: LecturerCardProps) {
             sizes="280px"
             className="object-cover grayscale"
             unoptimized
+            priority={priority}
           />
         ) : (
           <span className="grid size-full place-items-center text-5xl font-bold text-muted">
@@ -32,7 +34,7 @@ export default function LecturerCard({ lecturer }: LecturerCardProps) {
       </Link>
 
       <div>
-        <h2 className="text-[17px] font-bold leading-tight text-ink">
+        <h2 className="text-[17px] font-bold leading-tight text-dteti-blue">
           <Link href={`/people/${lecturer.id}`} className="hover:underline">
             {lecturer.fullName}
           </Link>
@@ -48,13 +50,9 @@ export default function LecturerCard({ lecturer }: LecturerCardProps) {
           <MapPin className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
           <span>{lecturer.contact.labName || "Lab XYZ"}</span>
         </p>
-        <p className="flex items-center gap-2">
-          <Phone className="shrink-0" size={16} aria-hidden="true" />
-          <span>{lecturer.contact.phone || "(+62)81234567890"}</span>
-        </p>
         <a
           href={`mailto:${lecturer.contact.email}`}
-          className="flex items-center gap-2 break-all hover:text-ink hover:underline"
+          className="flex items-center gap-2 break-all hover:text-dteti-blue hover:underline"
         >
           <Mail className="shrink-0" size={16} aria-hidden="true" />
           <span>{lecturer.contact.email}</span>

@@ -3,9 +3,17 @@ export interface teachingAssistant {
   profilePictureUrl?: string;
 
   contact: {
-    phone: string;
     email: string;
   };
+}
+
+export interface Advisee {
+  id: string;
+  fullName: string;
+  level: "S1" | "S2" | "S3";
+  project: string;
+  researchArea: string;
+  profileHref?: string;
 }
 
 export interface publication {
@@ -27,7 +35,6 @@ export interface PersonLite {
 
   contact: {
     labName: string;
-    phone: string;
     email: string;
   };
 }
@@ -39,7 +46,7 @@ export interface PersonFull extends PersonLite {
   degrees: string[];
   researchAreas: string[];
   teachingAssistants: teachingAssistant[];
-  advisees: string[];
+  advisees: Advisee[];
 
   academicLinks: {
     sinta: string;
