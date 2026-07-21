@@ -360,20 +360,11 @@ export async function restoreLecturer(req: Request, res: Response, next: NextFun
             return;
         }
 
-        const existing = await lecturerService.getLecturerById(id);
-        if (!existing) {
-            res.status(404).json({
-                success: false,
-                message: "Lecturer not found"
-            });
-            return;
-        }
-
         const success = await lecturerService.restoreLecturer(id);
         if (!success) {
-            res.status(500).json({
+            res.status(404).json({
                 success: false,
-                message: "Failed to restore lecturer"
+                message: "Lecturer not found or failed to restore"
             });
             return;
         }

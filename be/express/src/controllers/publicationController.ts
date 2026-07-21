@@ -407,20 +407,11 @@ export async function restorePublication(req: Request, res: Response, next: Next
             return;
         }
 
-        const existing = await publicationService.getPublicationById(id);
-        if (!existing) {
-            res.status(404).json({
-                success: false,
-                message: "Publication not found"
-            });
-            return;
-        }
-
         const success = await publicationService.restorePublication(id);
         if (!success) {
-            res.status(500).json({
+            res.status(404).json({
                 success: false,
-                message: "Failed to restore publication"
+                message: "Publication not found or failed to restore"
             });
             return;
         }

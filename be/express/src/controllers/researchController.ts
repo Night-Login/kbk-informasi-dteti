@@ -318,20 +318,11 @@ export async function restoreResearchCluster(req: Request, res: Response, next: 
             return;
         }
 
-        const existing = await researchService.getResearchClusterById(id);
-        if (!existing) {
-            res.status(404).json({
-                success: false,
-                message: "Research cluster not found"
-            });
-            return;
-        }
-
         const success = await researchService.restoreResearchCluster(id);
         if (!success) {
-            res.status(500).json({
+            res.status(404).json({
                 success: false,
-                message: "Failed to restore research cluster"
+                message: "Research cluster not found or failed to restore"
             });
             return;
         }
@@ -630,20 +621,11 @@ export async function restoreResearchTag(req: Request, res: Response, next: Next
             return;
         }
 
-        const existing = await researchService.getResearchTagById(id);
-        if (!existing) {
-            res.status(404).json({
-                success: false,
-                message: "Research tag not found"
-            });
-            return;
-        }
-
         const success = await researchService.restoreResearchTag(id);
         if (!success) {
-            res.status(500).json({
+            res.status(404).json({
                 success: false,
-                message: "Failed to restore research tag"
+                message: "Research tag not found or failed to restore"
             });
             return;
         }

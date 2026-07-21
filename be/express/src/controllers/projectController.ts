@@ -353,20 +353,11 @@ export async function restoreProject(req: Request, res: Response, next: NextFunc
             return;
         }
 
-        const existing = await projectService.getProjectById(id);
-        if (!existing) {
-            res.status(404).json({
-                success: false,
-                message: "Project not found"
-            });
-            return;
-        }
-
         const success = await projectService.restoreProject(id);
         if (!success) {
-            res.status(500).json({
+            res.status(404).json({
                 success: false,
-                message: "Failed to restore project"
+                message: "Project not found or failed to restore"
             });
             return;
         }
