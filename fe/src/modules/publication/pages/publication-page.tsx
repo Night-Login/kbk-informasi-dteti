@@ -1,81 +1,223 @@
-import { Search, ChevronDown } from "lucide-react";
+"use client";
+
+import Breadcrumbs from "@/components/global/breadcrumbs";
+import TopicTag from "@/components/global/topic-tag";
 import { publicationData } from "@/modules/publication/data/publication.data";
+import { Search, X } from "lucide-react";
+import { useMemo, useState } from "react";
+
+const topics = Array.from(new Set(publicationData.flatMap((item) => item.tags)));
+const years = Array.from(
+  new Set(publicationData.map((item) => item.date.match(/\d{4}/)?.[0] ?? "")),
+).filter(Boolean);
+const lecturers = Array.from(
+  new Set(
+    publicationData.flatMap((item) =>
+      item.authors
+        .split(",")
+        .map((author) => author.trim())
+        .filter(Boolean),
+    ),
+  ),
+);
 
 export default function PublicationPage() {
+  const [query, setQuery] = useState("");
+  const [topic, setTopic] = useState("Artificial Intelligence");
+  const [lecturer, setLecturer] = useState("");
+  const [year, setYear] = useState("2026");
+
+  const visiblePublications = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase();
+
+    return publicationData.filter((publication) => {
+      const matchesQuery = publication.title
+        .toLocaleLowerCase()
+        .includes(normalizedQuery);
+      const matchesTopic = !topic || publication.tags.includes(topic);
+      const matchesLecturer =
+        !lecturer || publication.authors.includes(lecturer);
+      const matchesYear = !year || publication.date.includes(year);
+
+      return matchesQuery && matchesTopic && matchesLecturer && matchesYear;
+    });
+  }, [lecturer, query, topic, year]);
+
+  const activeFilters = [
+    topic ? { key: "topic", label: topic, clear: () => setTopic("") } : null,
+    lecturer
+      ? { key: "lecturer", label: lecturer, clear: () => setLecturer("") }
+      : null,
+    year ? { key: "year", label: year, clear: () => setYear("") } : null,
+  ].filter((filter): filter is NonNullable<typeof filter> => filter !== null);
+
+  function clearFilters() {
+    setQuery("");
+    setTopic("");
+    setLecturer("");
+    setYear("");
+  }
+
   return (
-    <main className="min-h-screen max-w-7xl mx-auto px-4 py-24 flex flex-col gap-8 text-black bg-white">
-      {/* Title */}
-      <h1 className="text-3xl font-bold text-center mt-4">Publications</h1>
+    <main id="main-content" className="min-h-screen bg-white pb-20 pt-24 sm:pt-28">
+      <div className="page-container">
+        <Breadcrumbs
+          items={[{ label: "Home", href: "/" }, { label: "Publication" }]}
+        />
 
-      {/* Search Bar */}
-      <div className="flex justify-center">
-        <div className="relative w-full max-w-2xl">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search publication by title"
-            className="w-full pl-12 pr-4 py-3 border border-gray-400 rounded-lg outline-none focus:border-gray-600 bg-transparent"
-          />
-        </div>
-      </div>
+        <h1 className="mb-8 mt-6 text-center text-3xl font-bold text-dteti-blue sm:text-4xl">
+          Publications
+        </h1>
 
-      {/* Filters and Metadata */}
-      <div className="flex flex-col gap-4 mt-2">
-        <div className="flex flex-wrap items-center gap-3">
-          <button className="flex items-center justify-between gap-2 px-3 py-1 border border-gray-400 bg-white text-sm">
-            <span>Research Topic</span>
-            <ChevronDown className="w-4 h-4 text-gray-600" />
-          </button>
-          <button className="flex items-center justify-between gap-2 px-3 py-1 border border-gray-400 bg-white text-sm">
-            <span>Lecturer</span>
-            <ChevronDown className="w-4 h-4 text-gray-600" />
-          </button>
-          <button className="flex items-center justify-between gap-2 px-3 py-1 border border-gray-400 bg-white text-sm">
-            <span>Year</span>
-            <ChevronDown className="w-4 h-4 text-gray-600" />
-          </button>
-          <button className="px-3 py-1 bg-gray-300 text-sm font-semibold border border-transparent text-black">
-            Clear All
-          </button>
-        </div>
-
-        {/* Active Filters */}
-        <div className="flex flex-col gap-2 mt-2">
-          <span className="text-sm text-gray-700">Active filter:</span>
-          <div className="flex gap-2">
-            <span className="px-3 py-1 bg-gray-200 text-sm">
-              Artificial Intelligence
-            </span>
-            <span className="px-3 py-1 bg-gray-200 text-sm">2026</span>
+        <div className="mx-auto max-w-4xl">
+          <label htmlFor="publication-search" className="sr-only">
+            Search publication by title
+          </label>
+          <div className="relative">
+            <Search
+              className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-muted"
+              size={22}
+              aria-hidden="true"
+            />
+            <input
+              id="publication-search"
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search publication by title"
+              className="min-h-16 w-full rounded-xl border border-muted bg-white py-4 pl-14 pr-5 text-lg font-medium text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus sm:text-xl"
+            />
           </div>
         </div>
 
-        <p className="text-sm text-gray-700 mt-2">Showing {publicationData.length} Publications</p>
-      </div>
-
-      {/* List */}
-      <div className="flex flex-col border-t border-gray-400 mt-2">
-        {publicationData.map((pub, idx) => (
-          <div
-            key={idx}
-            className="py-6 border-b border-gray-400 flex flex-col gap-1.5"
-          >
-            <h2 className="text-lg font-bold">{pub.title}</h2>
-            <p className="text-sm text-gray-700">
-              {pub.type} &bull; {pub.date} &bull; {pub.authors}
-            </p>
-            <div className="flex gap-2 mt-1">
-              {pub.tags.map((tag, tIdx) => (
-                <span
-                  key={tIdx}
-                  className="px-2 py-0.5 border border-gray-500 text-xs text-gray-800"
-                >
-                  {tag}
-                </span>
+        <section className="mt-10" aria-label="Publication filters">
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="sr-only" htmlFor="publication-topic">
+              Research topic
+            </label>
+            <select
+              id="publication-topic"
+              value=""
+              onChange={(event) => setTopic(event.target.value)}
+              className="min-h-10 border border-line bg-white px-3 text-sm text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
+            >
+              <option value="">Research Topic</option>
+              {topics.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
               ))}
-            </div>
+            </select>
+
+            <label className="sr-only" htmlFor="publication-lecturer">
+              Lecturer
+            </label>
+            <select
+              id="publication-lecturer"
+              value=""
+              onChange={(event) => setLecturer(event.target.value)}
+              className="min-h-10 border border-line bg-white px-3 text-sm text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
+            >
+              <option value="">Lecturer</option>
+              {lecturers.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <label className="sr-only" htmlFor="publication-year">
+              Publication year
+            </label>
+            <select
+              id="publication-year"
+              value=""
+              onChange={(event) => setYear(event.target.value)}
+              className="min-h-10 border border-line bg-white px-3 text-sm text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
+            >
+              <option value="">Year</option>
+              {years.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="button"
+              onClick={clearFilters}
+              disabled={activeFilters.length === 0}
+              className="min-h-10 bg-dteti-blue-soft px-4 text-sm font-semibold text-dteti-ink transition-colors hover:bg-dteti-blue-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Clear All
+            </button>
           </div>
-        ))}
+
+          <div className="mt-6">
+            <p className="text-sm text-ink">Active filter:</p>
+            {activeFilters.length > 0 ? (
+              <div className="mt-2 flex flex-wrap gap-3">
+                {activeFilters.map((filter) => (
+                  <button
+                    key={filter.key}
+                    type="button"
+                    onClick={filter.clear}
+                    className="inline-flex min-h-9 items-center gap-2 border border-dteti-ink/70 bg-dteti-yellow px-3 py-1 text-sm text-dteti-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+                    aria-label={`Remove ${filter.label} filter`}
+                  >
+                    {filter.label}
+                    <X size={14} aria-hidden="true" />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-muted">No active filters</p>
+            )}
+          </div>
+
+          <p className="mt-5 text-sm text-muted" aria-live="polite">
+            Showing {visiblePublications.length}{" "}
+            {visiblePublications.length === 1 ? "Publication" : "Publications"}
+          </p>
+        </section>
+
+        <section className="mt-10" aria-label="Publication results">
+          {visiblePublications.length > 0 ? (
+            <ol className="border-t border-muted">
+              {visiblePublications.map((publication, index) => (
+                <li
+                  id={`publication-${index + 1}`}
+                  key={publication.title}
+                  className="border-b border-muted py-7"
+                >
+                  <a
+                    href={`#publication-${index + 1}`}
+                    className="text-lg font-bold text-dteti-blue hover:underline sm:text-xl"
+                  >
+                    {publication.title}
+                  </a>
+                  <p className="mt-1 text-sm text-ink">
+                    {publication.type} &bull; {publication.date} &bull; {publication.authors}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-3">
+                    {publication.tags.map((tag) => (
+                      <TopicTag key={tag}>{tag}</TopicTag>
+                    ))}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className="border border-line bg-surface px-6 py-16 text-center">
+              <h2 className="text-lg font-semibold text-dteti-blue">
+                No publications found
+              </h2>
+              <p className="mt-2 text-sm text-muted">
+                Try another title or remove one of the active filters.
+              </p>
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );
