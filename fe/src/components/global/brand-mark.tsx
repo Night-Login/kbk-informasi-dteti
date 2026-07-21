@@ -23,7 +23,7 @@ export default function BrandMark({ compact = false }: BrandMarkProps) {
         alt=""
         width={logoSize.width}
         height={logoSize.height}
-        priority={compact}
+        loading={compact ? "eager" : "lazy"}
         unoptimized
         className="h-full w-full object-contain object-left"
       />
