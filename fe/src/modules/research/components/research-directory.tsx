@@ -1,6 +1,10 @@
-import { FileText, Search, UserRound } from "lucide-react";
+"use client";
+
 import Breadcrumbs from "@/components/global/breadcrumbs";
 import WireframePlaceholder from "@/components/global/wireframe-placeholder";
+import { FileText, Search, UserRound } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
 type ResearchDirectoryItem = {
   title: string;
@@ -16,33 +20,33 @@ type ResearchDirectoryProps = {
   items: readonly ResearchDirectoryItem[];
 };
 
-function ResearchTag({ label }: { label: string }) {
-  return (
-    <span className="inline-flex min-h-8 items-center rounded-md border border-ink bg-white px-3 text-sm font-semibold text-ink">
-      {label}
-    </span>
-  );
-}
-
 function ResearchDirectoryCard({ item }: { item: ResearchDirectoryItem }) {
   return (
-    <WireframePlaceholder className="rounded-xl px-6 py-10">
+    <WireframePlaceholder className="rounded-xl px-6 py-9 shadow-[0_2px_8px_rgba(35,65,100,0.08)] sm:px-10 sm:py-11">
       <article>
-        <h2 className="text-2xl font-extrabold tracking-[-0.02em] text-ink">
+        <h2 className="text-2xl font-bold text-dteti-blue sm:text-3xl">
           {item.title}
         </h2>
-        <div className="mt-7 flex flex-wrap gap-5">
+        <div className="mt-7 flex flex-wrap gap-4">
           {item.tags.map((tag) => (
-            <ResearchTag key={`${item.title}-${tag}`} label={tag} />
+            <Link
+              key={`${item.title}-${tag}`}
+              href="/tag-research-areas"
+              className="inline-flex min-h-9 items-center rounded-md border border-dteti-ink/70 bg-dteti-yellow px-3.5 text-sm font-semibold text-dteti-ink transition-colors hover:bg-dteti-yellow/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+            >
+              {tag}
+            </Link>
           ))}
         </div>
         <div className="mt-8 flex items-center gap-8 text-base text-ink">
-          <span className="inline-flex items-center gap-2">
-            <UserRound size={20} aria-hidden="true" />
+          <span className="inline-flex items-center gap-2" title="Lecturers">
+            <UserRound size={21} aria-hidden="true" />
+            <span className="sr-only">Lecturers:</span>
             {item.lecturers}
           </span>
-          <span className="inline-flex items-center gap-2">
-            <FileText size={20} aria-hidden="true" />
+          <span className="inline-flex items-center gap-2" title="Publications">
+            <FileText size={21} aria-hidden="true" />
+            <span className="sr-only">Publications:</span>
             {item.publications}
           </span>
         </div>
@@ -57,9 +61,22 @@ export default function ResearchDirectory({
   breadcrumbCurrent,
   items,
 }: ResearchDirectoryProps) {
+  const [query, setQuery] = useState("");
+
+  const visibleItems = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase();
+
+    return items.filter((item) =>
+      [item.title, ...item.tags]
+        .join(" ")
+        .toLocaleLowerCase()
+        .includes(normalizedQuery),
+    );
+  }, [items, query]);
+
   return (
-    <main id="main-content" className="bg-white pt-16 text-ink sm:pt-20">
-      <div className="page-container py-6">
+    <main id="main-content" className="bg-white pb-20 pt-24 text-ink sm:pt-28">
+      <div className="page-container">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
@@ -67,34 +84,56 @@ export default function ResearchDirectory({
             { label: breadcrumbCurrent },
           ]}
         />
+
+        <section className="pb-4 pt-7">
+          <h1 className="text-center text-4xl font-bold tracking-[-0.025em] text-dteti-blue sm:text-5xl">
+            {title}
+          </h1>
+
+          <form
+            className="mx-auto mt-7 max-w-3xl"
+            role="search"
+            onSubmit={(event) => event.preventDefault()}
+          >
+            <label className="sr-only" htmlFor="research-search">
+              {searchPlaceholder}
+            </label>
+            <div className="flex min-h-16 items-center gap-4 rounded-xl border border-line bg-white px-6 focus-within:border-dteti-blue focus-within:ring-2 focus-within:ring-focus sm:px-8">
+              <Search className="text-muted" size={21} aria-hidden="true" />
+              <input
+                id="research-search"
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={searchPlaceholder}
+                className="min-w-0 flex-1 bg-transparent text-base font-semibold text-ink outline-none placeholder:text-muted sm:text-lg"
+              />
+            </div>
+          </form>
+
+          <p className="sr-only" aria-live="polite">
+            Showing {visibleItems.length}{" "}
+            {visibleItems.length === 1 ? "research area" : "research areas"}
+          </p>
+
+          {visibleItems.length > 0 ? (
+            <div className="mt-10 grid gap-10">
+              {visibleItems.map((item) => (
+                <ResearchDirectoryCard key={item.title} item={item} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-10 bg-surface px-6 py-16 text-center">
+              <h2 className="text-xl font-bold text-dteti-blue">
+                No research areas found
+              </h2>
+              <p className="mt-2 text-sm text-muted">
+                Try another research area or topic keyword.
+              </p>
+            </div>
+          )}
+        </section>
       </div>
-
-      <section className="page-container pb-12 pt-2">
-        <h1 className="text-center text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold tracking-[-0.025em] text-ink">
-          {title}
-        </h1>
-
-        <form className="mx-auto mt-6 max-w-2xl" role="search">
-          <label className="sr-only" htmlFor="research-search">
-            {searchPlaceholder}
-          </label>
-          <div className="flex min-h-14 items-center gap-5 rounded-xl border border-ink bg-white px-8">
-            <Search size={20} aria-hidden="true" />
-            <input
-              id="research-search"
-              type="search"
-              placeholder={searchPlaceholder}
-              className="min-w-0 flex-1 bg-transparent text-lg font-semibold text-ink outline-none placeholder:text-[oklch(0.55_0_0)]"
-            />
-          </div>
-        </form>
-
-        <div className="mx-auto mt-10 grid max-w-6xl gap-10">
-          {items.map((item) => (
-            <ResearchDirectoryCard key={item.title} item={item} />
-          ))}
-        </div>
-      </section>
     </main>
   );
 }
