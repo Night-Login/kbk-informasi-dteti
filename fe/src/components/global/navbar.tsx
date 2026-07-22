@@ -19,6 +19,10 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   return (
     <header className="site-header brand-gradient fixed inset-x-0 top-0 border-b-2 border-dteti-yellow">
       <div className="page-container flex h-16 items-center justify-between sm:h-20">
