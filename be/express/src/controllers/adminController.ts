@@ -60,6 +60,65 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
 }
 
 /*
+    Name           : Admin Logout Controller
+    Description    : Handle the admin logout process by clearing the token cookie
+    Request params : none
+    Action         : clear JWT cookie
+    Response       : success message 
+*/
+export async function logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict"
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Logout successful"
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/*
+    Name           : Get Current Admin (Me) Controller
+    Description    : Fetches the currently authenticated admin profile data
+    Request params : none (uses req.user from JWT)
+    Action         : fetch data from database based on req.user.id
+    Response       : success or error message 
+*/
+export async function getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        if (!req.user || !req.user.id) {
+            res.status(401).json({
+                success: false,
+                message: "Unauthorized"
+            });
+            return;
+        }
+
+        const admin = await adminService.getAdminById(req.user.id);
+        if (!admin) {
+            res.status(404).json({
+                success: false,
+                message: "Admin not found"
+            });
+            return;
+        }
+
+        res.status(200).json({
+            success: true,
+            data: admin
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/*
     Name           : Get all admins controller
     Description    : Fetches all admin data from database
     Request params : none

@@ -9,7 +9,13 @@ const router = Router();
 // POST /api/v1/admins/login
 router.post("/login", adminController.login);
 
+// POST /api/v1/admins/logout
+router.post("/logout", adminController.logout);
+
 /* #### Protected endpoints (Admin & Superadmin access) #### */
+
+// GET /api/v1/admins/me
+router.get("/me", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), adminController.getMe);
 
 // GET /api/v1/admins 
 router.get("/", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), adminController.getAdmins);

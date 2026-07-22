@@ -172,6 +172,17 @@ async function runTests() {
         }
 
         try {
+            const res = await axios.get(`${API_URL}/admins/me`, authHeaders);
+            if (res.data?.success && res.data?.data?.username) {
+                logPass("GET /api/v1/admins/me (Current Admin Profile)");
+            } else {
+                throw new Error("Invalid format returned for current admin profile");
+            }
+        } catch (e) {
+            logFail("GET /api/v1/admins/me (Current Admin Profile)", e);
+        }
+
+        try {
             const uniqueName = `admin_test_${Date.now()}`;
             const res = await axios.post(`${API_URL}/admins`, {
                 username: uniqueName,
@@ -206,6 +217,17 @@ async function runTests() {
             } catch (e) {
                 logFail(`PUT /api/v1/admins/${testAdminId}`, e);
             }
+        }
+
+        try {
+            const res = await axios.post(`${API_URL}/admins/logout`);
+            if (res.data?.success) {
+                logPass("POST /api/v1/admins/logout");
+            } else {
+                throw new Error("Failed response from logout");
+            }
+        } catch (e) {
+            logFail("POST /api/v1/admins/logout", e);
         }
 
         // -------------------------------------------------------------
