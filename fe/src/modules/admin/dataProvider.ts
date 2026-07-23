@@ -1,6 +1,6 @@
 import { DataProvider, fetchUtils } from "react-admin";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || "/api/v1";
 
 const httpClient = (url: string, options: fetchUtils.Options = {}) => {
   if (!options.headers) {

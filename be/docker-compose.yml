@@ -18,8 +18,12 @@ services:
       context: ./express
       dockerfile: Dockerfile
     restart: unless-stopped
+    depends_on:
+      - database
     ports:
       - "5000:5000"
+    volumes:
+      - ./express/uploads:/app/uploads
     environment:
       NODE_ENV: production
       PORT: 5000
