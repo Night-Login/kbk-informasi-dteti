@@ -133,6 +133,22 @@ export interface LecturerMetric {
   fetched_at?: string;
 }
 
+export interface LecturerAdvisee {
+  id: string;
+  full_name: string;
+  level: "S1" | "S2" | "S3";
+  project?: string | null;
+  research_area?: string | null;
+  profile_href?: string | null;
+}
+
+export interface LecturerTeachingAssistant {
+  id?: string;
+  full_name: string;
+  email?: string | null;
+  profile_href?: string | null;
+}
+
 export interface Lecturer {
   id: string;
   full_name: string;
@@ -153,6 +169,10 @@ export interface Lecturer {
   supervision_status?: string | null;
   is_active?: boolean;
   metrics?: LecturerMetric | null;
+  degrees?: string[];
+  teaching_assistants?: LecturerTeachingAssistant[];
+  advisees?: LecturerAdvisee[];
+  awards?: string[];
   research_tags?: Array<{
     lecturer_id?: string;
     tag_id?: string;
