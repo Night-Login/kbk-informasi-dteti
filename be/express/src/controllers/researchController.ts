@@ -93,6 +93,18 @@ export async function getPaginatedResearchClusters(req: Request, res: Response, 
     }
 }
 
+export async function getDeletedResearchClusters(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const clusters = await researchService.getDeletedResearchClusters();
+        res.status(200).json({
+            success: true,
+            data: clusters
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 /*
     Name           : Get single research cluster by ID controller
     Description    : Fetches single research cluster data from database based on ID parameter
@@ -390,6 +402,18 @@ export async function getPaginatedResearchTags(req: Request, res: Response, next
         res.status(200).json({
             success: true,
             data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getDeletedResearchTags(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const tags = await researchService.getDeletedResearchTags();
+        res.status(200).json({
+            success: true,
+            data: tags
         });
     } catch (error) {
         next(error);

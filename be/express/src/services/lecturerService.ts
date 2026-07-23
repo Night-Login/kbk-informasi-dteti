@@ -206,6 +206,19 @@ export const getPaginatedLecturers = async (filters?: LecturerFilters): Promise<
 };
 
 /**
+ * Get soft-deleted lecturers for the protected admin trash view.
+ */
+export const getDeletedLecturers = async (): Promise<Lecturer[]> => {
+    const lecturers = await prisma.lecturer.findMany({
+        where: { deleted_at: { not: null } },
+        orderBy: { deleted_at: "desc" },
+        include: includeClause
+    });
+
+    return lecturers as unknown as Lecturer[];
+};
+
+/**
  * Get a single lecturer by slug
  */
 export const getLecturerBySlug = async (slug: string): Promise<Lecturer | null> => {
