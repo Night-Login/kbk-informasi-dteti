@@ -1,9 +1,19 @@
+import "dotenv/config";
 import axios from "axios";
 import { spawn, ChildProcess } from "child_process";
 import path from "path";
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
+const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 const API_URL = `${BASE_URL}/api/v1`;
+const TEST_PORT = new URL(BASE_URL).port || "5000";
+const SUPERADMIN_USERNAME = process.env.SUPERADMIN_USERNAME;
+const SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD;
+
+if (!SUPERADMIN_USERNAME || !SUPERADMIN_PASSWORD) {
+    throw new Error(
+        "SUPERADMIN_USERNAME and SUPERADMIN_PASSWORD must be configured before running endpoint tests.",
+    );
+}
 
 let serverProcess: ChildProcess | null = null;
 let authToken: string = "";
@@ -59,7 +69,7 @@ async function startServerIfNeeded(): Promise<void> {
         cwd: process.cwd(),
         shell: true,
         stdio: "pipe",
-        env: { ...process.env, PORT: "8080" }
+        env: { ...process.env, PORT: TEST_PORT }
     });
 
     serverProcess.stdout?.on("data", (data) => {
@@ -80,7 +90,7 @@ async function startServerIfNeeded(): Promise<void> {
         }
     }
 
-    throw new Error("Timeout waiting for spawned server to start on port 8080");
+    throw new Error(`Timeout waiting for spawned server to start on port ${TEST_PORT}`);
 }
 
 async function stopServerIfNeeded(): Promise<void> {
@@ -120,8 +130,8 @@ async function runTests() {
         console.log("\n--- 2. Admin Authentication & Routes ---");
         try {
             await axios.post(`${API_URL}/admins/login`, {
-                username: "devSuperadmin",
-                password: "wrongpassword"
+                username: "__invalid_admin__",
+                password: "__invalid_password__"
             });
             logFail("POST /api/v1/admins/login with wrong credentials should fail", { message: "Did not throw 401" });
         } catch (e: any) {
@@ -134,8 +144,8 @@ async function runTests() {
 
         try {
             const res = await axios.post(`${API_URL}/admins/login`, {
-                username: "devSuperadmin",
-                password: "devSuperadmin123"
+                username: SUPERADMIN_USERNAME,
+                password: SUPERADMIN_PASSWORD
             });
             if (res.data?.success && res.data?.data?.token) {
                 authToken = res.data.data.token;

@@ -16,6 +16,9 @@ router.get("/clusters/paginated", researchController.getPaginatedResearchCluster
 // GET /api/v1/research/clusters/slug/:slug    
 router.get("/clusters/slug/:slug", researchController.getResearchClusterBySlug);
 
+// GET /api/v1/research/clusters/trash
+router.get("/clusters/trash", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), researchController.getDeletedResearchClusters);
+
 // GET /api/v1/research/clusters/:id    
 router.get("/clusters/:id", researchController.getResearchClusterById);
 
@@ -27,6 +30,9 @@ router.get("/tags/paginated", researchController.getPaginatedResearchTags);
 
 // GET /api/v1/research/tags/slug/:slug    
 router.get("/tags/slug/:slug", researchController.getResearchTagBySlug);
+
+// GET /api/v1/research/tags/trash
+router.get("/tags/trash", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), researchController.getDeletedResearchTags);
 
 // GET /api/v1/research/tags/:id    
 router.get("/tags/:id", researchController.getResearchTagById);

@@ -18,6 +18,9 @@ router.get("/slug/:slug", publicationController.getPublicationBySlug);
 // GET /api/v1/publications/doi/:doi 
 router.get("/doi/:doi", publicationController.getPublicationByDoi);
 
+// GET /api/v1/publications/trash
+router.get("/trash", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.getDeletedPublications);
+
 // GET /api/v1/publications/:id 
 router.get("/:id", publicationController.getPublicationById);
 

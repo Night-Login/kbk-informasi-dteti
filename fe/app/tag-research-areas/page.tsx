@@ -1,1 +1,5 @@
-export { default } from "@/modules/research/pages/tag-research-areas-page";
+import { redirect } from "next/navigation";
+
+export default function TagResearchAreasIndexPage() {
+  redirect("/research-areas");
+}
