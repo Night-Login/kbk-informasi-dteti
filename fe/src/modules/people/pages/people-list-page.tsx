@@ -40,6 +40,7 @@ function toPerson(lecturer: Lecturer): PersonLite {
 export default function PeopleListPage() {
   const [query, setQuery] = useState("");
   const [activeCluster, setActiveCluster] = useState("");
+  const [activeTag, setActiveTag] = useState("");
   const [research, setResearch] = useState<ResearchSummary | null>(null);
   const [result, setResult] = useState<PaginatedResult<Lecturer> | null>(null);
   const [page, setPage] = useState(1);
@@ -68,6 +69,7 @@ export default function PeopleListPage() {
         limit: PAGE_SIZE,
         search: debouncedQuery,
         cluster_slug: activeCluster,
+        tag_slug: activeTag,
         is_active: true,
         sort_by: "full_name",
         sort_order: "asc",
@@ -88,17 +90,26 @@ export default function PeopleListPage() {
       });
 
     return () => controller.abort();
-  }, [activeCluster, debouncedQuery, page, reloadKey]);
+  }, [activeCluster, activeTag, debouncedQuery, page, reloadKey]);
 
   const lecturers = useMemo(
     () => result?.data.map(toPerson) || [],
     [result],
   );
-  const clusters = research?.clusters || [];
+  const clusters = useMemo(() => research?.clusters || [], [research]);
+  const tags = useMemo(
+    () =>
+      clusters
+        .filter((cluster) => !activeCluster || cluster.slug === activeCluster)
+        .flatMap((cluster) => cluster.tags || [])
+        .sort((first, second) => first.name.localeCompare(second.name)),
+    [activeCluster, clusters],
+  );
 
   function chooseCluster(slug: string) {
     setLoading(true);
     setActiveCluster((current) => (current === slug ? "" : slug));
+    setActiveTag("");
     setPage(1);
   }
 
@@ -137,7 +148,7 @@ export default function PeopleListPage() {
         </div>
 
         {clusters.length > 0 ? (
-          <div className="mb-5 flex flex-wrap gap-3">
+          <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {clusters.map((cluster) => {
               const isActive = activeCluster === cluster.slug;
               return (
@@ -147,10 +158,10 @@ export default function PeopleListPage() {
                   aria-pressed={isActive}
                   onClick={() => chooseCluster(cluster.slug)}
                   className={[
-                    "min-h-11 border px-4 py-2 text-left text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2",
+                    "flex min-h-16 items-start border p-3 text-left text-sm font-medium leading-tight text-dteti-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2",
                     isActive
-                      ? "border-dteti-blue bg-dteti-yellow text-dteti-ink"
-                      : "border-line bg-white text-dteti-ink hover:border-dteti-blue hover:bg-dteti-blue-soft",
+                      ? "border-dteti-blue bg-dteti-yellow shadow-[inset_0_-4px_0_var(--dteti-blue)]"
+                      : "border-dteti-yellow bg-dteti-yellow hover:bg-dteti-yellow/80",
                   ].join(" ")}
                 >
                   {cluster.name}
@@ -161,23 +172,25 @@ export default function PeopleListPage() {
         ) : null}
 
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <label className="sr-only" htmlFor="people-category-filter">
-            Filter lecturers by research group
+          <label className="sr-only" htmlFor="people-tag-filter">
+            Filter lecturers by research tag
           </label>
           <select
-            id="people-category-filter"
-            value={activeCluster}
+            id="people-tag-filter"
+            value={activeTag}
             onChange={(event) => {
               setLoading(true);
-              setActiveCluster(event.target.value);
+              setActiveTag(event.target.value);
               setPage(1);
             }}
             className="min-h-10 w-full border border-line bg-white px-3 text-sm text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus sm:w-72"
           >
-            <option value="">All research groups</option>
-            {clusters.map((cluster) => (
-              <option key={cluster.id} value={cluster.slug}>
-                {cluster.name}
+            <option value="">
+              {activeCluster ? "All tags in this research group" : "Filter Tag"}
+            </option>
+            {tags.map((tag) => (
+              <option key={tag.id} value={tag.slug}>
+                {tag.name}
               </option>
             ))}
           </select>
@@ -261,11 +274,29 @@ export default function PeopleListPage() {
         ) : (
           <div className="border border-line bg-surface px-6 py-16 text-center">
             <h2 className="text-lg font-semibold text-dteti-blue">
-              No lecturers found
+              {activeCluster || activeTag
+                ? "No lecturers mapped to this research area yet"
+                : "No lecturers found"}
             </h2>
-            <p className="mt-2 text-sm text-muted">
-              Try another name or clear the selected research group.
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-muted">
+              {activeCluster || activeTag
+                ? "The filter is working, but lecturer-to-tag assignments have not been added to the database yet."
+                : "Try another name or clear the search."}
             </p>
+            {activeCluster || activeTag ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setLoading(true);
+                  setActiveCluster("");
+                  setActiveTag("");
+                  setPage(1);
+                }}
+                className="mt-5 min-h-11 bg-dteti-blue px-5 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+              >
+                Clear research filters
+              </button>
+            ) : null}
           </div>
         )}
       </div>
