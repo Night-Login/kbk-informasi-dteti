@@ -1,7 +1,12 @@
 "use client";
 
 import Breadcrumbs from "@/components/global/breadcrumbs";
-import LecturerCard from "@/components/people/lecturer-card";
+import LecturerCard from "@/modules/people/components/lecturer-card";
+import PeopleFilterModal, {
+  defaultPeopleFilterValues,
+  countActiveFilters,
+  type PeopleFilterValues,
+} from "@/modules/people/components/people-filter-modal";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {
   apiRequest,
@@ -12,7 +17,7 @@ import {
   type ResearchSummary,
 } from "@/lib/api";
 import type { PersonLite } from "@/types/person";
-import { ChevronLeft, ChevronRight, LoaderCircle, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, LoaderCircle, Search, SlidersHorizontal } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE = 12;
@@ -48,6 +53,11 @@ export default function PeopleListPage() {
   const [reloadKey, setReloadKey] = useState(0);
   const debouncedQuery = useDebouncedValue(query);
 
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState<PeopleFilterValues>(defaultPeopleFilterValues);
+
+  const activeFilterCount = useMemo(() => countActiveFilters(filters), [filters]);
+
   useEffect(() => {
     const controller = new AbortController();
     apiRequest<ResearchSummary>("research", { signal: controller.signal })
@@ -60,6 +70,8 @@ export default function PeopleListPage() {
 
   useEffect(() => {
     const controller = new AbortController();
+    const tagSlugParam =
+      filters.tagSlug && filters.tagSlug !== "all" ? filters.tagSlug : undefined;
 
     apiRequest<PaginatedResult<Lecturer>>("lecturers/paginated", {
       signal: controller.signal,
@@ -68,9 +80,10 @@ export default function PeopleListPage() {
         limit: PAGE_SIZE,
         search: debouncedQuery,
         cluster_slug: activeCluster,
-        is_active: true,
-        sort_by: "full_name",
-        sort_order: "asc",
+        tag_slug: tagSlugParam,
+        is_active: filters.isActive === "inactive" ? false : true,
+        sort_by: filters.sortBy === "name" ? "full_name" : filters.sortBy,
+        sort_order: filters.sortOrder,
       },
     })
       .then((data) => {
@@ -88,13 +101,30 @@ export default function PeopleListPage() {
       });
 
     return () => controller.abort();
-  }, [activeCluster, debouncedQuery, page, reloadKey]);
+  }, [activeCluster, debouncedQuery, filters, page, reloadKey]);
 
-  const lecturers = useMemo(
-    () => result?.data.map(toPerson) || [],
-    [result],
-  );
+  const lecturers = useMemo(() => {
+    let list = result?.data.map(toPerson) || [];
+    if (filters.supervisionStatus === "available") {
+      list = list.filter((p) => p.isSupervisorAvailable);
+    } else if (filters.supervisionStatus === "unavailable") {
+      list = list.filter((p) => !p.isSupervisorAvailable);
+    }
+    return list;
+  }, [result, filters.supervisionStatus]);
+
   const clusters = research?.clusters || [];
+
+  const availableTags = useMemo(() => {
+    if (!research?.clusters) return undefined;
+    const tags: { label: string; value: string }[] = [{ label: "All Topics", value: "all" }];
+    research.clusters.forEach((cluster) => {
+      cluster.tags?.forEach((tag) => {
+        tags.push({ label: `${cluster.name} - ${tag.name}`, value: tag.slug });
+      });
+    });
+    return tags;
+  }, [research]);
 
   function chooseCluster(slug: string) {
     setLoading(true);
@@ -111,11 +141,11 @@ export default function PeopleListPage() {
           People
         </h1>
 
-        {/* Search & Filter Row (Full Width) */}
+        {/* Search & Filter Row */}
         <div className="mb-6 flex w-full items-center gap-3">
           <div className="relative flex-1">
             <Search
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted"
               size={17}
               aria-hidden="true"
             />
@@ -129,7 +159,7 @@ export default function PeopleListPage() {
                 setPage(1);
               }}
               placeholder="Search name, title, or SINTA ID"
-              className="min-h-11 w-full border border-line bg-white py-2.5 pl-10 pr-3 text-sm text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
+              className="min-h-11 w-full rounded-full border border-line bg-white py-2.5 pl-11 pr-4 text-sm text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
 
@@ -137,7 +167,7 @@ export default function PeopleListPage() {
           <button
             type="button"
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+            className="flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-white px-5 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
             aria-label="Open filter options"
           >
             <SlidersHorizontal size={16} className="text-dteti-blue" />
@@ -150,94 +180,52 @@ export default function PeopleListPage() {
           </button>
         </div>
 
-        {clusters.length > 0 ? (
-          <div className="mb-5 flex flex-wrap gap-3">
-            {clusters.map((cluster) => {
-              const isActive = activeCluster === cluster.slug;
-              return (
-                <button
-                  key={cluster.id}
-                  type="button"
-                  aria-pressed={isActive}
-                  onClick={() => chooseCluster(cluster.slug)}
-                  className={[
-                    "min-h-11 border px-4 py-2 text-left text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2",
-                    isActive
-                      ? "border-dteti-blue bg-dteti-yellow text-dteti-ink"
-                      : "border-line bg-white text-dteti-ink hover:border-dteti-blue hover:bg-dteti-blue-soft",
-                  ].join(" ")}
-                >
-                  {cluster.name}
-                </button>
-              );
-            })}
-          </div>
-        ) : null}
-        {/* Category Tabs */}
-        <div className="mb-4 flex w-full items-center gap-3 overflow-x-auto pb-2">
+        {/* Category / Cluster Tabs */}
+        <div className="mb-6 flex flex-wrap items-center gap-3">
           <button
             type="button"
-            aria-pressed={!activeCategory}
-            onClick={() => setActiveCategory("")}
+            aria-pressed={!activeCluster}
+            onClick={() => {
+              setLoading(true);
+              setActiveCluster("");
+              setPage(1);
+            }}
             className={[
-              "flex min-h-12 shrink-0 items-center justify-center rounded-lg border px-5 py-3 text-center text-sm font-bold leading-tight text-dteti-ink transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2",
-              !activeCategory
-                ? "border-dteti-blue bg-dteti-yellow shadow-[inset_0_-3px_0_var(--dteti-blue)]"
-                : "border-dteti-yellow bg-white hover:bg-dteti-yellow/20",
+              "flex min-h-11 items-center justify-center rounded-xl border px-5 py-2 text-center text-sm font-bold leading-tight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
+              !activeCluster
+                ? "border-dteti-blue bg-dteti-yellow text-dteti-ink shadow-[inset_0_-3px_0_var(--dteti-blue)]"
+                : "border-dteti-yellow bg-white text-dteti-ink hover:bg-dteti-yellow/10",
             ].join(" ")}
           >
             All
           </button>
-          {categories.map((category) => {
-            const isActive = activeCategory === category;
-
+          {clusters.map((cluster) => {
+            const isActive = activeCluster === cluster.slug;
             return (
               <button
-                key={category}
+                key={cluster.id}
                 type="button"
                 aria-pressed={isActive}
-                onClick={() => toggleCategory(category)}
+                onClick={() => chooseCluster(cluster.slug)}
                 className={[
-                  "flex min-h-12 shrink-0 items-center justify-center rounded-lg border px-5 py-3 text-center text-sm font-bold leading-tight text-dteti-ink transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2",
+                  "flex min-h-11 items-center justify-center rounded-xl border px-5 py-2 text-center text-sm font-bold leading-tight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
                   isActive
-                    ? "border-dteti-blue bg-dteti-yellow shadow-[inset_0_-3px_0_var(--dteti-blue)]"
-                    : "border-dteti-yellow bg-white hover:bg-dteti-yellow/20",
+                    ? "border-dteti-blue bg-dteti-yellow text-dteti-ink shadow-[inset_0_-3px_0_var(--dteti-blue)]"
+                    : "border-dteti-yellow bg-white text-dteti-ink hover:bg-dteti-yellow/10",
                 ].join(" ")}
               >
-                {category}
+                {cluster.name}
               </button>
             );
           })}
         </div>
 
-        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <label className="sr-only" htmlFor="people-category-filter">
-            Filter lecturers by research group
-          </label>
-          <select
-            id="people-category-filter"
-            value={activeCluster}
-            onChange={(event) => {
-              setLoading(true);
-              setActiveCluster(event.target.value);
-              setPage(1);
-            }}
-            className="min-h-10 w-full border border-line bg-white px-3 text-sm text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus sm:w-72"
-          >
-            <option value="">All research groups</option>
-            {clusters.map((cluster) => (
-              <option key={cluster.id} value={cluster.slug}>
-                {cluster.name}
-              </option>
-            ))}
-          </select>
-
-          <p className="text-sm text-muted" aria-live="polite">
-            {loading
-              ? "Loading lecturers…"
-              : `Showing ${lecturers.length} of ${result?.total || 0} people`}
-          </p>
-        </div>
+        {/* Showing Count Text */}
+        <p className="mb-6 text-sm text-muted" aria-live="polite">
+          {loading
+            ? "Loading lecturers…"
+            : `Showing ${result?.total ?? lecturers.length} people`}
+        </p>
 
         {loading ? (
           <div className="grid min-h-64 place-items-center" role="status">
@@ -325,7 +313,12 @@ export default function PeopleListPage() {
         isOpen={isFilterModalOpen}
         onClose={() => setIsFilterModalOpen(false)}
         currentFilters={filters}
-        onApplyFilters={setFilters}
+        onApplyFilters={(newFilters) => {
+          setLoading(true);
+          setFilters(newFilters);
+          setPage(1);
+        }}
+        availableTags={availableTags}
       />
     </main>
   );
