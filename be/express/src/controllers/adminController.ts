@@ -143,6 +143,18 @@ export async function getAdmins(req: Request, res: Response, next: NextFunction)
     }
 }
 
+export async function getDeletedAdmins(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const admins = await adminService.getDeletedAdmins();
+        res.status(200).json({
+            success: true,
+            data: admins
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 /*
     Name           : Get single admin by ID controller
     Description    : Fetches single admin data from database based on ID parameter

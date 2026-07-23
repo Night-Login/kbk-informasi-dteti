@@ -124,6 +124,18 @@ export async function getPaginatedPublications(req: Request, res: Response, next
     }
 }
 
+export async function getDeletedPublications(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const publications = await publicationService.getDeletedPublications();
+        res.status(200).json({
+            success: true,
+            data: publications
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 /*
     Name           : Get single publication by ID controller
     Description    : Fetches single publication data from database based on ID parameter

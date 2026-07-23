@@ -101,6 +101,18 @@ export async function getPaginatedLecturers(req: Request, res: Response, next: N
     }
 }
 
+export async function getDeletedLecturers(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const lecturers = await lecturerService.getDeletedLecturers();
+        res.status(200).json({
+            success: true,
+            data: lecturers
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 /*
     Name           : Get single lecturer by ID controller
     Description    : Fetches single lecturer data from database based on ID parameter

@@ -221,6 +221,19 @@ export const getPaginatedProjects = async (filters?: ProjectFilters): Promise<Pa
 };
 
 /**
+ * Get soft-deleted projects for the protected admin trash view.
+ */
+export const getDeletedProjects = async (): Promise<Project[]> => {
+    const projects = await prisma.project.findMany({
+        where: { deleted_at: { not: null } },
+        orderBy: { deleted_at: "desc" },
+        include: includeClause
+    });
+
+    return projects as unknown as Project[];
+};
+
+/**
  * Get a single project by ID
  */
 export const getProjectById = async (id: string): Promise<Project | null> => {

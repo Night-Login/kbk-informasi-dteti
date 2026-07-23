@@ -128,6 +128,18 @@ export async function getPaginatedProjects(req: Request, res: Response, next: Ne
     }
 }
 
+export async function getDeletedProjects(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const projects = await projectService.getDeletedProjects();
+        res.status(200).json({
+            success: true,
+            data: projects
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 /*
     Name           : Get single project by ID controller
     Description    : Fetches single project data from database based on ID parameter

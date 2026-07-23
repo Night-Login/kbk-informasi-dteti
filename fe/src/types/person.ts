@@ -26,21 +26,20 @@ export interface publication {
 }
 
 export interface PersonLite {
-  // TODO: Update types after the backend API is ready
   id: string;
+  sourceId?: string;
   fullName: string;
   position: string;
   isSupervisorAvailable: boolean;
   profilePictureUrl?: string;
 
   contact: {
-    labName: string;
-    email: string;
+    labName?: string;
+    email?: string;
   };
 }
 
 export interface PersonFull extends PersonLite {
-  // TODO: Update types after the backend API is ready
   shortBio: string;
   longBio: string;
   degrees: string[];

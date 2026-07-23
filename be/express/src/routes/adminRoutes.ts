@@ -20,6 +20,9 @@ router.get("/me", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), adminCo
 // GET /api/v1/admins 
 router.get("/", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), adminController.getAdmins);
 
+// GET /api/v1/admins/trash
+router.get("/trash", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), adminController.getDeletedAdmins);
+
 // GET /api/v1/admins/:id
 router.get("/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), adminController.getAdminById);
 

@@ -42,6 +42,18 @@ export const getAdmins = async (filters?: { search?: string; role?: Role }): Pro
 };
 
 /**
+ * Get soft-deleted admins for the protected admin trash view.
+ */
+export const getDeletedAdmins = async (): Promise<Omit<Admin, "password">[]> => {
+    const admins = await prisma.admin.findMany({
+        where: { deletedAt: { not: null } },
+        orderBy: { deletedAt: "desc" }
+    });
+
+    return admins.map(omitPassword) as Omit<Admin, "password">[];
+};
+
+/**
  * Get admin by ID
  */
 export const getAdminById = async (id: number): Promise<Omit<Admin, "password"> | null> => {

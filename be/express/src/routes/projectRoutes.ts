@@ -15,6 +15,9 @@ router.get("/paginated", projectController.getPaginatedProjects);
 // GET /api/v1/projects/slug/:slug 
 router.get("/slug/:slug", projectController.getProjectBySlug);
 
+// GET /api/v1/projects/trash
+router.get("/trash", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), projectController.getDeletedProjects);
+
 // GET /api/v1/projects/:id 
 router.get("/:id", projectController.getProjectById);
 

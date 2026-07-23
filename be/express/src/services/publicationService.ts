@@ -15,7 +15,20 @@ const includeClause = {
     lecturers: {
         where: { lecturer: { deleted_at: null } },
         include: {
-            lecturer: true
+            lecturer: {
+                include: {
+                    research_tags: {
+                        where: { tag: { deleted_at: null, is_active: true } },
+                        include: {
+                            tag: {
+                                include: {
+                                    cluster: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         },
         orderBy: {
             author_order: "asc" as const
@@ -231,6 +244,19 @@ export const getPaginatedPublications = async (filters?: PublicationFilters): Pr
         limit,
         total_pages
     };
+};
+
+/**
+ * Get soft-deleted publications for the protected admin trash view.
+ */
+export const getDeletedPublications = async (): Promise<Publication[]> => {
+    const publications = await prisma.publication.findMany({
+        where: { deleted_at: { not: null } },
+        orderBy: { deleted_at: "desc" },
+        include: includeClause
+    });
+
+    return publications as unknown as Publication[];
 };
 
 /**
