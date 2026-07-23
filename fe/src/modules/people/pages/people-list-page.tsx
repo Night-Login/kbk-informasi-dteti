@@ -45,6 +45,7 @@ function toPerson(lecturer: Lecturer): PersonLite {
 export default function PeopleListPage() {
   const [query, setQuery] = useState("");
   const [activeCluster, setActiveCluster] = useState("");
+  const [activeTag, setActiveTag] = useState("");
   const [research, setResearch] = useState<ResearchSummary | null>(null);
   const [result, setResult] = useState<PaginatedResult<Lecturer> | null>(null);
   const [page, setPage] = useState(1);
@@ -129,6 +130,7 @@ export default function PeopleListPage() {
   function chooseCluster(slug: string) {
     setLoading(true);
     setActiveCluster((current) => (current === slug ? "" : slug));
+    setActiveTag("");
     setPage(1);
   }
 
@@ -299,11 +301,29 @@ export default function PeopleListPage() {
         ) : (
           <div className="border border-line bg-surface px-6 py-16 text-center">
             <h2 className="text-lg font-semibold text-dteti-blue">
-              No lecturers found
+              {activeCluster || activeTag
+                ? "No lecturers mapped to this research area yet"
+                : "No lecturers found"}
             </h2>
-            <p className="mt-2 text-sm text-muted">
-              Try another name or clear the selected research group.
+            <p className="mx-auto mt-2 max-w-2xl text-sm text-muted">
+              {activeCluster || activeTag
+                ? "The filter is working, but lecturer-to-tag assignments have not been added to the database yet."
+                : "Try another name or clear the search."}
             </p>
+            {activeCluster || activeTag ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setLoading(true);
+                  setActiveCluster("");
+                  setActiveTag("");
+                  setPage(1);
+                }}
+                className="mt-5 min-h-11 bg-dteti-blue px-5 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+              >
+                Clear research filters
+              </button>
+            ) : null}
           </div>
         )}
       </div>
@@ -323,4 +343,3 @@ export default function PeopleListPage() {
     </main>
   );
 }
-

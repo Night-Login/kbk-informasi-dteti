@@ -1,6 +1,11 @@
 "use client";
 
 import Breadcrumbs from "@/components/global/breadcrumbs";
+import DataTable, {
+  type DataTableColumn,
+  type DataTableFilter,
+  type DataTableRow,
+} from "@/components/global/data-table";
 import TopicTag from "@/components/global/topic-tag";
 import {
   ApiError,
@@ -8,6 +13,7 @@ import {
   getApiAssetUrl,
   lecturerIsAvailable,
   type Lecturer,
+  type Publication,
 } from "@/lib/api";
 import {
   BarChart3,
@@ -22,6 +28,30 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+
+const adviseeColumns: DataTableColumn[] = [
+  { key: "no", label: "No", className: "w-16 text-center" },
+  { key: "name", label: "Student Name", className: "min-w-48" },
+  { key: "level", label: "Level", className: "w-24 text-center" },
+  { key: "project", label: "Project", className: "min-w-80" },
+  { key: "researchArea", label: "Research Areas", className: "min-w-40" },
+];
+
+const adviseeFilters: DataTableFilter[] = [
+  { label: "Show All", value: "all" },
+  { label: "Bachelor (S1)", value: "S1" },
+  { label: "Master (S2)", value: "S2" },
+  { label: "Doctor (S3)", value: "S3" },
+];
+
+function publicationTimestamp(publication: Publication) {
+  if (publication.publication_date) {
+    const timestamp = Date.parse(publication.publication_date);
+    if (Number.isFinite(timestamp)) return timestamp;
+  }
+
+  return Date.UTC(publication.year || 0, 0, 1);
+}
 
 export default function PeopleDetailPage() {
   const params = useParams<{ id: string }>();
@@ -69,6 +99,40 @@ export default function PeopleDetailPage() {
         .filter((tag): tag is NonNullable<typeof tag> => Boolean(tag)) || [],
     [lecturer],
   );
+  const latestPublications = useMemo(
+    () =>
+      (lecturer?.publications || [])
+        .map((relation) => relation.publication)
+        .filter(
+          (publication): publication is Publication => Boolean(publication),
+        )
+        .sort((first, second) => {
+          const dateDifference =
+            publicationTimestamp(second) - publicationTimestamp(first);
+          return dateDifference || first.title.localeCompare(second.title);
+        })
+        .slice(0, 5),
+    [lecturer],
+  );
+  const adviseeRows = useMemo<DataTableRow[]>(
+    () =>
+      (lecturer?.advisees || []).map((advisee, index) => ({
+        id: advisee.id,
+        filterValue: advisee.level,
+        cells: {
+          no: index + 1,
+          name: advisee.full_name,
+          level: advisee.level,
+          project: advisee.project || "—",
+          researchArea: advisee.research_area || "—",
+        },
+        actionHref: advisee.profile_href || undefined,
+      })),
+    [lecturer],
+  );
+  const degrees = lecturer?.degrees || [];
+  const teachingAssistants = lecturer?.teaching_assistants || [];
+  const awards = lecturer?.awards || [];
 
   if (loading) {
     return (
@@ -216,20 +280,61 @@ export default function PeopleDetailPage() {
                 <div>
                   <h2 className="text-base font-semibold text-white">Research Areas</h2>
                   {tags.length > 0 ? (
-                    <ul className="mt-3 space-y-2 text-sm">
+                    <ul className="mt-3 flex flex-wrap gap-2">
                       {tags.map((tag) => (
                         <li key={tag.id}>
                           <Link
                             href={`/tag-research-areas/${tag.slug}`}
-                            className="font-semibold text-white underline decoration-white/60 underline-offset-4 hover:decoration-dteti-yellow"
+                            className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-dteti-blue"
                           >
-                            {tag.name}
+                            <TopicTag>{tag.name}</TopicTag>
                           </Link>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="mt-2 text-sm text-white/80">No research tags listed.</p>
+                    <p className="mt-2 text-sm text-white/80">
+                      Research tags have not been assigned yet.
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <h2 className="text-base font-semibold text-white">
+                    Teaching Assistants
+                  </h2>
+                  {teachingAssistants.length > 0 ? (
+                    <ul className="mt-3 space-y-3 text-sm">
+                      {teachingAssistants.map((assistant) => (
+                        <li key={assistant.id || assistant.full_name}>
+                          {assistant.profile_href ? (
+                            <Link
+                              href={assistant.profile_href}
+                              className="font-semibold text-white hover:underline"
+                            >
+                              {assistant.full_name}
+                            </Link>
+                          ) : (
+                            <p className="font-semibold text-white">
+                              {assistant.full_name}
+                            </p>
+                          )}
+                          {assistant.email ? (
+                            <a
+                              href={`mailto:${assistant.email}`}
+                              className="mt-1 flex items-center gap-2 text-white/80 hover:text-white hover:underline"
+                            >
+                              <Mail size={14} aria-hidden="true" />
+                              {assistant.email}
+                            </a>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-2 text-sm text-white/80">
+                      Teaching assistant data has not been added yet.
+                    </p>
                   )}
                 </div>
 
@@ -272,66 +377,114 @@ export default function PeopleDetailPage() {
             </div>
           </section>
 
-          {lecturer.metrics ? (
-            <aside aria-labelledby="metrics-heading">
+          <aside className="space-y-8">
+            <section aria-labelledby="metrics-heading">
               <h2 id="metrics-heading" className="flex items-center gap-2 text-lg font-bold text-dteti-blue">
                 <BarChart3 size={20} aria-hidden="true" />
                 Research Metrics
               </h2>
-              <dl className="mt-4 divide-y divide-line border-y border-line text-sm">
-                <div className="flex justify-between gap-4 py-3">
-                  <dt className="text-muted">H-index</dt>
-                  <dd className="font-semibold text-ink">{lecturer.metrics.h_index ?? "—"}</dd>
-                </div>
-                <div className="flex justify-between gap-4 py-3">
-                  <dt className="text-muted">Citations</dt>
-                  <dd className="font-semibold text-ink">{lecturer.metrics.total_citations ?? "—"}</dd>
-                </div>
-                <div className="flex justify-between gap-4 py-3">
-                  <dt className="text-muted">SINTA score</dt>
-                  <dd className="font-semibold text-ink">{lecturer.metrics.sinta_score ?? "—"}</dd>
-                </div>
-              </dl>
-            </aside>
-          ) : null}
+              {lecturer.metrics ? (
+                <dl className="mt-4 divide-y divide-line border-y border-line text-sm">
+                  <div className="flex justify-between gap-4 py-3">
+                    <dt className="text-muted">H-index</dt>
+                    <dd className="font-semibold text-ink">{lecturer.metrics.h_index ?? "—"}</dd>
+                  </div>
+                  <div className="flex justify-between gap-4 py-3">
+                    <dt className="text-muted">Citations</dt>
+                    <dd className="font-semibold text-ink">{lecturer.metrics.total_citations ?? "—"}</dd>
+                  </div>
+                  <div className="flex justify-between gap-4 py-3">
+                    <dt className="text-muted">SINTA score</dt>
+                    <dd className="font-semibold text-ink">{lecturer.metrics.sinta_score ?? "—"}</dd>
+                  </div>
+                </dl>
+              ) : (
+                <p className="mt-3 text-sm leading-6 text-muted">
+                  Research metrics have not been added yet.
+                </p>
+              )}
+            </section>
+
+            <section aria-labelledby="education-heading">
+              <h2 id="education-heading" className="text-lg font-bold text-dteti-blue">
+                Education
+              </h2>
+              {degrees.length > 0 ? (
+                <ul className="mt-3 space-y-3 text-sm leading-6 text-ink">
+                  {degrees.map((degree) => (
+                    <li key={degree}>{degree}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3 text-sm leading-6 text-muted">
+                  Education history has not been added yet.
+                </p>
+              )}
+            </section>
+          </aside>
         </div>
+
+        <section className="mt-14" aria-labelledby="advisees-heading">
+          <h2 id="advisees-heading" className="mb-5 text-2xl font-bold text-dteti-blue sm:text-3xl">
+            Advisees
+          </h2>
+          <DataTable
+            ariaLabel="Lecturer advisees"
+            columns={adviseeColumns}
+            rows={adviseeRows}
+            filters={adviseeFilters}
+            actionLabel="Action"
+            emptyMessage="Advisee data has not been added yet."
+            searchPlaceholder="Search advisees"
+            statusLabel="Supervisor status:"
+            statusTone={isAvailable ? "available" : "unavailable"}
+          />
+        </section>
 
         <section className="mt-14" aria-labelledby="publications-heading">
           <h2 id="publications-heading" className="text-2xl font-bold text-dteti-blue sm:text-3xl">
-            Publications
+            Latest Publications
           </h2>
-          {lecturer.publications && lecturer.publications.length > 0 ? (
+          {latestPublications.length > 0 ? (
             <ul className="mt-6 divide-y divide-line border-t border-line">
-              {lecturer.publications.map((relation) => {
-                const publication = relation.publication;
-                if (!publication) return null;
-                return (
-                  <li key={publication.id} className="py-5">
-                    <a
-                      href={publication.url || `/publication#${publication.slug}`}
-                      target={publication.url ? "_blank" : undefined}
-                      rel={publication.url ? "noopener noreferrer" : undefined}
-                      className="text-lg font-bold text-ink hover:text-dteti-blue hover:underline"
-                    >
-                      {publication.title}
-                    </a>
-                    <p className="mt-1 text-sm text-muted">
-                      {[publication.publication_type, publication.venue, publication.year]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {tags.map((tag) => (
-                        <TopicTag key={`${publication.id}-${tag.id}`}>{tag.name}</TopicTag>
-                      ))}
-                    </div>
-                  </li>
-                );
-              })}
+              {latestPublications.map((publication) => (
+                <li key={publication.id} className="py-5">
+                  <a
+                    href={publication.url || `/publication#${publication.slug}`}
+                    target={publication.url ? "_blank" : undefined}
+                    rel={publication.url ? "noopener noreferrer" : undefined}
+                    className="text-lg font-bold text-ink hover:text-dteti-blue hover:underline"
+                  >
+                    {publication.title}
+                  </a>
+                  <p className="mt-1 text-sm text-muted">
+                    {[publication.publication_type, publication.venue, publication.year]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                </li>
+              ))}
             </ul>
           ) : (
             <p className="mt-5 bg-surface px-6 py-10 text-sm text-muted">
               No publications have been linked to this profile.
+            </p>
+          )}
+        </section>
+
+        <section className="mt-12" aria-labelledby="awards-heading">
+          <h2 id="awards-heading" className="text-2xl font-bold text-dteti-blue sm:text-3xl">
+            Awards &amp; Honours
+          </h2>
+          {awards.length > 0 ? (
+            <ul className="mt-6 space-y-4 text-base text-ink">
+              {awards.map((award) => (
+                <li key={award}>{award}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-5 bg-surface px-6 py-10 text-sm text-muted">
+              Awards and honours have not been added yet.
             </p>
           )}
         </section>
