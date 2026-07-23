@@ -23,9 +23,6 @@ ENV HOST=0.0.0.0
 RUN addgroup -S nodejs && adduser -S express -G nodejs
 RUN mkdir -p /app/uploads/lecturers && chown -R express:nodejs /app/uploads
 
-# Create the uploads directory and give the express user ownership
-RUN mkdir -p /app/uploads && chown -R express:nodejs /app/uploads
-
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
