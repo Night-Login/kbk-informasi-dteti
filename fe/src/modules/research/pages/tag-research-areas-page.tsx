@@ -2,7 +2,7 @@
 
 import Breadcrumbs from "@/components/global/breadcrumbs";
 import TopicTag from "@/components/global/topic-tag";
-import LecturerCard from "@/components/people/lecturer-card";
+import LecturerCard from "@/modules/people/components/lecturer-card";
 import dummyLecturers from "@/data/dummy-lecturers.json";
 import { publicationData } from "@/modules/publication/data/publication.data";
 import type { PersonLite } from "@/types/person";

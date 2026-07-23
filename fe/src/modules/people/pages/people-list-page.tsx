@@ -1,10 +1,15 @@
 "use client";
 
 import Breadcrumbs from "@/components/global/breadcrumbs";
-import LecturerCard from "@/components/people/lecturer-card";
+import LecturerCard from "@/modules/people/components/lecturer-card";
+import PeopleFilterModal, {
+  defaultPeopleFilterValues,
+  countActiveFilters,
+  type PeopleFilterValues,
+} from "@/modules/people/components/people-filter-modal";
 import dummyLecturers from "@/data/dummy-lecturers.json";
 import type { PersonLite } from "@/types/person";
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const categories = [
@@ -23,19 +28,42 @@ const lecturers = dummyLecturers.map((lecturer, index) => ({
 export default function PeopleListPage() {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("");
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState<PeopleFilterValues>(
+    defaultPeopleFilterValues
+  );
+
+  const activeFilterCount = useMemo(() => countActiveFilters(filters), [filters]);
 
   const visibleLecturers = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase();
 
-    return lecturers.filter(({ lecturer, category }) => {
+    let filtered = lecturers.filter(({ lecturer, category }) => {
       const matchesName = lecturer.fullName
         .toLocaleLowerCase()
         .includes(normalizedQuery);
       const matchesCategory = !activeCategory || category === activeCategory;
 
-      return matchesName && matchesCategory;
+      const matchesSupervision =
+        filters.supervisionStatus === "all"
+          ? true
+          : filters.supervisionStatus === "available"
+          ? lecturer.isSupervisorAvailable
+          : !lecturer.isSupervisorAvailable;
+
+      return matchesName && matchesCategory && matchesSupervision;
     });
-  }, [activeCategory, query]);
+
+    // Handle Sorting
+    if (filters.sortBy === "name" || !filters.sortBy) {
+      filtered = [...filtered].sort((a, b) => {
+        const cmp = a.lecturer.fullName.localeCompare(b.lecturer.fullName);
+        return filters.sortOrder === "desc" ? -cmp : cmp;
+      });
+    }
+
+    return filtered;
+  }, [activeCategory, filters, query]);
 
   function toggleCategory(category: string) {
     setActiveCategory((current) => (current === category ? "" : category));
@@ -50,13 +78,11 @@ export default function PeopleListPage() {
           People
         </h1>
 
-        <div className="mb-6 max-w-sm">
-          <label htmlFor="lecturer-search" className="sr-only">
-            Search lecturer name
-          </label>
-          <div className="relative">
+        {/* Search & Filter Row (Full Width) */}
+        <div className="mb-6 flex w-full items-center gap-3">
+          <div className="relative flex-1">
             <Search
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
               size={17}
               aria-hidden="true"
             />
@@ -66,12 +92,42 @@ export default function PeopleListPage() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search name"
-              className="min-h-11 w-full border border-line bg-white py-2.5 pl-10 pr-3 text-sm text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
+              className="min-h-11 w-full rounded-full border border-line bg-white py-2.5 pl-10 pr-4 text-sm text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
+
+          {/* Filter Modal Trigger Button */}
+          <button
+            type="button"
+            onClick={() => setIsFilterModalOpen(true)}
+            className="flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+            aria-label="Open filter options"
+          >
+            <SlidersHorizontal size={16} className="text-dteti-blue" />
+            <span>Filter</span>
+            {activeFilterCount > 0 && (
+              <span className="grid size-5 place-items-center rounded-full bg-dteti-blue text-[11px] font-extrabold text-white">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
         </div>
 
-        <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {/* Category Tabs */}
+        <div className="mb-4 flex w-full items-center gap-3 overflow-x-auto pb-2">
+          <button
+            type="button"
+            aria-pressed={!activeCategory}
+            onClick={() => setActiveCategory("")}
+            className={[
+              "flex min-h-12 shrink-0 items-center justify-center rounded-lg border px-5 py-3 text-center text-sm font-bold leading-tight text-dteti-ink transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2",
+              !activeCategory
+                ? "border-dteti-blue bg-dteti-yellow shadow-[inset_0_-3px_0_var(--dteti-blue)]"
+                : "border-dteti-yellow bg-white hover:bg-dteti-yellow/20",
+            ].join(" ")}
+          >
+            All
+          </button>
           {categories.map((category) => {
             const isActive = activeCategory === category;
 
@@ -82,10 +138,10 @@ export default function PeopleListPage() {
                 aria-pressed={isActive}
                 onClick={() => toggleCategory(category)}
                 className={[
-                  "flex min-h-16 items-start border p-3 text-left text-sm font-medium leading-tight text-dteti-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2",
+                  "flex min-h-12 shrink-0 items-center justify-center rounded-lg border px-5 py-3 text-center text-sm font-bold leading-tight text-dteti-ink transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2",
                   isActive
-                    ? "border-dteti-blue bg-dteti-yellow shadow-[inset_0_-4px_0_var(--dteti-blue)]"
-                    : "border-dteti-yellow bg-dteti-yellow hover:bg-dteti-yellow/80",
+                    ? "border-dteti-blue bg-dteti-yellow shadow-[inset_0_-3px_0_var(--dteti-blue)]"
+                    : "border-dteti-yellow bg-white hover:bg-dteti-yellow/20",
                 ].join(" ")}
               >
                 {category}
@@ -94,24 +150,8 @@ export default function PeopleListPage() {
           })}
         </div>
 
-        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <label className="sr-only" htmlFor="people-category-filter">
-            Filter lecturers by research group
-          </label>
-          <select
-            id="people-category-filter"
-            value={activeCategory}
-            onChange={(event) => setActiveCategory(event.target.value)}
-            className="min-h-10 w-full border border-line bg-white px-3 text-sm text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus sm:w-64"
-          >
-            <option value="">Filter Tag</option>
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-
+        {/* Showing People Counter Below Tabs */}
+        <div className="mb-8 flex items-center justify-between">
           <p className="text-sm text-muted" aria-live="polite">
             Showing {visibleLecturers.length}{" "}
             {visibleLecturers.length === 1 ? "person" : "people"}
@@ -139,6 +179,15 @@ export default function PeopleListPage() {
           </div>
         )}
       </div>
+
+      {/* Filter Modal Component */}
+      <PeopleFilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        currentFilters={filters}
+        onApplyFilters={setFilters}
+      />
     </main>
   );
 }
+
