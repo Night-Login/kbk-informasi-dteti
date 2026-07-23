@@ -8,7 +8,13 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:status": "prisma migrate status",
+    "db:import:legacy": "tsx scripts/import-legacy-database.ts",
+    "test:endpoints": "tsx src/test_endpoints.ts"
   },
   "keywords": [],
   "author": "",

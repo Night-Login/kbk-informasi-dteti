@@ -1,7 +1,14 @@
+import "dotenv/config";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret-key";
+const JWT_SECRET = process.env.JWT_SECRET || (
+    process.env.NODE_ENV === "production" ? "" : "development-only-secret-key"
+);
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "2h";
+
+if (!JWT_SECRET) {
+    throw new Error("JWT_SECRET must be configured in production.");
+}
 
 export interface TokenPayload {
     id?: number;

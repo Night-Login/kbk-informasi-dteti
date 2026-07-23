@@ -48,15 +48,17 @@ export default function LecturerCard({ lecturer, priority = false }: LecturerCar
       <div className="flex flex-col gap-2 text-[13px] text-muted">
         <p className="flex items-start gap-2">
           <MapPin className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
-          <span>{lecturer.contact.labName || "Lab XYZ"}</span>
+          <span>{lecturer.contact.labName || "Research group member"}</span>
         </p>
-        <a
-          href={`mailto:${lecturer.contact.email}`}
-          className="flex items-center gap-2 break-all hover:text-dteti-blue hover:underline"
-        >
-          <Mail className="shrink-0" size={16} aria-hidden="true" />
-          <span>{lecturer.contact.email}</span>
-        </a>
+        {lecturer.contact.email ? (
+          <a
+            href={`mailto:${lecturer.contact.email}`}
+            className="flex items-center gap-2 break-all hover:text-dteti-blue hover:underline"
+          >
+            <Mail className="shrink-0" size={16} aria-hidden="true" />
+            <span>{lecturer.contact.email}</span>
+          </a>
+        ) : null}
       </div>
     </article>
   );

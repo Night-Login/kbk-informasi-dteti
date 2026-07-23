@@ -11,6 +11,9 @@ import {
   SimpleForm,
   TextInput,
   SelectInput,
+  TopToolbar,
+  CreateButton,
+  ExportButton,
 } from "react-admin";
 
 const roleChoices = [
@@ -18,8 +21,24 @@ const roleChoices = [
   { id: "SUPERADMIN", name: "SUPERADMIN" },
 ];
 
+const adminFilters = [
+  <TextInput key="search" source="search" label="Search username" alwaysOn />,
+  <SelectInput key="role" source="role" label="Role" choices={roleChoices} />,
+];
+
+const AdminListActions = () => (
+  <TopToolbar>
+    <ExportButton />
+    <CreateButton />
+  </TopToolbar>
+);
+
 export const AdminList: React.FC = () => (
-  <List>
+  <List
+    filters={adminFilters}
+    actions={<AdminListActions />}
+    sort={{ field: "createdAt", order: "DESC" }}
+  >
     <Datagrid rowClick="edit">
       <TextField source="id" label="ID" />
       <TextField source="username" label="Username" />
@@ -31,7 +50,7 @@ export const AdminList: React.FC = () => (
 );
 
 export const AdminCreate: React.FC = () => (
-  <Create>
+  <Create redirect="list">
     <SimpleForm>
       <Box
         sx={{

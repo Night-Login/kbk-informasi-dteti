@@ -18,6 +18,9 @@ router.get("/slug/:slug", lecturerController.getLecturerBySlug);
 // GET /api/v1/lecturers/sinta/:sinta_id 
 router.get("/sinta/:sinta_id", lecturerController.getLecturerBySintaId);
 
+// GET /api/v1/lecturers/trash
+router.get("/trash", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), lecturerController.getDeletedLecturers);
+
 // GET /api/v1/lecturers/:id 
 router.get("/:id", lecturerController.getLecturerById);
 

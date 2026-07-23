@@ -10,7 +10,7 @@ import {
     ResearchTagFilters,
     PaginatedResult
 } from "../types/index.js";
-import { Prisma } from "@prisma/client";
+import { Prisma, Visibility } from "@prisma/client";
 
 /**
  * Common include clause for ResearchCluster queries
@@ -20,7 +20,14 @@ const clusterIncludeClause = {
         where: { deleted_at: null },
         include: {
             _count: {
-                select: { lecturers: true }
+                select: {
+                    lecturers: {
+                        where: { lecturer: { deleted_at: null, is_active: true } }
+                    },
+                    projects: {
+                        where: { project: { deleted_at: null, visibility: Visibility.PUBLIC } }
+                    }
+                }
             }
         }
     }
@@ -66,7 +73,7 @@ export const getResearch = async (filters?: any): Promise<any> => {
         ];
     }
 
-    const [clusters, totalTags, activeTags] = await Promise.all([
+    const [clusters, totalTags, activeTags, totalLecturers, totalProjects, totalPublications] = await Promise.all([
         prisma.researchCluster.findMany({
             where: { AND: clusterConditions },
             orderBy: { sort_order: "asc" },
@@ -75,36 +82,113 @@ export const getResearch = async (filters?: any): Promise<any> => {
                     where: tagWhere,
                     include: {
                         _count: {
-                            select: { lecturers: true }
+                            select: {
+                                lecturers: {
+                                    where: { lecturer: { deleted_at: null, is_active: true } }
+                                },
+                                projects: {
+                                    where: { project: { deleted_at: null, visibility: Visibility.PUBLIC } }
+                                }
+                            }
                         }
                     }
                 }
             }
         }),
         prisma.researchTag.count({ where: { deleted_at: null } }),
-        prisma.researchTag.count({ where: { is_active: true, deleted_at: null } })
+        prisma.researchTag.count({ where: { is_active: true, deleted_at: null } }),
+        prisma.lecturer.count({ where: { deleted_at: null, is_active: true } }),
+        prisma.project.count({ where: { deleted_at: null, visibility: Visibility.PUBLIC } }),
+        prisma.publication.count({ where: { deleted_at: null } })
     ]);
+
+    const enrichedClusters = await Promise.all(
+        clusters.map(async (cluster) => {
+            const [lecturerCount, projectCount, publicationCount] = await Promise.all([
+                prisma.lecturer.count({
+                    where: {
+                        deleted_at: null,
+                        is_active: true,
+                        research_tags: {
+                            some: {
+                                tag: {
+                                    cluster_id: cluster.id,
+                                    deleted_at: null,
+                                    is_active: true
+                                }
+                            }
+                        }
+                    }
+                }),
+                prisma.project.count({
+                    where: {
+                        deleted_at: null,
+                        visibility: Visibility.PUBLIC,
+                        research_tags: {
+                            some: {
+                                tag: {
+                                    cluster_id: cluster.id,
+                                    deleted_at: null,
+                                    is_active: true
+                                }
+                            }
+                        }
+                    }
+                }),
+                prisma.publication.count({
+                    where: {
+                        deleted_at: null,
+                        lecturers: {
+                            some: {
+                                lecturer: {
+                                    deleted_at: null,
+                                    research_tags: {
+                                        some: {
+                                            tag: {
+                                                cluster_id: cluster.id,
+                                                deleted_at: null,
+                                                is_active: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+            ]);
+
+            return {
+                id: cluster.id,
+                name: cluster.name,
+                slug: cluster.slug,
+                description: cluster.description,
+                sort_order: cluster.sort_order,
+                lecturer_count: lecturerCount,
+                project_count: projectCount,
+                publication_count: publicationCount,
+                tags: cluster.tags.map((tag) => ({
+                    id: tag.id,
+                    name: tag.name,
+                    slug: tag.slug,
+                    description: tag.description,
+                    lecturer_count: tag._count.lecturers,
+                    project_count: tag._count.projects
+                }))
+            };
+        })
+    );
 
     return {
         summary: {
             total_clusters: clusters.length,
             total_tags: totalTags,
-            active_tags: activeTags
+            active_tags: activeTags,
+            total_lecturers: totalLecturers,
+            total_projects: totalProjects,
+            total_publications: totalPublications
         },
-        clusters: clusters.map((c) => ({
-            id: c.id,
-            name: c.name,
-            slug: c.slug,
-            description: c.description,
-            sort_order: c.sort_order,
-            tags: c.tags.map((t) => ({
-                id: t.id,
-                name: t.name,
-                slug: t.slug,
-                description: t.description,
-                lecturer_count: t._count.lecturers
-            }))
-        }))
+        clusters: enrichedClusters
     };
 };
 
@@ -189,6 +273,19 @@ export const getPaginatedResearchClusters = async (filters?: ResearchClusterFilt
         limit,
         total_pages
     };
+};
+
+/**
+ * Get soft-deleted research clusters for the protected admin trash view.
+ */
+export const getDeletedResearchClusters = async (): Promise<ResearchCluster[]> => {
+    const clusters = await prisma.researchCluster.findMany({
+        where: { deleted_at: { not: null } },
+        orderBy: { deleted_at: "desc" },
+        include: clusterIncludeClause
+    });
+
+    return clusters as unknown as ResearchCluster[];
 };
 
 /**
@@ -396,6 +493,19 @@ export const getPaginatedResearchTags = async (filters?: ResearchTagFilters): Pr
         limit,
         total_pages
     };
+};
+
+/**
+ * Get soft-deleted research tags for the protected admin trash view.
+ */
+export const getDeletedResearchTags = async (): Promise<ResearchTag[]> => {
+    const tags = await prisma.researchTag.findMany({
+        where: { deleted_at: { not: null } },
+        orderBy: { deleted_at: "desc" },
+        include: tagIncludeClause
+    });
+
+    return tags as unknown as ResearchTag[];
 };
 
 /**
