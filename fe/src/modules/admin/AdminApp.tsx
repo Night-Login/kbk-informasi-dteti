@@ -1,9 +1,21 @@
 "use client";
 
 import React from "react";
-import { Admin, Resource } from "react-admin";
+import { Admin, CustomRoutes, Resource } from "react-admin";
+import { Route } from "react-router-dom";
+import PeopleIcon from "@mui/icons-material/People";
+import WorkIcon from "@mui/icons-material/Work";
+import ArticleIcon from "@mui/icons-material/Article";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import SellIcon from "@mui/icons-material/Sell";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { dataProvider } from "./dataProvider";
-import { DashboardPlaceholder } from "./components/DashboardPlaceholder";
+import { authProvider } from "./authProvider";
+import { AdminDashboard } from "./components/AdminDashboard";
+import { AdminLayout } from "./components/AdminLayout";
+import { AdminLogin } from "./components/AdminLogin";
+import { TrashPage } from "./components/TrashPage";
+import { adminTheme } from "./theme";
 import { LecturerList, LecturerCreate, LecturerEdit } from "./resources/lecturers";
 import { ProjectList, ProjectCreate, ProjectEdit } from "./resources/projects";
 import { PublicationList, PublicationCreate, PublicationEdit } from "./resources/publications";
@@ -15,14 +27,22 @@ export const AdminApp: React.FC = () => {
   return (
     <Admin
       dataProvider={dataProvider}
-      dashboard={DashboardPlaceholder}
-      requireAuth={false}
+      authProvider={authProvider}
+      dashboard={AdminDashboard}
+      layout={AdminLayout}
+      loginPage={AdminLogin}
+      theme={adminTheme}
+      requireAuth
+      disableTelemetry
+      title="KBK Informasi DTETI Admin"
     >
       <Resource
         name="lecturers"
         list={LecturerList}
         create={LecturerCreate}
         edit={LecturerEdit}
+        icon={PeopleIcon}
+        recordRepresentation="full_name"
         options={{ label: "Lecturers" }}
       />
       <Resource
@@ -30,6 +50,8 @@ export const AdminApp: React.FC = () => {
         list={ProjectList}
         create={ProjectCreate}
         edit={ProjectEdit}
+        icon={WorkIcon}
+        recordRepresentation="title"
         options={{ label: "Projects" }}
       />
       <Resource
@@ -37,6 +59,8 @@ export const AdminApp: React.FC = () => {
         list={PublicationList}
         create={PublicationCreate}
         edit={PublicationEdit}
+        icon={ArticleIcon}
+        recordRepresentation="title"
         options={{ label: "Publications" }}
       />
       <Resource
@@ -44,6 +68,8 @@ export const AdminApp: React.FC = () => {
         list={ResearchClusterList}
         create={ResearchClusterCreate}
         edit={ResearchClusterEdit}
+        icon={AccountTreeIcon}
+        recordRepresentation="name"
         options={{ label: "Research Clusters" }}
       />
       <Resource
@@ -51,6 +77,8 @@ export const AdminApp: React.FC = () => {
         list={ResearchTagList}
         create={ResearchTagCreate}
         edit={ResearchTagEdit}
+        icon={SellIcon}
+        recordRepresentation="name"
         options={{ label: "Research Tags" }}
       />
       <Resource
@@ -58,8 +86,13 @@ export const AdminApp: React.FC = () => {
         list={AdminList}
         create={AdminCreate}
         edit={AdminEdit}
+        icon={AdminPanelSettingsIcon}
+        recordRepresentation="username"
         options={{ label: "Admins" }}
       />
+      <CustomRoutes>
+        <Route path="/trash" element={<TrashPage />} />
+      </CustomRoutes>
     </Admin>
   );
 };
