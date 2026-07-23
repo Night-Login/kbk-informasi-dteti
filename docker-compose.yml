@@ -9,43 +9,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  directus:
-    image: directus/directus:latest
-    restart: unless-stopped
-    depends_on:
-      - database
-    expose:
-      - "8055"
-    environment:
-      KEY: ${DIRECTUS_KEY}
-      SECRET: ${DIRECTUS_SECRET}
-      DB_CLIENT: pg
-      DB_HOST: database
-      DB_PORT: 5432
-      DB_DATABASE: directus
-      DB_USER: directus
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
-      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
-      PUBLIC_URL: ${DIRECTUS_PUBLIC_URL:-http://localhost/directus}
-    volumes:
-      - ./be/directus/uploads:/directus/uploads
-      - ./be/directus/extensions:/directus/extensions
-
   backend:
     build:
       context: ./be/express
       dockerfile: Dockerfile
     restart: unless-stopped
-    depends_on:
-      - directus
     expose:
       - "3000"
     environment:
       NODE_ENV: production
       PORT: 3000
-      DIRECTUS_URL: http://directus:8055
-      DIRECTUS_TOKEN: ${DIRECTUS_TOKEN}
 
   frontend:
     build:
@@ -68,7 +41,6 @@ services:
     depends_on:
       - frontend
       - backend
-      - directus
     ports:
       - "80:80"
     volumes:
