@@ -10,7 +10,7 @@ type LecturerCardProps = {
 
 export default function LecturerCard({ lecturer, priority = false }: LecturerCardProps) {
   return (
-    <article className="mx-auto flex h-full w-full max-w-80 flex-col gap-5 bg-dteti-blue-soft p-6">
+    <article className="mx-auto flex h-full w-full max-w-80 flex-col gap-5 bg-dteti-blue-soft p-6 rounded-lg">
       <Link
         href={`/people/${lecturer.id}`}
         className="relative mx-auto aspect-square w-full overflow-hidden rounded-full bg-surface-strong"

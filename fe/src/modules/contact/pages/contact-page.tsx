@@ -1,9 +1,4 @@
 import WireframePlaceholder from "@/components/global/wireframe-placeholder";
-import {
-  contactAddress,
-  contactCards,
-  contactSocialLinks,
-} from "@/modules/contact/data/contact.data";
 
 function Field({
   id,
@@ -31,11 +26,6 @@ function Field({
 }
 
 export default function ContactPage() {
-  const [emailCard, addressCard, socialCard] = contactCards;
-  const EmailIcon = emailCard.icon;
-  const AddressIcon = addressCard.icon;
-  const SocialIcon = socialCard.icon;
-
   return (
     <main id="main-content" className="bg-white pt-16 text-ink sm:pt-20">
       <section className="page-container pb-10 pt-12">
@@ -81,45 +71,6 @@ export default function ContactPage() {
           </form>
 
           <WireframePlaceholder className="min-h-[22rem] w-full lg:min-h-full" />
-        </div>
-
-        <div className="mx-auto mt-8 grid max-w-6xl gap-8 md:grid-cols-3">
-          <article className="brand-gradient grid min-h-72 place-items-center p-8 text-center text-white">
-            <div>
-              <EmailIcon className="mx-auto" size={46} aria-hidden="true" />
-              <p className="mt-8 text-lg">{emailCard.value}</p>
-            </div>
-          </article>
-
-          <article className="brand-gradient grid min-h-72 place-items-center p-8 text-center text-white">
-            <div>
-              <AddressIcon className="mx-auto" size={46} aria-hidden="true" />
-              <h2 className="mt-8 text-lg font-extrabold leading-tight">
-                {contactAddress.title}
-              </h2>
-              {contactAddress.lines.map((line) => (
-                <p key={line} className="mx-auto mt-6 max-w-xs text-lg leading-tight">
-                  {line}
-                </p>
-              ))}
-            </div>
-          </article>
-
-          <article className="brand-gradient grid min-h-72 place-items-center p-8 text-white">
-            <div>
-              <SocialIcon className="mx-auto" size={46} aria-hidden="true" />
-              <ul className="mt-8 space-y-4 text-lg">
-                {contactSocialLinks.map(({ label, value, short }) => (
-                  <li key={label} className="flex items-center gap-4">
-                    <span className="grid size-6 place-items-center rounded-full text-xs font-extrabold">
-                      {short}
-                    </span>
-                    <span>{value}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </article>
         </div>
       </section>
     </main>

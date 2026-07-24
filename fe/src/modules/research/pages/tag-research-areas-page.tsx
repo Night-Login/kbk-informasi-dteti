@@ -2,7 +2,7 @@
 
 import Breadcrumbs from "@/components/global/breadcrumbs";
 import TopicTag from "@/components/global/topic-tag";
-import LecturerCard from "@/components/people/lecturer-card";
+import LecturerCard from "@/modules/people/components/lecturer-card";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {
   apiRequest,
