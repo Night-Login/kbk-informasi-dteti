@@ -161,7 +161,7 @@ export default function PeopleListPage() {
                 setPage(1);
               }}
               placeholder="Search name, title, or SINTA ID"
-              className="min-h-11 w-full rounded-full border border-line bg-white py-2.5 pl-11 pr-4 text-sm text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
+              className="min-h-11 w-full rounded-xl border border-line bg-white py-2.5 pl-11 pr-4 text-sm text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
 
@@ -169,7 +169,7 @@ export default function PeopleListPage() {
           <button
             type="button"
             onClick={() => setIsFilterModalOpen(true)}
-            className="flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-white px-5 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+            className="flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-line bg-white px-5 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
             aria-label="Open filter options"
           >
             <SlidersHorizontal size={16} className="text-dteti-blue" />
@@ -183,7 +183,7 @@ export default function PeopleListPage() {
         </div>
 
         {/* Category / Cluster Tabs */}
-        <div className="mb-6 flex flex-wrap items-center gap-3">
+        <div className="mb-6 flex items-center gap-3 overflow-x-auto pb-2">
           <button
             type="button"
             aria-pressed={!activeCluster}
@@ -193,7 +193,7 @@ export default function PeopleListPage() {
               setPage(1);
             }}
             className={[
-              "flex min-h-11 items-center justify-center rounded-xl border px-5 py-2 text-center text-sm font-bold leading-tight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
+              "flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-xl border px-5 py-2 text-center text-sm font-bold leading-tight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
               !activeCluster
                 ? "border-dteti-blue bg-dteti-yellow text-dteti-ink shadow-[inset_0_-3px_0_var(--dteti-blue)]"
                 : "border-dteti-yellow bg-white text-dteti-ink hover:bg-dteti-yellow/10",
@@ -210,7 +210,7 @@ export default function PeopleListPage() {
                 aria-pressed={isActive}
                 onClick={() => chooseCluster(cluster.slug)}
                 className={[
-                  "flex min-h-11 items-center justify-center rounded-xl border px-5 py-2 text-center text-sm font-bold leading-tight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
+                  "flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-xl border px-5 py-2 text-center text-sm font-bold leading-tight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
                   isActive
                     ? "border-dteti-blue bg-dteti-yellow text-dteti-ink shadow-[inset_0_-3px_0_var(--dteti-blue)]"
                     : "border-dteti-yellow bg-white text-dteti-ink hover:bg-dteti-yellow/10",
