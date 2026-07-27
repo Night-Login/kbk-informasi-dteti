@@ -13,15 +13,17 @@ export function AdminLogin() {
         },
       }}
     >
-      <Box sx={{ px: 3, pt: 3 }}>
-        <Typography variant="h5" color="primary.dark">
+      <Box sx={{ px: 3, pt: 3, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <Typography variant="h5" color="primary.dark" align="center">
           KBK Informasi DTETI
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }} align="justify">
           Sign in to manage lecturer, research, project, and publication data.
         </Typography>
       </Box>
-      <LoginForm />
+      <Box sx={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", "& .MuiFormControl-root": { width: "100%", textAlign: "center" }, "& .MuiInputBase-input": { textAlign: "center" }, "& form": { width: "100%", display: "flex", flexDirection: "column", alignItems: "center" } }}>
+        <LoginForm />
+      </Box>
     </Login>
   );
 }

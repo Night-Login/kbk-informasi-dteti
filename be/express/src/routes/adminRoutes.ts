@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { adminController } from "../controllers/index.js";
-import { authenticateJWT, requireRole } from "../middleware/index.js";
+import { authenticateJWT, requireRole, validateRequest } from "../middleware/index.js";
+import { adminSchema, createAdminSchema } from "../schemas/index.js";
 
 const router = Router();
 
@@ -27,10 +28,10 @@ router.get("/trash", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), admi
 router.get("/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), adminController.getAdminById);
 
 // POST /api/v1/admins
-router.post("/", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), adminController.createAdmin);
+router.post("/", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), validateRequest(createAdminSchema), adminController.createAdmin);
 
 // PUT /api/v1/admins/:id 
-router.put("/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), adminController.updateAdmin);
+router.put("/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), validateRequest(adminSchema), adminController.updateAdmin);
 
 // DELETE /api/v1/admins/:id 
 router.delete("/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), adminController.deleteAdmin);

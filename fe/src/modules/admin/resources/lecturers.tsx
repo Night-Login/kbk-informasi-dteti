@@ -1,4 +1,6 @@
 import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { lecturerFormSchema } from "../../../schemas/lecturer.schema";
 import { Box, Typography } from "@mui/material";
 import {
   AutocompleteArrayInput,
@@ -139,7 +141,7 @@ export const LecturerList: React.FC = () => (
 
 export const LecturerCreate: React.FC = () => (
   <Create redirect="list">
-    <SimpleForm>
+    <SimpleForm resolver={zodResolver(lecturerFormSchema)}>
       <LecturerFormFields />
     </SimpleForm>
   </Create>
@@ -147,7 +149,7 @@ export const LecturerCreate: React.FC = () => (
 
 export const LecturerEdit: React.FC = () => (
   <Edit>
-    <SimpleForm>
+    <SimpleForm resolver={zodResolver(lecturerFormSchema)}>
       <LecturerFormFields editing />
     </SimpleForm>
   </Edit>

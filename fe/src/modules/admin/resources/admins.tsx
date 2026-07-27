@@ -1,4 +1,6 @@
 import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { adminFormSchema, createAdminFormSchema } from "../../../schemas/admin.schema";
 import { Box } from "@mui/material";
 import {
   List,
@@ -51,7 +53,7 @@ export const AdminList: React.FC = () => (
 
 export const AdminCreate: React.FC = () => (
   <Create redirect="list">
-    <SimpleForm>
+    <SimpleForm resolver={zodResolver(createAdminFormSchema)}>
       <Box
         sx={{
           display: "grid",
@@ -71,7 +73,7 @@ export const AdminCreate: React.FC = () => (
 
 export const AdminEdit: React.FC = () => (
   <Edit>
-    <SimpleForm>
+    <SimpleForm resolver={zodResolver(adminFormSchema)}>
       <Box
         sx={{
           display: "grid",

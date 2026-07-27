@@ -141,14 +141,13 @@ export default function PublicationPage() {
           Publications
         </h1>
 
-        <div className="mx-auto max-w-4xl">
-          <label htmlFor="publication-search" className="sr-only">
-            Search publications
-          </label>
-          <div className="relative">
+        {/* Search & Filter Row */}
+        <div className="mb-6 flex w-full flex-col gap-3 lg:flex-row lg:items-center">
+          {/* Search Input Bar (matching /people) */}
+          <div className="relative flex-1">
             <Search
-              className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-muted"
-              size={22}
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+              size={17}
               aria-hidden="true"
             />
             <input
@@ -161,12 +160,11 @@ export default function PublicationPage() {
                 setPage(1);
               }}
               placeholder="Search title, author, venue, DOI, or abstract"
-              className="min-h-16 w-full border border-muted bg-white py-4 pl-14 pr-5 text-lg font-medium text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus sm:text-xl"
+              className="min-h-11 w-full rounded-xl border border-line bg-white py-2.5 pl-11 pr-4 text-sm text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
-        </div>
 
-        <section className="mt-10" aria-label="Publication filters">
+          {/* Filter Bar (Research topic, Lecturer, Year, Clear) */}
           <div className="flex flex-wrap items-center gap-3">
             <label className="sr-only" htmlFor="publication-topic">
               Research topic
@@ -179,7 +177,7 @@ export default function PublicationPage() {
                 setTag(event.target.value);
                 setPage(1);
               }}
-              className="min-h-11 border border-line bg-white px-3 text-sm text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
+              className="min-h-11 cursor-pointer rounded-xl border border-line bg-white px-4 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
             >
               <option value="">Research topic</option>
               {tags.map((option) => (
@@ -200,7 +198,7 @@ export default function PublicationPage() {
                 setLecturer(event.target.value);
                 setPage(1);
               }}
-              className="min-h-11 max-w-72 border border-line bg-white px-3 text-sm text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
+              className="min-h-11 max-w-60 cursor-pointer truncate rounded-xl border border-line bg-white px-4 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
             >
               <option value="">Lecturer</option>
               {lecturers.map((option) => (
@@ -221,7 +219,7 @@ export default function PublicationPage() {
                 setYear(event.target.value);
                 setPage(1);
               }}
-              className="min-h-11 border border-line bg-white px-3 text-sm text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
+              className="min-h-11 cursor-pointer rounded-xl border border-line bg-white px-4 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
             >
               <option value="">Year</option>
               {years.map((option) => (
@@ -231,15 +229,19 @@ export default function PublicationPage() {
               ))}
             </select>
 
-            <button
-              type="button"
-              onClick={clearFilters}
-              disabled={activeFilters.length === 0 && !query}
-              className="min-h-11 bg-dteti-blue-soft px-4 text-sm font-semibold text-dteti-ink transition-colors hover:bg-dteti-blue-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Clear all
-            </button>
+            {(activeFilters.length > 0 || query) && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-line bg-white px-4 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+              >
+                Clear all
+              </button>
+            )}
           </div>
+        </div>
+
+        <section aria-label="Publication filters">
 
           {activeFilters.length > 0 ? (
             <div className="mt-6 flex flex-wrap items-center gap-3">

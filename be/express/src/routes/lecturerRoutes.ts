@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { lecturerController } from "../controllers/index.js";
-import { authenticateJWT, requireRole, uploadPhoto } from "../middleware/index.js";
+import { authenticateJWT, requireRole, uploadPhoto, validateRequest } from "../middleware/index.js";
+import { lecturerSchema } from "../schemas/index.js";
 
 const router = Router();
 
@@ -27,13 +28,13 @@ router.get("/:id", lecturerController.getLecturerById);
 /* #### Protected endpoints #### */
 
 // POST /api/v1/lecturers 
-router.post("/", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), lecturerController.createLecturer);
+router.post("/", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), validateRequest(lecturerSchema), lecturerController.createLecturer);
 
 // POST /api/v1/lecturers/import 
 router.post("/import", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), lecturerController.importLecturersCSV);
 
 // PUT /api/v1/lecturers/:id 
-router.put("/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), lecturerController.updateLecturer);
+router.put("/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), validateRequest(lecturerSchema), lecturerController.updateLecturer);
 
 // DELETE /api/v1/lecturers/:id 
 router.delete("/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), lecturerController.deleteLecturer);
