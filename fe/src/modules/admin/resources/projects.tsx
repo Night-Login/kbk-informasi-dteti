@@ -1,4 +1,6 @@
 import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { projectFormSchema } from "../../../schemas/project.schema";
 import { Box } from "@mui/material";
 import {
   AutocompleteArrayInput,
@@ -139,7 +141,7 @@ export const ProjectList: React.FC = () => (
 
 export const ProjectCreate: React.FC = () => (
   <Create redirect="list">
-    <SimpleForm>
+    <SimpleForm resolver={zodResolver(projectFormSchema)}>
       <ProjectFormFields />
     </SimpleForm>
   </Create>
@@ -147,7 +149,7 @@ export const ProjectCreate: React.FC = () => (
 
 export const ProjectEdit: React.FC = () => (
   <Edit>
-    <SimpleForm>
+    <SimpleForm resolver={zodResolver(projectFormSchema)}>
       <ProjectFormFields editing />
     </SimpleForm>
   </Edit>
