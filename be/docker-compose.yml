@@ -34,7 +34,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5000
-      DB_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      DB_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB:-kbk-backend}
 
 volumes:
   kbk_postgres_data:
