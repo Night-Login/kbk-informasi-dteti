@@ -1,6 +1,7 @@
 "use client";
 
 import Breadcrumbs from "@/components/global/breadcrumbs";
+import { DropdownSelect } from "@/components/global/dropdown-select";
 import TopicTag from "@/components/global/topic-tag";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {
@@ -17,7 +18,6 @@ import {
   ExternalLink,
   LoaderCircle,
   Search,
-  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -36,7 +36,26 @@ export default function PublicationPage() {
   const [result, setResult] = useState<PaginatedResult<Publication> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const debouncedQuery = useDebouncedValue(query);
+  const debouncedQuery = useDebouncedValue(query, 300);
+
+  const tagOptions = useMemo(
+    () => tags.map((option) => ({ label: option.name, value: option.slug })),
+    [tags],
+  );
+
+  const lecturerOptions = useMemo(
+    () =>
+      lecturers.map((option) => ({
+        label: option.full_name,
+        value: option.slug,
+      })),
+    [lecturers],
+  );
+
+  const yearOptions = useMemo(
+    () => years.map((option) => ({ label: String(option), value: String(option) })),
+    [],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -121,6 +140,8 @@ export default function PublicationPage() {
     year ? { key: "year", label: year, clear: () => setYear("") } : null,
   ].filter((filter): filter is NonNullable<typeof filter> => filter !== null);
 
+  const hasActiveFilters = activeFilters.length > 0 || query.trim() !== "";
+
   function clearFilters() {
     setLoading(true);
     setQuery("");
@@ -166,111 +187,73 @@ export default function PublicationPage() {
 
           {/* Filter Bar (Research topic, Lecturer, Year, Clear) */}
           <div className="flex flex-wrap items-center gap-3">
-            <label className="sr-only" htmlFor="publication-topic">
-              Research topic
-            </label>
-            <select
+            <DropdownSelect
               id="publication-topic"
               value={tag}
-              onChange={(event) => {
+              onChange={(val) => {
                 setLoading(true);
-                setTag(event.target.value);
+                setTag(val);
                 setPage(1);
               }}
-              className="min-h-11 cursor-pointer rounded-xl border border-line bg-white px-4 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
-            >
-              <option value="">Research topic</option>
-              {tags.map((option) => (
-                <option key={option.id} value={option.slug}>
-                  {option.name}
-                </option>
-              ))}
-            </select>
+              options={tagOptions}
+              placeholder="Research topic"
+              searchable
+              searchPlaceholder="Search topic..."
+              className="w-44 sm:w-48"
+            />
 
-            <label className="sr-only" htmlFor="publication-lecturer">
-              Lecturer
-            </label>
-            <select
+            <DropdownSelect
               id="publication-lecturer"
               value={lecturer}
-              onChange={(event) => {
+              onChange={(val) => {
                 setLoading(true);
-                setLecturer(event.target.value);
+                setLecturer(val);
                 setPage(1);
               }}
-              className="min-h-11 max-w-60 cursor-pointer truncate rounded-xl border border-line bg-white px-4 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
-            >
-              <option value="">Lecturer</option>
-              {lecturers.map((option) => (
-                <option key={option.id} value={option.slug}>
-                  {option.full_name}
-                </option>
-              ))}
-            </select>
+              options={lecturerOptions}
+              placeholder="Lecturer"
+              searchable
+              searchPlaceholder="Search lecturer..."
+              className="w-48 sm:w-56"
+            />
 
-            <label className="sr-only" htmlFor="publication-year">
-              Publication year
-            </label>
-            <select
+            <DropdownSelect
               id="publication-year"
               value={year}
-              onChange={(event) => {
+              onChange={(val) => {
                 setLoading(true);
-                setYear(event.target.value);
+                setYear(val);
                 setPage(1);
               }}
-              className="min-h-11 cursor-pointer rounded-xl border border-line bg-white px-4 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
-            >
-              <option value="">Year</option>
-              {years.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+              options={yearOptions}
+              placeholder="Year"
+              searchable
+              searchPlaceholder="Search year..."
+              align="right"
+              className="w-28 sm:w-32"
+            />
 
-            {(activeFilters.length > 0 || query) && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-line bg-white px-4 py-2 text-xs font-bold text-dteti-ink transition-all hover:border-dteti-blue hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
-              >
-                Clear all
-              </button>
-            )}
+            <button
+              type="button"
+              disabled={!hasActiveFilters}
+              onClick={clearFilters}
+              className={[
+                "flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border px-4 py-2 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
+                hasActiveFilters
+                  ? "border-dteti-blue bg-dteti-blue text-white hover:bg-dteti-blue-deep shadow-xs cursor-pointer"
+                  : "border-line bg-surface/50 text-muted opacity-40 cursor-not-allowed select-none",
+              ].join(" ")}
+            >
+              Clear all
+            </button>
           </div>
         </div>
 
-        <section aria-label="Publication filters">
-
-          {activeFilters.length > 0 ? (
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <p className="text-sm text-ink">Active filters:</p>
-              {activeFilters.map((filter) => (
-                <button
-                  key={filter.key}
-                  type="button"
-                  onClick={() => {
-                    setLoading(true);
-                    filter.clear();
-                    setPage(1);
-                  }}
-                  className="inline-flex min-h-9 items-center gap-2 border border-dteti-ink/70 bg-dteti-yellow px-3 py-1 text-sm text-dteti-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
-                  aria-label={`Remove ${filter.label} filter`}
-                >
-                  {filter.label}
-                  <X size={14} aria-hidden="true" />
-                </button>
-              ))}
-            </div>
-          ) : null}
-
-          <p className="mt-5 text-sm text-muted" aria-live="polite">
-            {loading
-              ? "Loading publications…"
-              : `${result?.total || 0} ${result?.total === 1 ? "publication" : "publications"} found`}
-          </p>
-        </section>
+        <p className="mt-5 text-sm text-muted" aria-live="polite">
+          {loading
+            ? "Loading publications…"
+            : `${result?.total || 0} ${result?.total === 1 ? "publication" : "publications"} found`}
+        </p>
 
         <section className="mt-10" aria-label="Publication results">
           {loading ? (

@@ -1,6 +1,7 @@
 "use client";
 
 import Breadcrumbs from "@/components/global/breadcrumbs";
+import { DropdownSelect } from "@/components/global/dropdown-select";
 import TopicTag from "@/components/global/topic-tag";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {
@@ -17,7 +18,7 @@ import {
   LoaderCircle,
   Search,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE = 8;
 
@@ -39,7 +40,31 @@ export default function ProjectsPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const debouncedQuery = useDebouncedValue(query);
+  const debouncedQuery = useDebouncedValue(query, 300);
+
+  const tagOptions = useMemo(
+    () => tags.map((t) => ({ label: t.name, value: t.slug })),
+    [tags],
+  );
+
+  const statusOptions = useMemo(
+    () => [
+      { label: "Planned", value: "PLANNED" },
+      { label: "Ongoing", value: "ONGOING" },
+      { label: "Completed", value: "COMPLETED" },
+    ],
+    [],
+  );
+
+  const hasActiveFilters = query.trim() !== "" || tag !== "" || status !== "";
+
+  function clearFilters() {
+    setLoading(true);
+    setQuery("");
+    setTag("");
+    setStatus("");
+    setPage(1);
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -96,19 +121,21 @@ export default function ProjectsPage() {
           ]}
         />
 
-        <h1 className="pb-10 pt-7 text-center text-4xl font-bold text-dteti-blue sm:text-5xl">
+        <h1 className="mb-8 mt-6 text-center text-3xl font-bold text-dteti-blue sm:text-4xl">
           Projects
         </h1>
 
-        <section aria-label="Project filters" className="flex flex-col gap-3 lg:flex-row">
-          <label className="relative block w-full lg:max-w-xl">
-            <span className="sr-only">Search projects</span>
+        {/* Search & Filter Row */}
+        <div className="mb-6 flex w-full flex-col gap-3 lg:flex-row lg:items-center">
+          {/* Search Input Bar */}
+          <div className="relative flex-1">
             <Search
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-              size={18}
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+              size={17}
               aria-hidden="true"
             />
             <input
+              id="project-search"
               type="search"
               value={query}
               onChange={(event) => {
@@ -117,48 +144,56 @@ export default function ProjectsPage() {
                 setPage(1);
               }}
               placeholder="Search title, partner, or funding source"
-              className="min-h-12 w-full border border-line bg-white py-2 pl-10 pr-3 text-base text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
+              className="min-h-11 w-full rounded-xl border border-line bg-white py-2.5 pl-11 pr-4 text-sm text-ink placeholder:text-muted focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
             />
-          </label>
+          </div>
 
-          <label>
-            <span className="sr-only">Research topic</span>
-            <select
+          {/* Filter Bar (Research topic, Project status, Clear) */}
+          <div className="flex flex-wrap items-center gap-3">
+            <DropdownSelect
+              id="project-topic"
               value={tag}
-              onChange={(event) => {
+              onChange={(val) => {
                 setLoading(true);
-                setTag(event.target.value);
+                setTag(val);
                 setPage(1);
               }}
-              className="min-h-12 w-full border border-line bg-white px-3 text-sm text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus lg:w-64"
-            >
-              <option value="">All research topics</option>
-              {tags.map((researchTag) => (
-                <option key={researchTag.id} value={researchTag.slug}>
-                  {researchTag.name}
-                </option>
-              ))}
-            </select>
-          </label>
+              options={tagOptions}
+              placeholder="Research topic"
+              searchable
+              searchPlaceholder="Search topic..."
+              className="w-48 sm:w-56"
+            />
 
-          <label>
-            <span className="sr-only">Project status</span>
-            <select
+            <DropdownSelect
+              id="project-status"
               value={status}
-              onChange={(event) => {
+              onChange={(val) => {
                 setLoading(true);
-                setStatus(event.target.value);
+                setStatus(val);
                 setPage(1);
               }}
-              className="min-h-12 w-full border border-line bg-white px-3 text-sm text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus lg:w-48"
+              options={statusOptions}
+              placeholder="Project status"
+              align="right"
+              className="w-36 sm:w-44"
+            />
+
+            <button
+              type="button"
+              disabled={!hasActiveFilters}
+              onClick={clearFilters}
+              className={[
+                "flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border px-4 py-2 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
+                hasActiveFilters
+                  ? "border-dteti-blue bg-dteti-blue text-white hover:bg-dteti-blue-deep shadow-xs cursor-pointer"
+                  : "border-line bg-surface/50 text-muted opacity-40 cursor-not-allowed select-none",
+              ].join(" ")}
             >
-              <option value="">All statuses</option>
-              <option value="PLANNED">Planned</option>
-              <option value="ONGOING">Ongoing</option>
-              <option value="COMPLETED">Completed</option>
-            </select>
-          </label>
-        </section>
+              Clear all
+            </button>
+          </div>
+        </div>
 
         <p className="mt-5 text-sm text-muted" aria-live="polite">
           {loading
