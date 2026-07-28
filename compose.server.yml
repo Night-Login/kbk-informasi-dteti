@@ -1,0 +1,141 @@
+name: kbk-informasi-server
+
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "${DOCKER_LOG_MAX_SIZE:-10m}"
+    max-file: "${DOCKER_LOG_MAX_FILES:-3}"
+
+services:
+  database:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-kbk-backend}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\"",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    stop_grace_period: 30s
+    volumes:
+      - server_postgres_data:/var/lib/postgresql/data
+    networks:
+      - database_network
+    logging: *default-logging
+
+  # This profile prevents migrations from running during a normal `up`.
+  # Run it only through the explicit, approved command in the deployment guide.
+  database_init:
+    profiles: ["maintenance"]
+    build:
+      context: ./be/express
+      dockerfile: Dockerfile
+      target: builder
+    restart: "no"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DB_URL: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@database:5432/${POSTGRES_DB:-kbk-backend}"
+      SUPERADMIN_USERNAME: "${SUPERADMIN_USERNAME:?SUPERADMIN_USERNAME is required}"
+      SUPERADMIN_PASSWORD: "${SUPERADMIN_PASSWORD:?SUPERADMIN_PASSWORD is required}"
+    command: ["npx", "prisma", "migrate", "deploy"]
+    networks:
+      - database_network
+    logging: *default-logging
+
+  backend:
+    build:
+      context: ./be/express
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    expose:
+      - "5000"
+    environment:
+      NODE_ENV: production
+      PORT: "5000"
+      DB_URL: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@database:5432/${POSTGRES_DB:-kbk-backend}"
+      FRONTEND_URLS: "${FRONTEND_URLS:?FRONTEND_URLS is required}"
+      JWT_SECRET: "${JWT_SECRET:?JWT_SECRET is required}"
+      JWT_EXPIRES_IN: "${JWT_EXPIRES_IN:-2h}"
+      DB_POOL_MAX: "${DB_POOL_MAX:-10}"
+      DB_CONNECT_TIMEOUT_MS: "${DB_CONNECT_TIMEOUT_MS:-10000}"
+      DB_IDLE_TIMEOUT_MS: "${DB_IDLE_TIMEOUT_MS:-30000}"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:5000/health').then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1));",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    stop_grace_period: 30s
+    volumes:
+      - server_backend_uploads:/app/uploads
+    networks:
+      - database_network
+      - tunnel_network
+    logging: *default-logging
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.7.3
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: "${CLOUDFLARE_TUNNEL_TOKEN:?CLOUDFLARE_TUNNEL_TOKEN is required}"
+    networks:
+      - tunnel_network
+    logging: *default-logging
+
+  database_backup:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.backup
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: database
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: "${POSTGRES_DB:-kbk-backend}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      PGPASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}"
+      BACKUP_DIR: /backups
+      BACKUP_RETENTION_DAYS: "${BACKUP_RETENTION_DAYS:-14}"
+      BACKUP_CRON_SCHEDULE: "${BACKUP_CRON_SCHEDULE:-0 2 * * *}"
+      TZ: "${TZ:-Asia/Jakarta}"
+    volumes:
+      - ./backups/archives:/backups
+    networks:
+      - database_network
+    logging: *default-logging
+
+volumes:
+  server_postgres_data:
+    name: kbk_server_postgres_data
+  server_backend_uploads:
+    name: kbk_server_backend_uploads
+
+networks:
+  database_network:
+    internal: true
+  tunnel_network:
