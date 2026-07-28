@@ -15,28 +15,56 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-    const username = process.env.SUPERADMIN_USERNAME || "superadmin";
-    const password = process.env.SUPERADMIN_PASSWORD || "superadmin123";
-    const isFromEnv = Boolean(process.env.SUPERADMIN_USERNAME || process.env.SUPERADMIN_PASSWORD);
+    const username = process.env.SUPERADMIN_USERNAME?.trim();
+    const password = process.env.SUPERADMIN_PASSWORD;
 
-    console.log(`Upserting superadmin account: ${username}...`);
-    const hashedPassword = await bcrypt.hash(password, 10);
+    if (!username || !password) {
+        throw new Error(
+            "SUPERADMIN_USERNAME and SUPERADMIN_PASSWORD must both be configured before seeding.",
+        );
+    }
 
-    const superAdmin = await prisma.admin.upsert({
+    const existingByUsername = await prisma.admin.findUnique({
         where: { username },
-        update: { role: Role.SUPERADMIN, password: hashedPassword },
-        create: {
+    });
+
+    if (existingByUsername) {
+        if (
+            existingByUsername.role !== Role.SUPERADMIN ||
+            existingByUsername.deletedAt !== null
+        ) {
+            throw new Error(
+                `Admin username "${username}" already exists but is not an active superadmin.`,
+            );
+        }
+
+        console.log(`Superadmin account "${username}" already exists; no changes were made.`);
+        return;
+    }
+
+    const existingSuperAdmin = await prisma.admin.findFirst({
+        where: {
+            role: Role.SUPERADMIN,
+            deletedAt: null,
+        },
+    });
+
+    if (existingSuperAdmin) {
+        throw new Error(
+            `An active superadmin already exists with username "${existingSuperAdmin.username}".`,
+        );
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await prisma.admin.create({
+        data: {
             username,
             password: hashedPassword,
             role: Role.SUPERADMIN,
         },
     });
 
-    if (isFromEnv) {
-        console.log(`Created superadmin account using env parameters: ${superAdmin.username}`);
-    } else {
-        console.log(`Created default superadmin account: ${superAdmin.username} (password: superadmin123)`);
-    }
+    console.log(`Created superadmin account "${username}".`);
 }
 
 main()

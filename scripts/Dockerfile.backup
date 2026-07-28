@@ -1,0 +1,7 @@
+FROM postgres:17-alpine
+
+RUN apk add --no-cache tzdata
+
+COPY --chmod=0755 backup-db.sh restore-db.sh backup-entrypoint.sh /usr/local/bin/
+
+ENTRYPOINT ["/usr/local/bin/backup-entrypoint.sh"]
