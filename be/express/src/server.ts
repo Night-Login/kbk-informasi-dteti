@@ -8,10 +8,12 @@ import dotenv from "dotenv";
 import path from "path";
 import routes from "./routes/index.js";
 import prisma from "./prisma/client.js";
+import { connectRedis } from "./utils/redis.js";
 
 dotenv.config();
 
 const app = express();
+connectRedis();
 const allowedOrigins = (
     process.env.FRONTEND_URLS ||
     process.env.FRONTEND_URL ||

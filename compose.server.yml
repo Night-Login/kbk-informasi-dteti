@@ -60,12 +60,15 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     expose:
       - "5000"
     environment:
       NODE_ENV: production
       PORT: "5000"
       DB_URL: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@database:5432/${POSTGRES_DB:-kbk-backend}"
+      REDIS_URL: "redis://redis:6379"
       FRONTEND_URLS: "${FRONTEND_URLS:?FRONTEND_URLS is required}"
       JWT_SECRET: "${JWT_SECRET:?JWT_SECRET is required}"
       JWT_EXPIRES_IN: "${JWT_EXPIRES_IN:-2h}"
@@ -90,6 +93,19 @@ services:
     networks:
       - database_network
       - tunnel_network
+    logging: *default-logging
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - database_network
     logging: *default-logging
 
   cloudflared:
