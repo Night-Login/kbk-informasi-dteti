@@ -45,6 +45,7 @@ model ResearchCluster {
   sort_order  Int?
   deleted_at  DateTime?
   tags        ResearchTag[]
+  primary_lecturers Lecturer[]
 
   @@map("research_clusters")
 }
@@ -138,6 +139,7 @@ model Lecturer {
   supervision_status  String?
   is_active           Boolean               @default(true)
   source_csv_row_ref  String?
+  primary_research_cluster_id String?       @db.Uuid
   created_at          DateTime              @default(now())
   updated_at          DateTime              @updatedAt
   deleted_at          DateTime?
@@ -146,6 +148,10 @@ model Lecturer {
   research_tags       LecturerResearchTag[]
   led_projects        Project[]             @relation("ProjectLead")
   member_projects     LecturerProject[]
+  primary_research_cluster ResearchCluster? @relation(fields: [primary_research_cluster_id], references: [id])
+  supervised_students SupervisedStudent[]
+  teaching_assistants TeachingAssistant[]
+  supervision_quota   LecturerSupervisionQuota?
 
   @@map("lecturers")
 }
@@ -184,6 +190,7 @@ model Publication {
   deleted_at       DateTime?
   lecturers        LecturerPublication[]
 
+  @@index([source])
   @@map("publications")
 }
 
@@ -196,4 +203,57 @@ model LecturerPublication {
 
   @@id([lecturer_id, publication_id])
   @@map("lecturer_publications")
+}
+
+model SupervisedStudent {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lecturer_id       String    @db.Uuid
+  student_name      String
+  student_id_number String?
+  program_level     String?   // S1, S2, S3
+  thesis_title      String?
+  supervision_role  String?
+  status            String?
+  start_date        DateTime? @db.Date
+  end_date          DateTime? @db.Date
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  deleted_at        DateTime?
+
+  lecturer          Lecturer  @relation(fields: [lecturer_id], references: [id], onDelete: Cascade)
+
+  @@index([lecturer_id])
+  @@map("supervised_students")
+}
+
+model TeachingAssistant {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lecturer_id       String    @db.Uuid
+  student_name      String
+  student_id_number String?
+  course_name       String?
+  academic_period   String?
+  status            String?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  deleted_at        DateTime?
+
+  lecturer          Lecturer  @relation(fields: [lecturer_id], references: [id], onDelete: Cascade)
+
+  @@index([lecturer_id])
+  @@map("teaching_assistants")
+}
+
+model LecturerSupervisionQuota {
+  lecturer_id             String    @id @db.Uuid
+  max_quota               Int?
+  current_students_count  Int       @default(0)
+  academic_period         String?
+  source                  String?
+  updated_at              DateTime  @default(now()) @updatedAt
+  deleted_at              DateTime?
+
+  lecturer                Lecturer  @relation(fields: [lecturer_id], references: [id], onDelete: Cascade)
+
+  @@map("lecturer_supervision_quota")
 }

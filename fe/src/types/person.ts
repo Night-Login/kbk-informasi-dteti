@@ -1,19 +1,20 @@
-export interface teachingAssistant {
-  fullName: string;
-  profilePictureUrl?: string;
+export interface PersonStudent extends PersonLite {
+  studentIdNumber?: string;
+  level?: "S1" | "S2" | "S3";
+  isAdvisee: boolean;
+  isTeachingAssistant: boolean;
+  
+  // Advisee specific
+  thesisTitle?: string;
+  supervisionRole?: string;
+  adviseeStatus?: string;
+  startDate?: string;
+  endDate?: string;
 
-  contact: {
-    email: string;
-  };
-}
-
-export interface Advisee {
-  id: string;
-  fullName: string;
-  level: "S1" | "S2" | "S3";
-  project: string;
-  researchArea: string;
-  profileHref?: string;
+  // TA specific
+  courseName?: string;
+  academicPeriod?: string;
+  taStatus?: string;
 }
 
 export interface publication {
@@ -39,13 +40,13 @@ export interface PersonLite {
   };
 }
 
-export interface PersonFull extends PersonLite {
+export interface PersonLecturer extends PersonLite {
   shortBio: string;
   longBio: string;
   degrees: string[];
   researchAreas: string[];
-  teachingAssistants: teachingAssistant[];
-  advisees: Advisee[];
+  teachingAssistants: PersonStudent[];
+  advisees: PersonStudent[];
 
   academicLinks: {
     sinta: string;
