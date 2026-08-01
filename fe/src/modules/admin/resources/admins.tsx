@@ -1,6 +1,9 @@
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { adminFormSchema, createAdminFormSchema } from "../../../schemas/admin.schema";
+import {
+  adminFormSchema,
+  createAdminFormSchema,
+} from "../../../schemas/admin.schema";
 import { Box } from "@mui/material";
 import {
   List,
@@ -16,6 +19,7 @@ import {
   TopToolbar,
   CreateButton,
   ExportButton,
+  useRecordContext,
 } from "react-admin";
 
 const roleChoices = [
@@ -35,6 +39,16 @@ const AdminListActions = () => (
   </TopToolbar>
 );
 
+const AdminDeleteButton = () => {
+  const record = useRecordContext();
+
+  if (record?.role === "SUPERADMIN") {
+    return null;
+  }
+
+  return <DeleteButton />;
+};
+
 export const AdminList: React.FC = () => (
   <List
     filters={adminFilters}
@@ -46,7 +60,7 @@ export const AdminList: React.FC = () => (
       <TextField source="username" label="Username" />
       <TextField source="role" label="Role" />
       <EditButton />
-      <DeleteButton />
+      <AdminDeleteButton />
     </Datagrid>
   </List>
 );
@@ -64,8 +78,18 @@ export const AdminCreate: React.FC = () => (
         }}
       >
         <TextInput source="username" label="Username" required />
-        <TextInput source="password" label="Password" type="password" required />
-        <SelectInput source="role" label="Role" choices={roleChoices} defaultValue="ADMIN" />
+        <TextInput
+          source="password"
+          label="Password"
+          type="password"
+          required
+        />
+        <SelectInput
+          source="role"
+          label="Role"
+          choices={roleChoices}
+          defaultValue="ADMIN"
+        />
       </Box>
     </SimpleForm>
   </Create>
@@ -85,7 +109,11 @@ export const AdminEdit: React.FC = () => (
       >
         <TextInput source="id" label="ID" disabled />
         <TextInput source="username" label="Username" required />
-        <TextInput source="password" label="New Password (Optional)" type="password" />
+        <TextInput
+          source="password"
+          label="New Password (Optional)"
+          type="password"
+        />
         <SelectInput source="role" label="Role" choices={roleChoices} />
       </Box>
     </SimpleForm>

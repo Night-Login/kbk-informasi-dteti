@@ -127,6 +127,14 @@ export const updateAdmin = async (id: number, data: UpdateAdminDTO): Promise<Omi
  */
 export const deleteAdmin = async (id: number): Promise<boolean> => {
     try {
+        const admin = await prisma.admin.findUnique({ where: { id } });
+        if (!admin) return false;
+        
+        if (admin.role === 'SUPERADMIN') {
+            console.warn(`Attempted to delete SUPERADMIN (id: ${id}). Operation denied.`);
+            return false;
+        }
+
         await prisma.admin.update({
             where: { id },
             data: { deletedAt: new Date() }
