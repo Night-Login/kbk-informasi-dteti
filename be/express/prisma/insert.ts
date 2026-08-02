@@ -29,8 +29,8 @@ const CONFIG = {
   CSV_LECTURERS: findFile('Lecturers_Base', '.csv'),
   CSV_PUBLICATIONS: findFile('Publications_Base', '.csv'),
   JSON_PUB_LINKS: findFile('Link_Lecturer-Publications', '.json'),
-  CSV_CLUSTER_LINKS: findFile('Link_Research_Clusters', '.csv'),
-  CSV_TAG_LINKS: findFile('Link_Lecturer_Research_Tags', '.csv'),
+  CSV_CLUSTER_LINKS: findFile('Link_Lecturer-Clusters', '.csv'),
+  CSV_TAG_LINKS: findFile('Link_Lecturer-Tags', '.csv'),
 };
 // ==============================================================================
 
