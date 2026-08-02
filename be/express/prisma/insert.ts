@@ -28,7 +28,7 @@ const CONFIG = {
   SQL_CLUSTERS_TAGS: path.join(DATA_DIR, 'seed_vocabulary.sql'),
   CSV_LECTURERS: findFile('Lecturers_Base', '.csv'),
   CSV_PUBLICATIONS: findFile('Publications_Base', '.csv'),
-  JSON_PUB_LINKS: findFile('Link_Lecturer-Publications', '.json'),
+  CSV_PUB_LINKS: findFile('Link_Lecturer-Publications', '.csv'),
   CSV_CLUSTER_LINKS: findFile('Link_Lecturer-Clusters', '.csv'),
   CSV_TAG_LINKS: findFile('Link_Lecturer-Tags', '.csv'),
 };
@@ -195,7 +195,8 @@ async function main() {
   // STEP 4: LINK LECTURERS TO PUBLICATIONS
   // ==============================================================================
   console.log('➡️ Linking Publications to Lecturers...');
-  const pubLinks: any[] = JSON.parse(fs.readFileSync(CONFIG.JSON_PUB_LINKS, 'utf8'));
+  const pubLinksCsv = fs.readFileSync(CONFIG.CSV_PUB_LINKS, 'utf8');
+  const pubLinks: any[] = parse(pubLinksCsv, { columns: true, skip_empty_lines: true });
   
   const pubLinksToInsert = [];
   for (const link of pubLinks) {
