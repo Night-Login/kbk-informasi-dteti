@@ -13,14 +13,24 @@ const __dirname = path.dirname(__filename);
 // Update these paths whenever you receive new data batches.
 // ==============================================================================
 const DATA_DIR = path.join(__dirname, 'seed_data');
+const findFile = (keyword: string, extension: string) => {
+  try {
+    const files = fs.readdirSync(DATA_DIR);
+    // Find the first file that includes the keyword and has the correct extension
+    const matched = files.find(f => f.toLowerCase().includes(keyword.toLowerCase()) && f.endsWith(extension));
+    return matched ? path.join(DATA_DIR, matched) : path.join(DATA_DIR, `NOT_FOUND_${keyword}${extension}`);
+  } catch (e) {
+    return path.join(DATA_DIR, `DIR_NOT_FOUND${extension}`);
+  }
+};
 
 const CONFIG = {
   SQL_CLUSTERS_TAGS: path.join(DATA_DIR, 'seed_vocabulary.sql'),
-  CSV_LECTURERS: path.join(DATA_DIR, 'Lecturers_Base_OpenAlex-Metrics_2026-08-01.csv'),
-  CSV_PUBLICATIONS: path.join(DATA_DIR, 'Publications_Base_OpenAlex_2026-08-01.csv'),
-  JSON_PUB_LINKS: path.join(DATA_DIR, 'Link_Lecturer-Publications_2026-08-01.json'),
-  CSV_CLUSTER_LINKS: path.join(DATA_DIR, 'lecturer_research_clusters_candidates.csv'),
-  CSV_TAG_LINKS: path.join(DATA_DIR, 'lecturer_research_tags_candidates.csv'),
+  CSV_LECTURERS: findFile('Lecturers_Base', '.csv'),
+  CSV_PUBLICATIONS: findFile('Publications_Base', '.csv'),
+  JSON_PUB_LINKS: findFile('Link_Lecturer-Publications', '.json'),
+  CSV_CLUSTER_LINKS: findFile('Link_Research_Clusters', '.csv'),
+  CSV_TAG_LINKS: findFile('Link_Lecturer_Research_Tags', '.csv'),
 };
 // ==============================================================================
 
