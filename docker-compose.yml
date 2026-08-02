@@ -7,11 +7,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-kbk-backend}",
-        ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-kbk-backend}" ]
       interval: 5s
       timeout: 5s
       retries: 12
@@ -30,9 +26,10 @@ services:
       DB_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB:-kbk-backend}
       SUPERADMIN_USERNAME: ${SUPERADMIN_USERNAME:-superadmin}
       SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD}
+    volumes:
+      - ./seed_data:/app/prisma/seed_data:ro
     command: >
-      sh -c "npx prisma migrate deploy &&
-      npx tsx prisma/seed.ts"
+      sh -c "npx prisma migrate deploy && npx tsx prisma/seed.ts && npx tsx prisma/insert.ts"
     restart: "no"
 
   backend:
