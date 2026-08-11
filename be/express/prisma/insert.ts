@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -12,11 +13,21 @@ const __dirname = path.dirname(__filename);
 // CONFIGURATION
 // Update these paths whenever you receive new data batches.
 // ==============================================================================
-const DATA_DIR = path.join(__dirname, 'seed_data');
+const candidateDirs = [
+  path.join(__dirname, 'seed_data'), // Docker: /app/prisma/seed_data
+  path.resolve(__dirname, '../../../seed_data'), // Local dev: root/seed_data from be/express/prisma
+  path.resolve(process.cwd(), '../../seed_data'), // Local dev: root/seed_data from be/express CWD
+  path.resolve(process.cwd(), 'seed_data'), // Local dev: root/seed_data from root CWD
+];
+const DATA_DIR = candidateDirs.find(dir => fs.existsSync(dir)) || path.join(__dirname, 'seed_data');
+
 const findFile = (keyword: string, extension: string) => {
   try {
     const files = fs.readdirSync(DATA_DIR);
-    // Find the first file that includes the keyword and has the correct extension
+    // Find file that includes keyword and extension. If multiple, prefer ones with 'Metrics'
+    const matchedWithMetrics = files.find(f => f.toLowerCase().includes(keyword.toLowerCase()) && f.toLowerCase().includes('metrics') && f.endsWith(extension));
+    if (matchedWithMetrics) return path.join(DATA_DIR, matchedWithMetrics);
+
     const matched = files.find(f => f.toLowerCase().includes(keyword.toLowerCase()) && f.endsWith(extension));
     return matched ? path.join(DATA_DIR, matched) : path.join(DATA_DIR, `NOT_FOUND_${keyword}${extension}`);
   } catch (e) {
@@ -39,7 +50,7 @@ import { Pool } from "pg";
 
 const connectionString = process.env.DB_URL || process.env.DIRECT_URL || process.env.DATABASE_URL;
 if (!connectionString) {
-    throw new Error("DB_URL, DIRECT_URL, or DATABASE_URL must be configured before seeding.");
+  throw new Error("DB_URL, DIRECT_URL, or DATABASE_URL must be configured before seeding.");
 }
 
 const pool = new Pool({ connectionString });
@@ -86,7 +97,7 @@ async function main() {
     const slug = generateSlug(row.full_name);
 
     const lecturer = await prisma.lecturer.upsert({
-      where: { sinta_id: finalSintaId }, 
+      where: { sinta_id: finalSintaId },
       update: {
         full_name: row.full_name,
         academic_title: row.academic_title || null,
@@ -162,7 +173,7 @@ async function main() {
     }
 
     await prisma.publication.upsert({
-      where: { id: pubId }, 
+      where: { id: pubId },
       update: {
         title: row.title,
         citation_count: parseInt(row.citation_count) || 0,
@@ -197,7 +208,7 @@ async function main() {
   console.log('➡️ Linking Publications to Lecturers...');
   const pubLinksCsv = fs.readFileSync(CONFIG.CSV_PUB_LINKS, 'utf8');
   const pubLinks: any[] = parse(pubLinksCsv, { columns: true, skip_empty_lines: true });
-  
+
   const pubLinksToInsert = [];
   for (const link of pubLinks) {
     const actualLecturerId = refToLecturerId.get(link.lecturer_row_ref);
@@ -219,21 +230,21 @@ async function main() {
   // STEP 5: LINK CLUSTERS & TAGS
   // ==============================================================================
   console.log('➡️ Linking Clusters and Tags...');
-  
+
   const dbClusters = await prisma.researchCluster.findMany({ select: { id: true, slug: true } });
   const dbTags = await prisma.researchTag.findMany({ select: { id: true, slug: true } });
-  
+
   const slugToClusterId = new Map(dbClusters.map(c => [c.slug, c.id]));
   const slugToTagId = new Map(dbTags.map(t => [t.slug, t.id]));
 
   // Process Primary Clusters
   const clusterLinksRaw: any[] = parse(fs.readFileSync(CONFIG.CSV_CLUSTER_LINKS, 'utf8'), { columns: true });
   let clusterUpdates = 0;
-  
+
   for (const row of clusterLinksRaw) {
     const lecId = nameToLecturerId.get(normalizeStr(row.full_name));
     const clusterId = slugToClusterId.get(row.cluster_slug?.trim() || '');
-    
+
     if (lecId && clusterId) {
       await prisma.lecturer.update({
         where: { id: lecId },
@@ -251,7 +262,7 @@ async function main() {
   for (const row of tagLinksRaw) {
     const lecId = nameToLecturerId.get(normalizeStr(row.full_name));
     const tagId = slugToTagId.get(row.tag_slug?.trim() || '');
-    
+
     if (lecId && tagId) {
       tagsToInsert.push({ lecturer_id: lecId, tag_id: tagId });
     }

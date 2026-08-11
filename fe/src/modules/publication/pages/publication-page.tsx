@@ -25,6 +25,30 @@ const PAGE_SIZE = 12;
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 25 }, (_, index) => currentYear - index);
 
+function ExpandableText({ text, maxLength = 400 }: { text: string; maxLength?: number }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  if (!text || text.length <= maxLength) {
+    return <p className="mt-3 max-w-4xl text-sm leading-6 text-muted">{text}</p>;
+  }
+
+  const truncatedText = text.slice(0, maxLength).replace(/\s+\S*$/, "") + "…";
+
+  return (
+    <p className="mt-3 max-w-4xl text-sm leading-6 text-muted">
+      {isExpanded ? text : truncatedText}{" "}
+      <button
+        type="button"
+        onClick={() => setIsExpanded((prev) => !prev)}
+        className="font-semibold text-dteti-blue hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded"
+        aria-expanded={isExpanded}
+      >
+        {isExpanded ? "Read less" : "Read more"}
+      </button>
+    </p>
+  );
+}
+
 export default function PublicationPage() {
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState("");
@@ -132,10 +156,10 @@ export default function PublicationPage() {
       : null,
     lecturer
       ? {
-          key: "lecturer",
-          label: selectedLecturer || lecturer,
-          clear: () => setLecturer(""),
-        }
+        key: "lecturer",
+        label: selectedLecturer || lecturer,
+        clear: () => setLecturer(""),
+      }
       : null,
     year ? { key: "year", label: year, clear: () => setYear("") } : null,
   ].filter((filter): filter is NonNullable<typeof filter> => filter !== null);
@@ -306,9 +330,7 @@ export default function PublicationPage() {
                           .join(" · ")}
                       </p>
                       {publication.abstract ? (
-                        <p className="mt-3 max-w-4xl text-sm leading-6 text-muted">
-                          {publication.abstract}
-                        </p>
+                        <ExpandableText text={publication.abstract} maxLength={200} />
                       ) : null}
                       {publicationTags.length > 0 ? (
                         <div className="mt-3 flex flex-wrap gap-3">

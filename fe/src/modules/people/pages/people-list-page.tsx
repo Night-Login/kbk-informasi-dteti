@@ -20,7 +20,7 @@ import type { PersonLite } from "@/types/person";
 import { ChevronLeft, ChevronRight, LoaderCircle, Search, SlidersHorizontal } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 15;
 
 function toPerson(lecturer: Lecturer): PersonLite {
   const groups = new Set<string>();
@@ -253,7 +253,7 @@ export default function PeopleListPage() {
           </div>
         ) : lecturers.length > 0 ? (
           <>
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-x-6 gap-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-x-6 gap-y-8">
               {lecturers.map((lecturer, index) => (
                 <LecturerCard
                   key={lecturer.sourceId || lecturer.id}

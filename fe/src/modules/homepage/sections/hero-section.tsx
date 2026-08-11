@@ -1,7 +1,16 @@
+import Image from "next/image";
+
 export default function HeroSection() {
   return (
-    <section className="wireframe-checker relative mt-16 min-h-[520px] overflow-hidden bg-white sm:mt-20">
-      <div className="absolute inset-0 bg-white/20" />
+    <section className="relative mt-16 min-h-[520px] overflow-hidden bg-white sm:mt-20">
+      <Image
+        src="/images/hero-campus.jpg"
+        alt="Profil Kelompok Keahlian DTETI"
+        fill
+        className="object-cover object-center"
+        priority
+      />
+      <div className="absolute inset-0 bg-black/20" />
 
       <div className="page-container relative z-10 flex min-h-[520px] items-end pb-8">
         <div className="w-full">

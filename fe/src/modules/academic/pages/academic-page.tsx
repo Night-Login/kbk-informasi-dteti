@@ -52,9 +52,9 @@ export default function AcademicPage() {
           Academic Programs and Scholarships
         </h1>
 
-        <div className="mt-20">
-          <h2 className="text-2xl font-extrabold text-dteti-blue">Programs</h2>
-          <div className="mx-auto mt-10 grid max-w-6xl gap-10 md:grid-cols-2">
+        <div className="mx-auto mt-16 max-w-6xl">
+          <h2 className="text-2xl font-extrabold text-dteti-blue sm:text-3xl">Programs</h2>
+          <div className="mt-8 grid gap-10 md:grid-cols-2">
             {academicPrograms.map((program) => (
               <article key={program.title} id={program.href.slice(1)}>
                 <h3 className="text-2xl font-extrabold text-dteti-blue-deep">
@@ -71,9 +71,9 @@ export default function AcademicPage() {
           </div>
         </div>
 
-        <div className="mt-12">
-          <h2 className="text-2xl font-extrabold text-dteti-blue">Scholarships</h2>
-          <div className="brand-gradient mt-6 grid gap-10 px-8 py-12 text-white md:grid-cols-2 md:px-24">
+        <div className="mx-auto mt-16 max-w-6xl sm:mt-20">
+          <h2 className="text-2xl font-extrabold text-dteti-blue sm:text-3xl">Scholarships</h2>
+          <div className="brand-gradient mt-6 grid gap-10 rounded-2xl px-8 py-12 text-white shadow-md md:grid-cols-2 md:px-16">
             {scholarships.map((scholarship) => (
               <article key={scholarship.title} id={scholarship.href.slice(1)}>
                 <h3 className="text-2xl font-extrabold text-white">
@@ -93,48 +93,58 @@ export default function AcademicPage() {
           </div>
         </div>
 
-        <section className="mt-8 max-w-3xl">
-          <h2 className="text-2xl font-extrabold text-dteti-blue">
-            Frequently Asked Questions (FAQs)
-          </h2>
-          <h3 className="mt-6 text-2xl font-extrabold text-dteti-blue">
-            How to contact a potential supervisor?
-          </h3>
+        {/* FAQ Section - Centered with proper spacing */}
+        <section className="mx-auto mt-20 max-w-4xl sm:mt-24">
+          <div className="text-center">
+            <h2 className="text-2xl font-extrabold text-dteti-blue sm:text-3xl">
+              Frequently Asked Questions (FAQs)
+            </h2>
+            <p className="mt-2 text-sm text-muted">
+              Find answers and guidance for common academic procedures
+            </p>
+          </div>
 
-          <ol className="mt-6 space-y-5">
-            {supervisorSteps.map((step, index) => (
-              <li key={step.title}>
-                <h4 className="text-lg font-extrabold text-ink">
-                  {index + 1}. {step.title}
-                </h4>
-                <p className="ml-6 mt-1 text-sm text-ink">{step.description}</p>
-                {step.href ? (
-                  <Link
-                    href={step.href}
-                    className="ml-6 mt-2 inline-flex min-h-8 items-center gap-2 rounded-md border border-ink px-3 text-xs font-bold text-ink hover:bg-[oklch(0.94_0_0)]"
-                  >
-                    {step.actionLabel}
-                    <ArrowRight size={15} aria-hidden="true" />
-                  </Link>
-                ) : null}
-              </li>
-            ))}
-          </ol>
+          <div className="mt-10 rounded-2xl border border-line bg-surface p-6 sm:p-10 shadow-xs">
+            <h3 className="text-xl font-extrabold text-dteti-blue-deep sm:text-2xl">
+              How to contact a potential supervisor?
+            </h3>
+
+            <ol className="mt-6 space-y-4">
+              {supervisorSteps.map((step, index) => (
+                <li key={step.title} className="rounded-xl border border-line/70 bg-white p-5 shadow-xs">
+                  <h4 className="text-base font-extrabold text-ink sm:text-lg">
+                    {index + 1}. {step.title}
+                  </h4>
+                  <p className="mt-2 text-sm text-ink/80">{step.description}</p>
+                  {step.href ? (
+                    <Link
+                      href={step.href}
+                      className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg border border-line bg-surface px-4 text-xs font-bold text-dteti-blue transition-colors hover:border-dteti-blue hover:bg-dteti-blue-soft/30"
+                    >
+                      {step.actionLabel}
+                      <ArrowRight size={14} aria-hidden="true" />
+                    </Link>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          </div>
         </section>
 
-        <section className="mt-28 max-w-2xl">
-          <h2 className="text-2xl font-extrabold text-dteti-blue">
+        {/* Need More Info Section - Centered Callout Banner */}
+        <section className="mx-auto mt-20 max-w-4xl rounded-2xl brand-gradient p-8 text-center text-white shadow-md sm:mt-24 sm:p-12">
+          <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
             Need more Information?
           </h2>
-          <p className="mt-2 text-sm text-ink">
-            For general academic program inquiries, contact the department / KBK.
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-white/90">
+            For general academic program inquiries, contact the department or KBK administration.
           </p>
           <Link
             href="/contact"
-            className="mt-2 inline-flex min-h-8 items-center gap-2 rounded-md border border-ink px-3 text-xs font-bold text-ink hover:bg-[oklch(0.94_0_0)]"
+            className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-6 text-sm font-extrabold text-dteti-blue-deep shadow-xs transition-transform hover:scale-105 hover:bg-dteti-blue-soft"
           >
             Contact us
-            <ArrowRight size={15} aria-hidden="true" />
+            <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </section>
       </section>
