@@ -92,6 +92,27 @@ services:
       - tunnel_network
     logging: *default-logging
 
+  frontend:
+    build:
+      context: ./fe
+      dockerfile: dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required}"
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    expose:
+      - "3000"
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+    networks:
+      - tunnel_network
+    logging: *default-logging
+
   cloudflared:
     image: cloudflare/cloudflared:2026.7.3
     restart: unless-stopped
