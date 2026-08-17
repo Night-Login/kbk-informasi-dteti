@@ -47,6 +47,8 @@ services:
       DB_URL: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@database:5432/${POSTGRES_DB:-kbk-backend}"
       SUPERADMIN_USERNAME: "${SUPERADMIN_USERNAME:?SUPERADMIN_USERNAME is required}"
       SUPERADMIN_PASSWORD: "${SUPERADMIN_PASSWORD:?SUPERADMIN_PASSWORD is required}"
+    volumes:
+      - ./seed_data:/app/prisma/seed_data:ro
     command: ["npx", "prisma", "migrate", "deploy"]
     networks:
       - database_network
