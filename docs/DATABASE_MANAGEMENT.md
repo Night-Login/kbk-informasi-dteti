@@ -66,3 +66,15 @@ docker compose exec backup pg_restore -h database -U kbk-informasi -d kbk-inform
 **Understanding the flags:**
 - `--clean --if-exists`: Safely drops the existing tables before recreating them from the backup.
 - `--single-transaction`: Wraps the entire restoration in a single transaction. If the restore fails midway, it automatically rolls back everything, preventing a corrupted database state.
+
+### How to restore User Uploads (`.tar.gz`):
+The user uploads backup (images, documents, etc.) is stored in a `.tar.gz` archive. Because the `backup` container is restricted to read-only access for safety, you should use a temporary `backend` container to restore these files.
+
+1. Locate the exact filename of your uploads backup (e.g., `uploads_20260802_120000.tar.gz`).
+2. Run this command from your project root (replace the filename at the end):
+
+```bash
+docker compose run --rm -v ./backups/archives:/archives backend sh -c "cd / && tar -xzf /archives/uploads_YOUR_TIMESTAMP.tar.gz"
+```
+
+This spins up a temporary container, gives it access to your backups folder, and extracts the files perfectly back into your live `/app/uploads` Docker volume!
