@@ -17,16 +17,18 @@ import {
   required,
 } from "react-admin";
 import { ListActions } from "../components/ImportButton";
+import { SlugInput } from "../components/SlugInput";
 
 const tagFilters = [
-  <TextInput key="search" source="search" label="Search" alwaysOn />,
+  <TextInput key="search" source="search" label="Search tag name" alwaysOn />,
   <ReferenceInput
     key="cluster"
     source="cluster_id"
     reference="research/clusters"
     sort={{ field: "sort_order", order: "ASC" }}
+    perPage={1000}
   >
-    <AutocompleteInput optionText="name" label="Research Cluster" />
+    <AutocompleteInput optionText="name" label="Research Cluster" emptyText="All Clusters" />
   </ReferenceInput>,
   <BooleanInput key="active" source="is_active" label="Active only" />,
 ];
@@ -44,12 +46,12 @@ function TagFormFields({ editing = false }: { editing?: boolean }) {
     >
       {editing ? <TextInput source="id" label="ID" disabled /> : null}
       <TextInput source="name" label="Tag Name" required />
-      <TextInput source="slug" label="Slug" required />
+      <SlugInput source="slug" sourceToWatch="name" label="Slug" helperText="Unique URL slug (click Auto-Slug to fill)." />
       <ReferenceInput
         source="cluster_id"
         reference="research/clusters"
         sort={{ field: "sort_order", order: "ASC" }}
-        perPage={250}
+        perPage={1000}
       >
         <AutocompleteInput
           optionText="name"
@@ -57,11 +59,11 @@ function TagFormFields({ editing = false }: { editing?: boolean }) {
           validate={required()}
         />
       </ReferenceInput>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Box sx={{ display: "flex", alignItems: "center", pt: 1 }}>
         <BooleanInput source="is_active" label="Active on public website" defaultValue />
       </Box>
       <Box sx={{ gridColumn: "1 / -1" }}>
-        <TextInput source="description" label="Description" multiline rows={6} fullWidth />
+        <TextInput source="description" label="Description" multiline rows={5} fullWidth />
       </Box>
     </Box>
   );
@@ -74,10 +76,10 @@ export const ResearchTagList: React.FC = () => (
     sort={{ field: "name", order: "ASC" }}
   >
     <Datagrid rowClick="edit">
-      <TextField source="name" label="Tag Name" />
+      <TextField source="name" label="Tag Name" sx={{ fontWeight: 700 }} />
       <TextField source="slug" label="Slug" />
       <TextField source="cluster.name" label="Cluster" />
-      <TextField source="description" label="Description" />
+      <TextField source="description" label="Description" sx={{ maxW: 300, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} />
       <BooleanField source="is_active" label="Active" />
       <EditButton />
       <DeleteButton />
@@ -100,3 +102,4 @@ export const ResearchTagEdit: React.FC = () => (
     </SimpleForm>
   </Edit>
 );
+

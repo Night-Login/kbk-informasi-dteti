@@ -1,7 +1,7 @@
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { lecturerFormSchema } from "../../../schemas/lecturer.schema";
-import { Box, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import {
   AutocompleteArrayInput,
   BooleanField,
@@ -19,9 +19,10 @@ import {
   SelectInput,
   SimpleForm,
   TextField,
-  TextInput,
 } from "react-admin";
+import { TextInput } from "react-admin";
 import { ListActions } from "../components/ImportButton";
+import { SlugInput } from "../components/SlugInput";
 
 const supervisionChoices = [
   { id: "Available", name: "Available" },
@@ -30,15 +31,30 @@ const supervisionChoices = [
 ];
 
 const lecturerFilters = [
-  <TextInput key="search" source="search" label="Search" alwaysOn />,
+  <TextInput key="search" source="search" label="Search name, NIP, SINTA" alwaysOn />,
   <SelectInput
     key="supervision"
     source="supervision_status"
     label="Supervision"
     choices={supervisionChoices}
+    emptyText="All Supervision Statuses"
   />,
   <BooleanInput key="active" source="is_active" label="Active only" />,
 ];
+
+function SectionTitle({ title }: { title: string }) {
+  return (
+    <Box sx={{ gridColumn: "1 / -1", mt: 2, mb: 0.5 }}>
+      <Typography
+        variant="subtitle1"
+        sx={{ fontWeight: 800, color: "#255b88", letterSpacing: "-0.01em" }}
+      >
+        {title}
+      </Typography>
+      <Divider sx={{ mt: 0.5 }} />
+    </Box>
+  );
+}
 
 function LecturerFormFields({ editing = false }: { editing?: boolean }) {
   return (
@@ -51,39 +67,44 @@ function LecturerFormFields({ editing = false }: { editing?: boolean }) {
         "& .MuiFormControl-root": { width: "100%" },
       }}
     >
+      <SectionTitle title="1. Basic Information" />
       {editing ? <TextInput source="id" label="ID" disabled /> : null}
       <TextInput source="full_name" label="Full Name" required />
-      <TextInput source="academic_title" label="Academic Title" />
-      <TextInput source="slug" label="Slug" required helperText="Used in the public profile URL." />
+      <TextInput source="academic_title" label="Academic Title" placeholder="e.g. Prof. Dr., S.T., M.Eng." />
+      <SlugInput source="slug" sourceToWatch="full_name" label="Slug" helperText="Unique URL slug (click Auto-Slug to fill)." />
       <TextInput source="nip_or_staff_id" label="NIP / Staff ID" required />
-      <TextInput source="sinta_id" label="SINTA ID" required />
       <TextInput source="email" label="Email" type="email" />
-      <TextInput source="scopus_author_id" label="Scopus Author ID" />
-      <TextInput source="google_scholar_url" label="Google Scholar URL" />
-      <TextInput source="google_scholar_id" label="Google Scholar ID" />
-      <TextInput source="orcid_id" label="ORCID ID" />
-      <TextInput source="openalex_author_id" label="OpenAlex Author ID" />
-      <TextInput source="semantic_scholar_id" label="Semantic Scholar ID" />
       <SelectInput
         source="supervision_status"
         label="Supervision Status"
         choices={supervisionChoices}
+        defaultValue="Available"
       />
-      <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Box sx={{ display: "flex", alignItems: "center", pt: 1 }}>
         <BooleanInput source="is_active" label="Active on public website" defaultValue />
       </Box>
 
+      <SectionTitle title="2. Academic & Research Identifiers" />
+      <TextInput source="sinta_id" label="SINTA ID" required helperText="Required for SINTA synchronization." />
+      <TextInput source="scopus_author_id" label="Scopus Author ID" />
+      <TextInput source="google_scholar_id" label="Google Scholar ID" />
+      <TextInput source="google_scholar_url" label="Google Scholar URL" type="url" />
+      <TextInput source="orcid_id" label="ORCID ID" />
+      <TextInput source="openalex_author_id" label="OpenAlex Author ID" />
+      <TextInput source="semantic_scholar_id" label="Semantic Scholar ID" />
+
+      <SectionTitle title="3. Research Topics & Photo" />
       <Box sx={{ gridColumn: "1 / -1" }}>
         <ReferenceArrayInput
           source="tag_ids"
           reference="research/tags"
           sort={{ field: "name", order: "ASC" }}
-          perPage={250}
+          perPage={1000}
         >
           <AutocompleteArrayInput
             label="Research Tags"
             optionText="name"
-            helperText="The first selected tag is stored as the primary topic."
+            helperText="Select research tags associated with this lecturer."
           />
         </ReferenceArrayInput>
       </Box>
@@ -98,23 +119,22 @@ function LecturerFormFields({ editing = false }: { editing?: boolean }) {
         >
           <ImageField source="src" title="title" />
         </FileInput>
-        {editing ? <ImageField source="photo_preview" label="Current Photo" /> : null}
+        {editing ? <ImageField source="photo_preview" label="Current Photo" sx={{ mt: 1, "& img": { maxHeight: 120, borderRadius: 1 } }} /> : null}
       </Box>
 
+      <SectionTitle title="4. Biography" />
       <Box sx={{ gridColumn: "1 / -1" }}>
         <TextInput source="short_bio" label="Short Bio" multiline rows={3} fullWidth />
       </Box>
       <Box sx={{ gridColumn: "1 / -1" }}>
-        <TextInput source="bio" label="Full Biography" multiline rows={8} fullWidth />
+        <TextInput source="bio" label="Full Biography" multiline rows={6} fullWidth />
       </Box>
 
-      <Typography variant="h6" sx={{ gridColumn: "1 / -1", mt: 1 }}>
-        Research Metrics
-      </Typography>
+      <SectionTitle title="5. Research Metrics" />
       <NumberInput source="metrics.h_index" label="H-index" min={0} />
       <NumberInput source="metrics.total_citations" label="Total Citations" min={0} />
       <NumberInput source="metrics.sinta_score" label="SINTA Score" min={0} />
-      <TextInput source="metrics.source" label="Metric Source" />
+      <TextInput source="metrics.source" label="Metric Source" placeholder="e.g. SINTA / Manual" />
     </Box>
   );
 }
@@ -126,11 +146,19 @@ export const LecturerList: React.FC = () => (
     sort={{ field: "full_name", order: "ASC" }}
   >
     <Datagrid rowClick="edit">
-      <TextField source="full_name" label="Full Name" />
+      <TextField
+        source="full_name"
+        label="Full Name"
+        sx={{ fontWeight: 700, maxW: 240, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+      />
       <TextField source="academic_title" label="Title" />
       <TextField source="nip_or_staff_id" label="NIP / Staff ID" />
       <TextField source="sinta_id" label="SINTA ID" />
-      <TextField source="email" label="Email" />
+      <TextField
+        source="email"
+        label="Email"
+        sx={{ maxW: 200, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+      />
       <TextField source="supervision_status" label="Supervision" />
       <BooleanField source="is_active" label="Active" />
       <EditButton />
@@ -154,3 +182,4 @@ export const LecturerEdit: React.FC = () => (
     </SimpleForm>
   </Edit>
 );
+

@@ -8,8 +8,80 @@ import {
   useNotify,
   useRefresh,
 } from "react-admin";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button as MuiButton,
+  Typography,
+  Box,
+  IconButton,
+} from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import CloseIcon from "@mui/icons-material/Close";
 import type { AdminDataProvider } from "../dataProvider";
+
+const resourceHeaderGuides: Record<string, { csv: string; json: string }> = {
+  lecturers: {
+    csv: "full_name,slug,nip_or_staff_id,sinta_id,academic_title,email,supervision_status,is_active",
+    json: `[
+  {
+    "full_name": "Dr. Budi Santoso",
+    "slug": "budi-santoso",
+    "nip_or_staff_id": "198001012005011001",
+    "sinta_id": "5971234",
+    "email": "budi.santoso@ugm.ac.id",
+    "supervision_status": "Available"
+  }
+]`,
+  },
+  projects: {
+    csv: "title,slug,status,start_year,end_year,partner_names,funding_source,visibility",
+    json: `[
+  {
+    "title": "Sistem Cerdas IoT DTETI",
+    "slug": "sistem-cerdas-iot-dteti",
+    "status": "ONGOING",
+    "start_year": 2024,
+    "funding_source": "RKAT DTETI 2024"
+  }
+]`,
+  },
+  publications: {
+    csv: "title,slug,year,venue,publication_type,doi,url,citation_count,source,verified_status",
+    json: `[
+  {
+    "title": "Machine Learning for Smart Grid",
+    "slug": "machine-learning-smart-grid",
+    "year": 2024,
+    "venue": "IEEE Access",
+    "doi": "10.1109/ACCESS.2024.12345"
+  }
+]`,
+  },
+  "research/clusters": {
+    csv: "name,slug,description,sort_order",
+    json: `[
+  {
+    "name": "Sistem Informasi & Data",
+    "slug": "sistem-informasi-data",
+    "sort_order": 1
+  }
+]`,
+  },
+  "research/tags": {
+    csv: "name,slug,cluster_id,description,is_active",
+    json: `[
+  {
+    "name": "Machine Learning",
+    "slug": "machine-learning",
+    "cluster_id": "uuid-here"
+  }
+]`,
+  },
+};
 
 const numericFields = new Set([
   "sort_order",
@@ -101,6 +173,7 @@ function parseFile(name: string, text: string): Record<string, unknown>[] {
 export function ImportButton({ resource }: { resource: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const dataProvider = useDataProvider<AdminDataProvider>();
   const notify = useNotify();
   const refresh = useRefresh();
@@ -128,6 +201,11 @@ export function ImportButton({ resource }: { resource: string }) {
     }
   }
 
+  const guide = resourceHeaderGuides[resource] || {
+    csv: "id,name,description",
+    json: '[{ "name": "Example" }]',
+  };
+
   return (
     <>
       <input
@@ -144,6 +222,49 @@ export function ImportButton({ resource }: { resource: string }) {
       >
         <UploadFileIcon />
       </Button>
+
+      <MuiButton
+        size="small"
+        startIcon={<HelpOutlineIcon />}
+        onClick={() => setGuideOpen(true)}
+        sx={{ textTransform: "none", fontSize: "0.8125rem", color: "text.secondary", ml: 0.5 }}
+      >
+        Format Guide
+      </MuiButton>
+
+      <Dialog open={guideOpen} onClose={() => setGuideOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ display: "flex", justifyContent: "between", alignItems: "center" }}>
+          <span>Import Format Guide ({resource})</span>
+          <IconButton onClick={() => setGuideOpen(false)} size="small" sx={{ ml: "auto" }}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            You can upload a <strong>.csv</strong> or <strong>.json</strong> file. Ensure column names match the expected format below:
+          </Typography>
+
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: 2 }}>
+            Expected CSV Headers:
+          </Typography>
+          <Box sx={{ p: 1.5, bg: "#f0f4f8", bgcolor: "#f5f7f9", borderRadius: 1, fontFamily: "monospace", fontSize: 13, wordBreak: "break-all" }}>
+            {guide.csv}
+          </Box>
+
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: 2 }}>
+            Sample JSON Format:
+          </Typography>
+          <Box component="pre" sx={{ p: 1.5, bgcolor: "#f5f7f9", borderRadius: 1, fontFamily: "monospace", fontSize: 12, overflowX: "auto" }}>
+            {guide.json}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <MuiButton onClick={() => setGuideOpen(false)}>Close</MuiButton>
+          <MuiButton variant="contained" onClick={() => { setGuideOpen(false); inputRef.current?.click(); }}>
+            Select File to Upload
+          </MuiButton>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
@@ -157,3 +278,4 @@ export function ListActions({ resource }: { resource: string }) {
     </TopToolbar>
   );
 }
+

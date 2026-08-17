@@ -106,12 +106,33 @@ function TiktokIcon({ size = 24, className }: IconProps) {
   );
 }
 
+function YoutubeIcon({ size = 24, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.56 49.56 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
+      <polygon points="10 15 15 12 10 9 10 15" />
+    </svg>
+  );
+}
+
 const socialLinks = [
-  { label: "Instagram", href: "https://instagram.com", icon: InstagramIcon },
-  { label: "LinkedIn", href: "https://linkedin.com", icon: LinkedinIcon },
-  { label: "Facebook", href: "https://facebook.com", icon: FacebookIcon },
-  { label: "GitHub", href: "https://github.com", icon: GithubIcon },
-  { label: "TikTok", href: "https://tiktok.com", icon: TiktokIcon },
+  { label: "Instagram", href: "https://www.instagram.com/dtetiugm/", icon: InstagramIcon },
+  { label: "YouTube", href: "https://youtube.com", icon: YoutubeIcon },
+  // { label: "LinkedIn", href: "https://linkedin.com", icon: LinkedinIcon },
+  { label: "Facebook", href: "https://web.facebook.com/DTETIFTUGM?_rdc=1&_rdr", icon: FacebookIcon },
+  // { label: "GitHub", href: "https://github.com", icon: GithubIcon },
+  // { label: "TikTok", href: "https://tiktok.com", icon: TiktokIcon },
 ];
 
 export default function Footer() {
@@ -154,11 +175,11 @@ export default function Footer() {
           <h2 className="mt-8 text-2xl font-bold text-white">Contact Us</h2>
           <div className="mt-4 space-y-3 text-sm text-white/90">
             <a
-              href="mailto:KBKDTETI@mail.ugm.ac.id"
+              href="mailto:lukito@ugm.ac.id "
               className="flex items-center gap-3 hover:text-dteti-yellow hover:underline"
             >
               <Mail size={18} aria-hidden="true" />
-              <span>KBKDTETI@mail.ugm.ac.id</span>
+              <span>lukito@ugm.ac.id </span>
             </a>
             <p className="flex items-start gap-3 leading-5">
               <MapPin className="mt-0.5 shrink-0" size={18} aria-hidden="true" />
