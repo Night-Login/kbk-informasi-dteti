@@ -14,9 +14,10 @@ import {
   TextInput,
 } from "react-admin";
 import { ListActions } from "../components/ImportButton";
+import { SlugInput } from "../components/SlugInput";
 
 const clusterFilters = [
-  <TextInput key="search" source="search" label="Search" alwaysOn />,
+  <TextInput key="search" source="search" label="Search cluster name" alwaysOn />,
 ];
 
 function ClusterFormFields({ editing = false }: { editing?: boolean }) {
@@ -32,10 +33,10 @@ function ClusterFormFields({ editing = false }: { editing?: boolean }) {
     >
       {editing ? <TextInput source="id" label="ID" disabled /> : null}
       <TextInput source="name" label="Cluster Name" required />
-      <TextInput source="slug" label="Slug" required />
+      <SlugInput source="slug" sourceToWatch="name" label="Slug" helperText="Unique URL slug (click Auto-Slug to fill)." />
       <NumberInput source="sort_order" label="Display Order" defaultValue={0} />
       <Box sx={{ gridColumn: "1 / -1" }}>
-        <TextInput source="description" label="Description" multiline rows={6} fullWidth />
+        <TextInput source="description" label="Description" multiline rows={5} fullWidth />
       </Box>
     </Box>
   );
@@ -48,9 +49,9 @@ export const ResearchClusterList: React.FC = () => (
     sort={{ field: "sort_order", order: "ASC" }}
   >
     <Datagrid rowClick="edit">
-      <TextField source="name" label="Cluster Name" />
+      <TextField source="name" label="Cluster Name" sx={{ fontWeight: 700 }} />
       <TextField source="slug" label="Slug" />
-      <TextField source="description" label="Description" />
+      <TextField source="description" label="Description" sx={{ maxW: 350, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} />
       <NumberField source="sort_order" label="Display Order" />
       <EditButton />
       <DeleteButton />
@@ -73,3 +74,4 @@ export const ResearchClusterEdit: React.FC = () => (
     </SimpleForm>
   </Edit>
 );
+
