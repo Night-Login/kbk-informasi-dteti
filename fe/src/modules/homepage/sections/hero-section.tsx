@@ -4,7 +4,7 @@ export default function HeroSection() {
   return (
     <section className="relative mt-16 min-h-[520px] overflow-hidden bg-white sm:mt-20">
       <Image
-        src="/images/hero-campus.jpg"
+        src="/images/pakdn.jpeg"
         alt="Profil Kelompok Keahlian DTETI"
         fill
         className="object-cover object-center"

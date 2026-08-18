@@ -175,11 +175,11 @@ export default function Footer() {
           <h2 className="mt-8 text-2xl font-bold text-white">Contact Us</h2>
           <div className="mt-4 space-y-3 text-sm text-white/90">
             <a
-              href="mailto:lukito@ugm.ac.id "
+              href="mailto:teti@ugm.ac.id "
               className="flex items-center gap-3 hover:text-dteti-yellow hover:underline"
             >
               <Mail size={18} aria-hidden="true" />
-              <span>lukito@ugm.ac.id </span>
+              <span>teti@ugm.ac.id </span>
             </a>
             <p className="flex items-start gap-3 leading-5">
               <MapPin className="mt-0.5 shrink-0" size={18} aria-hidden="true" />
