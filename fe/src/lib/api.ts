@@ -238,7 +238,7 @@ export interface Lecturer {
     tag?: ResearchTag;
   }>;
   publications?: Array<{
-    publication_id?: string;
+    publication_doi?: string;
     author_order?: number | null;
     publication?: Publication;
   }>;
@@ -269,7 +269,7 @@ export interface Project {
 }
 
 export interface Publication {
-  id: string;
+  doi: string;
   title: string;
   slug: string;
   year: number;
@@ -277,7 +277,6 @@ export interface Publication {
   authors_text?: string | null;
   venue?: string | null;
   publication_type?: string | null;
-  doi?: string | null;
   url?: string | null;
   abstract?: string | null;
   citation_count?: number;

@@ -318,7 +318,7 @@ export default function TagResearchAreasPage() {
                 const external = href.startsWith("http");
 
                 return (
-                  <li key={publication.id} className="py-5">
+                  <li key={publication.doi} className="py-5">
                     <a
                       href={href}
                       target={external ? "_blank" : undefined}

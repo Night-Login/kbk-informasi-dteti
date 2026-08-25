@@ -84,16 +84,34 @@ npm run seed
 npm run db:status
 ```
 
-`db:migrate` menjalankan dua migration yang sudah disiapkan:
-
-1. Membuat enum, tabel, index, dan foreign key dari schema Prisma.
-2. Mengaktifkan RLS tanpa policy publik, karena seluruh akses aplikasi melewati Express.
+`db:migrate` menjalankan seluruh migration yang sudah disiapkan, termasuk
+pembuatan schema awal, aktivasi RLS, penyatuan model student, konten website yang
+dikelola admin, dan perubahan primary key publikasi menjadi DOI.
 
 Setelah seed selesai, ganti `SUPERADMIN_PASSWORD` di environment deployment bila nilainya masih sementara.
 
 ## 3B. Memindahkan PostgreSQL yang sudah berisi data
 
 Gunakan project Supabase baru/kosong. Jangan menjalankan `db:migrate` sebelum restore karena tabel aplikasi akan bertabrakan.
+
+Sebelum menjalankan migration DOI terhadap database lama, cek bahwa seluruh
+publikasi memiliki DOI asli dan tidak ada duplikat setelah whitespace dihapus:
+
+```sql
+SELECT id, title, doi
+FROM publications
+WHERE doi IS NULL OR btrim(doi) = '';
+
+SELECT btrim(doi) AS normalized_doi, count(*) AS publication_count
+FROM publications
+WHERE doi IS NOT NULL
+GROUP BY btrim(doi)
+HAVING count(*) > 1;
+```
+
+Kedua query harus mengembalikan nol row. Jika tidak, lengkapi DOI asli dan
+selesaikan duplikat terlebih dahulu; migration sengaja berhenti tanpa mengubah
+data apabila syarat ini belum terpenuhi.
 
 Pastikan `pg_dump`/`pg_restore` berasal dari versi PostgreSQL client yang sama atau lebih baru daripada database sumber. Untuk database proyek ini yang relatif kecil, custom-format dump sudah memadai:
 
@@ -153,11 +171,15 @@ Gunakan jalur ini jika arsip lama berisi schema staging dan data SQL, tetapi
 strukturnya belum sama dengan schema Prisma terbaru. Script
 `scripts/import-legacy-database.ts` akan:
 
-- mempertahankan UUID data lama;
+- mempertahankan UUID dosen/data terkait dan memetakan UUID publikasi lama ke DOI yang menjadi primary key publikasi;
 - membuat slug dosen dan publikasi yang stabil;
 - menambahkan kolom baru dengan nilai aman;
 - mengimpor data dalam satu transaksi;
-- melakukan upsert sehingga aman dijalankan ulang untuk data yang sama.
+- melakukan upsert berdasarkan DOI sehingga aman dijalankan ulang untuk data publikasi yang sama.
+
+Seluruh publikasi legacy wajib memiliki DOI. Import berhenti dengan aman jika
+masih ada DOI kosong; lengkapi DOI asli terlebih dahulu sebelum menjalankan
+migrasi atau import.
 
 Restore schema dan data handoff ke database sumber sementara terlebih dahulu.
 Contoh berikut mengasumsikan database sementara sudah hidup di port `55432`:

@@ -157,31 +157,43 @@ async function main() {
   console.log('➡️ Processing Publications...');
   const pubsCsv = fs.readFileSync(CONFIG.CSV_PUBLICATIONS, 'utf8');
   const pubsRaw: any[] = parse(pubsCsv, { columns: true, skip_empty_lines: true });
+  const legacyPublicationIdToDoi = new Map<string, string>();
+  let upsertedPublications = 0;
 
   for (const row of pubsRaw) {
+    const doi = row.doi?.trim();
+    if (!doi) {
+      console.warn(`⚠️ Missing DOI for publication; skipping: ${row.title || row.id || '(untitled)'}`);
+      continue;
+    }
+
     let parsedExternalIds = null;
     try {
       if (row.external_ids) parsedExternalIds = JSON.parse(row.external_ids);
     } catch (e) {
-      console.warn(`⚠️ Failed to parse JSON for pub ${row.id}`);
-    }
-
-    const pubId = row.id?.trim();
-    if (!pubId) {
-      console.warn(`⚠️ Missing ID for publication: ${row.title}`);
-      continue;
+      console.warn(`⚠️ Failed to parse JSON for publication ${doi}`);
     }
 
     await prisma.publication.upsert({
-      where: { id: pubId },
+      where: { doi },
       update: {
         title: row.title,
+        year: parseInt(row.year) || new Date().getFullYear(),
+        publication_date: row.publication_date || null,
+        authors_text: row.authors_text || null,
+        venue: row.venue || null,
+        publication_type: row.publication_type || null,
+        url: row.url || null,
         citation_count: parseInt(row.citation_count) || 0,
         abstract: row.abstract || null,
-        verified_status: row.verified_status || 'NEEDS_REVIEW'
+        source: row.source || 'OPENALEX',
+        external_ids: parsedExternalIds,
+        verified_status: row.verified_status || 'NEEDS_REVIEW',
+        fetch_batch_id: row.fetch_batch_id || null,
+        deleted_at: null,
       },
       create: {
-        id: pubId,
+        doi,
         title: row.title,
         slug: generateSlug(row.title),
         year: parseInt(row.year) || new Date().getFullYear(),
@@ -189,7 +201,6 @@ async function main() {
         authors_text: row.authors_text || null,
         venue: row.venue || null,
         publication_type: row.publication_type || null,
-        doi: row.doi?.trim() || null,
         url: row.url || null,
         abstract: row.abstract || null,
         citation_count: parseInt(row.citation_count) || 0,
@@ -199,8 +210,15 @@ async function main() {
         fetch_batch_id: row.fetch_batch_id || null,
       }
     });
+
+    const legacyPublicationId = row.id?.trim();
+    if (legacyPublicationId) {
+      legacyPublicationIdToDoi.set(legacyPublicationId, doi);
+    }
+    legacyPublicationIdToDoi.set(doi, doi);
+    upsertedPublications++;
   }
-  console.log(`✅ Upserted ${pubsRaw.length} Publications.`);
+  console.log(`✅ Upserted ${upsertedPublications} Publications by DOI.`);
 
   // ==============================================================================
   // STEP 4: LINK LECTURERS TO PUBLICATIONS
@@ -212,11 +230,18 @@ async function main() {
   const pubLinksToInsert = [];
   for (const link of pubLinks) {
     const actualLecturerId = refToLecturerId.get(link.lecturer_row_ref);
-    if (actualLecturerId) {
+    const directPublicationDoi = link.publication_doi?.trim() || link.doi?.trim();
+    const legacyPublicationId = link.publication_id?.trim();
+    const publicationDoi = directPublicationDoi ||
+      (legacyPublicationId ? legacyPublicationIdToDoi.get(legacyPublicationId) : undefined);
+
+    if (actualLecturerId && publicationDoi) {
       pubLinksToInsert.push({
         lecturer_id: actualLecturerId,
-        publication_id: link.publication_id
+        publication_doi: publicationDoi
       });
+    } else if (actualLecturerId) {
+      console.warn(`⚠️ Could not resolve publication DOI for lecturer link: ${legacyPublicationId || '(missing publication reference)'}`);
     }
   }
 

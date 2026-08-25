@@ -305,7 +305,7 @@ export default function PublicationPage() {
                   return (
                     <li
                       id={publication.slug}
-                      key={publication.id}
+                      key={publication.doi}
                       className="border-b border-muted py-7"
                     >
                       <a

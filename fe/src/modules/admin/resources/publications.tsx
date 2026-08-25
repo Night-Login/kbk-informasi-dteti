@@ -83,7 +83,6 @@ function PublicationFormFields({ editing = false }: { editing?: boolean }) {
       }}
     >
       <SectionTitle title="1. Publication Overview" />
-      {editing ? <TextInput source="id" label="ID" disabled /> : null}
       <TextInput source="title" label="Title" required />
       <SlugInput source="slug" sourceToWatch="title" label="Slug" helperText="Unique URL slug (click Auto-Slug to fill)." />
       <NumberInput source="year" label="Year" required min={1900} max={2200} defaultValue={new Date().getFullYear()} />
@@ -92,7 +91,16 @@ function PublicationFormFields({ editing = false }: { editing?: boolean }) {
       <TextInput source="publication_type" label="Publication Type" placeholder="e.g. Journal / Conference / Book Chapter" />
 
       <SectionTitle title="2. Identifiers & Review Status" />
-      <TextInput source="doi" label="DOI" placeholder="e.g. 10.1109/ACCESS.2024.123456" />
+      <TextInput
+        source="doi"
+        label="DOI (primary key)"
+        placeholder="e.g. 10.1109/ACCESS.2024.123456"
+        required
+        disabled={editing}
+        helperText={editing
+          ? "The DOI identifies this publication and cannot be changed."
+          : "Required. CSV imports update existing publications using this DOI."}
+      />
       <TextInput source="url" label="Publication URL" type="url" placeholder="https://..." />
       <NumberInput source="citation_count" label="Citation Count" defaultValue={0} min={0} />
       <SelectInput

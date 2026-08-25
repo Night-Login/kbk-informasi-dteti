@@ -2,7 +2,7 @@ import { Publication, Lecturer, Project } from "../types/index.js";
 
 export const mockPublications: Publication[] = [
     {
-        id: "pub-1",
+        doi: "10.1109/example.2025.1",
         title: "Deep Learning for Automated Medical Image Analysis",
         slug: "deep-learning-automated-medical-image-analysis",
         year: 2025,

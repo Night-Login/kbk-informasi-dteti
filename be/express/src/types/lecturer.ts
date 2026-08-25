@@ -14,7 +14,7 @@ export interface LecturerMetric {
 
 export interface LecturerPublication {
     lecturer_id: string;
-    publication_id: string;
+    publication_doi: string;
     author_order?: number | null;
     lecturer?: Lecturer;
     publication?: Publication;

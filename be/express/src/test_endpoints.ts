@@ -20,11 +20,17 @@ let authToken: string = "";
 
 // State IDs to share across tests
 let testAdminId: number | null = null;
+let testAdminUsername: string | null = null;
 let testClusterId: string | null = null;
 let testTagId: string | null = null;
 let testLecturerId: string | null = null;
+let testLecturerRequiredFields: {
+    full_name: string;
+    nip_or_staff_id: string;
+    sinta_id: string;
+} | null = null;
 let testProjectId: string | null = null;
-let testPublicationId: string | null = null;
+let testPublicationDoi: string | null = null;
 
 let passedTests = 0;
 let failedTests = 0;
@@ -196,11 +202,12 @@ async function runTests() {
             const uniqueName = `admin_test_${Date.now()}`;
             const res = await axios.post(`${API_URL}/admins`, {
                 username: uniqueName,
-                password: "testpassword123",
+                password: "TestPassword123",
                 role: "ADMIN"
             }, authHeaders);
             if (res.data?.success && res.data?.data?.id) {
                 testAdminId = res.data.data.id;
+                testAdminUsername = res.data.data.username;
                 logPass("POST /api/v1/admins (Create Admin)");
             } else {
                 throw new Error("Failed to create admin");
@@ -220,6 +227,7 @@ async function runTests() {
 
             try {
                 const res = await axios.put(`${API_URL}/admins/${testAdminId}`, {
+                    username: testAdminUsername,
                     role: "ADMIN"
                 }, authHeaders);
                 if (res.data?.success) logPass(`PUT /api/v1/admins/${testAdminId}`);
@@ -379,6 +387,11 @@ async function runTests() {
             }, authHeaders);
             if (res.data?.success && res.data?.data?.id) {
                 testLecturerId = res.data.data.id;
+                testLecturerRequiredFields = {
+                    full_name: res.data.data.full_name,
+                    nip_or_staff_id: res.data.data.nip_or_staff_id,
+                    sinta_id: res.data.data.sinta_id,
+                };
                 logPass("POST /api/v1/lecturers (Create Lecturer)");
             } else {
                 throw new Error("Failed to create lecturer");
@@ -414,6 +427,7 @@ async function runTests() {
 
             try {
                 const res = await axios.put(`${API_URL}/lecturers/${testLecturerId}`, {
+                    ...testLecturerRequiredFields,
                     short_bio: "Updated bio for AI expert."
                 }, authHeaders);
                 if (res.data?.success) logPass(`PUT /api/v1/lecturers/${testLecturerId}`);
@@ -500,6 +514,7 @@ async function runTests() {
 
             try {
                 const res = await axios.put(`${API_URL}/projects/${testProjectId}`, {
+                    title: "AI-Powered Smart Grid Monitoring",
                     description: "Updated description for AI Smart Grid project."
                 }, authHeaders);
                 if (res.data?.success) logPass(`PUT /api/v1/projects/${testProjectId}`);
@@ -548,8 +563,8 @@ async function runTests() {
                 doi: pubDoi,
                 source: "OPENALEX"
             }, authHeaders);
-            if (res.data?.success && res.data?.data?.id) {
-                testPublicationId = res.data.data.id;
+            if (res.data?.success && res.data?.data?.doi) {
+                testPublicationDoi = res.data.data.doi;
                 logPass("POST /api/v1/publications (Create Publication)");
             } else {
                 throw new Error("Failed to create publication");
@@ -574,34 +589,35 @@ async function runTests() {
             logFail("GET /api/v1/publications/paginated", e);
         }
 
-        if (testPublicationId) {
+        if (testPublicationDoi) {
+            const encodedPublicationDoi = encodeURIComponent(testPublicationDoi);
             try {
-                const res = await axios.get(`${API_URL}/publications/${testPublicationId}`);
-                if (res.data?.success) logPass(`GET /api/v1/publications/${testPublicationId}`);
+                const res = await axios.get(`${API_URL}/publications/${encodedPublicationDoi}`);
+                if (res.data?.success) logPass(`GET /api/v1/publications/${testPublicationDoi}`);
                 else throw new Error("Publication not found");
             } catch (e) {
-                logFail(`GET /api/v1/publications/${testPublicationId}`, e);
+                logFail(`GET /api/v1/publications/${testPublicationDoi}`, e);
             }
 
             try {
-                const res = await axios.put(`${API_URL}/publications/${testPublicationId}`, {
+                const res = await axios.put(`${API_URL}/publications/${encodedPublicationDoi}`, {
                     abstract: "An exhaustive survey of deep learning techniques applied to grid anomaly detection."
                 }, authHeaders);
-                if (res.data?.success) logPass(`PUT /api/v1/publications/${testPublicationId}`);
+                if (res.data?.success) logPass(`PUT /api/v1/publications/${testPublicationDoi}`);
                 else throw new Error("Failed to update publication");
             } catch (e) {
-                logFail(`PUT /api/v1/publications/${testPublicationId}`, e);
+                logFail(`PUT /api/v1/publications/${testPublicationDoi}`, e);
             }
 
             if (testLecturerId) {
                 try {
-                    const res = await axios.put(`${API_URL}/publications/${testPublicationId}/lecturers`, {
+                    const res = await axios.put(`${API_URL}/publications/${encodedPublicationDoi}/lecturers`, {
                         lecturers: [{ lecturer_id: testLecturerId, author_order: 1 }]
                     }, authHeaders);
-                    if (res.data?.success) logPass(`PUT /api/v1/publications/${testPublicationId}/lecturers`);
+                    if (res.data?.success) logPass(`PUT /api/v1/publications/${testPublicationDoi}/lecturers`);
                     else throw new Error("Failed to assign lecturers to publication");
                 } catch (e) {
-                    logFail(`PUT /api/v1/publications/${testPublicationId}/lecturers`, e);
+                    logFail(`PUT /api/v1/publications/${testPublicationDoi}/lecturers`, e);
                 }
             }
         }
@@ -611,18 +627,19 @@ async function runTests() {
         // -------------------------------------------------------------
         console.log("\n--- 7. Deletion & Restoration Endpoints ---");
         
-        if (testPublicationId) {
+        if (testPublicationDoi) {
+            const encodedPublicationDoi = encodeURIComponent(testPublicationDoi);
             try {
-                await axios.delete(`${API_URL}/publications/${testPublicationId}`, authHeaders);
-                logPass(`DELETE /api/v1/publications/${testPublicationId}`);
+                await axios.delete(`${API_URL}/publications/${encodedPublicationDoi}`, authHeaders);
+                logPass(`DELETE /api/v1/publications/${testPublicationDoi}`);
             } catch (e) {
-                logFail(`DELETE /api/v1/publications/${testPublicationId}`, e);
+                logFail(`DELETE /api/v1/publications/${testPublicationDoi}`, e);
             }
             try {
-                await axios.patch(`${API_URL}/publications/${testPublicationId}/restore`, {}, authHeaders);
-                logPass(`PATCH /api/v1/publications/${testPublicationId}/restore`);
+                await axios.patch(`${API_URL}/publications/${encodedPublicationDoi}/restore`, {}, authHeaders);
+                logPass(`PATCH /api/v1/publications/${testPublicationDoi}/restore`);
             } catch (e) {
-                logFail(`PATCH /api/v1/publications/${testPublicationId}/restore`, e);
+                logFail(`PATCH /api/v1/publications/${testPublicationDoi}/restore`, e);
             }
         }
 

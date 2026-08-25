@@ -89,7 +89,11 @@ async function httpClient(url: string, options: RequestInit = {}) {
 }
 
 function recordId(record: Record<string, unknown>, fallback?: Identifier): Identifier {
-  return (record.id || record.slug || fallback) as Identifier;
+  return (record.id || record.doi || record.slug || fallback) as Identifier;
+}
+
+function encodeIdentifier(id: Identifier): string {
+  return encodeURIComponent(String(id));
 }
 
 function normalizeRecord<RecordType extends RaRecord = ApiRecord>(
@@ -235,7 +239,7 @@ function preparePayload(
 async function uploadLecturerPhoto(id: Identifier, photo: File) {
   const form = new FormData();
   form.append("photo", photo);
-  const { json } = await httpClient(`${API_URL}/lecturers/${id}/photo`, {
+  const { json } = await httpClient(`${API_URL}/lecturers/${encodeIdentifier(id)}/photo`, {
     method: "PUT",
     body: form,
   });
@@ -245,7 +249,7 @@ async function uploadLecturerPhoto(id: Identifier, photo: File) {
 async function uploadContentImage(resource: string, id: Identifier, image: File) {
   const form = new FormData();
   form.append("image", image);
-  const { json } = await httpClient(`${API_URL}/${resource}/${id}/image`, {
+  const { json } = await httpClient(`${API_URL}/${resource}/${encodeIdentifier(id)}/image`, {
     method: "PUT",
     body: form,
   });
@@ -295,7 +299,7 @@ const baseProvider: DataProvider = {
   },
 
   getOne: async (resource, params) => {
-    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
+    const { json } = await httpClient(`${API_URL}/${resource}/${encodeIdentifier(params.id)}`, {
       signal: params.signal,
     });
     return { data: normalizeRecord(resource, json.data || json) };
@@ -304,7 +308,7 @@ const baseProvider: DataProvider = {
   getMany: async (resource, params) => {
     const responses = await Promise.all(
       params.ids.map((id) =>
-        httpClient(`${API_URL}/${resource}/${id}`, { signal: params.signal }),
+        httpClient(`${API_URL}/${resource}/${encodeIdentifier(id)}`, { signal: params.signal }),
       ),
     );
     return {
@@ -344,7 +348,7 @@ const baseProvider: DataProvider = {
 
   update: async (resource, params) => {
     const { payload, photo, image } = preparePayload(resource, params.data);
-    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
+    const { json } = await httpClient(`${API_URL}/${resource}/${encodeIdentifier(params.id)}`, {
       method: "PUT",
       body: JSON.stringify(payload),
     });
@@ -362,7 +366,7 @@ const baseProvider: DataProvider = {
     await Promise.all(
       params.ids.map((id) => {
         const { payload } = preparePayload(resource, params.data);
-        return httpClient(`${API_URL}/${resource}/${id}`, {
+        return httpClient(`${API_URL}/${resource}/${encodeIdentifier(id)}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
@@ -388,7 +392,7 @@ const baseProvider: DataProvider = {
   },
 
   delete: async (resource, params) => {
-    const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
+    const { json } = await httpClient(`${API_URL}/${resource}/${encodeIdentifier(params.id)}`, {
       method: "DELETE",
     });
     return {
@@ -399,7 +403,7 @@ const baseProvider: DataProvider = {
   deleteMany: async (resource, params) => {
     await Promise.all(
       params.ids.map((id) =>
-        httpClient(`${API_URL}/${resource}/${id}`, { method: "DELETE" }),
+        httpClient(`${API_URL}/${resource}/${encodeIdentifier(id)}`, { method: "DELETE" }),
       ),
     );
     return { data: params.ids };
@@ -408,7 +412,7 @@ const baseProvider: DataProvider = {
 
 export const dataProvider = Object.assign(baseProvider, {
   restore: async (resource: string, id: Identifier) => {
-    const { json } = await httpClient(`${API_URL}/${resource}/${id}/restore`, {
+    const { json } = await httpClient(`${API_URL}/${resource}/${encodeIdentifier(id)}/restore`, {
       method: "PATCH",
       body: JSON.stringify({}),
     });

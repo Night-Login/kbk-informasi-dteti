@@ -28,12 +28,14 @@ Please provide the following 6 files per update cycle:
    * **Description:** Unified base profile data for lecturers (names, IDs, academic titles) **merged with** their fluctuating metrics (h-index, citations, etc.). 
 3. `Publications_Base_{Source}_{Date}.csv`
    * **Description:** Core publication data (DOIs, titles, abstracts, year, citation count).
+   * **Primary key:** `doi` is required for every publication. Reusing an existing DOI updates that publication; missing DOI values are skipped.
 
 ### Relational (Link) Data
-*Because the database uses auto-generated UUIDs, we rely on link tables to map human-readable identifiers to database entities.*
+*Lecturers use UUIDs, while publications are identified by their DOI. Link tables bridge source data to those database entities.*
 
 4. `Link_Lecturer-Publications_{Source}_{Date}.csv`
-   * **Description:** Maps a lecturer's original row reference (e.g., `dosen_source.csv:2`) to the target publication's ID. 
+   * **Description:** Maps a lecturer's original row reference (e.g., `dosen_source.csv:2`) to the target publication's DOI using a `publication_doi` or `doi` column.
+   * **Legacy compatibility:** Existing `publication_id` columns remain supported when their values match an `id` in the same publications CSV; the importer resolves those legacy IDs to the corresponding DOI.
 5. `Link_Lecturer-Clusters_{Source}_{Date}.csv`
    * **Description:** Maps a lecturer's `full_name` to their primary `cluster_slug`. (Updates the primary research cluster on the lecturer profile).
 6. `Link_Lecturer-Tags_{Source}_{Date}.csv`

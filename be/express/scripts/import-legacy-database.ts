@@ -143,6 +143,33 @@ async function loadLegacyData() {
     const lecturerTags = await source.query(
         "SELECT * FROM lecturer_research_tags ORDER BY lecturer_id, tag_id",
     );
+    const publicationsWithoutDoi = publications.rows.filter(
+        (row) => typeof row.doi !== "string" || row.doi.trim() === "",
+    );
+
+    if (publicationsWithoutDoi.length > 0) {
+        throw new Error(
+            `Cannot import legacy publications: ${publicationsWithoutDoi.length} publication(s) have no DOI. Populate their real DOI values in the legacy source first.`,
+        );
+    }
+
+    const publicationIdToDoi = new Map(
+        publications.rows.map((row) => [String(row.id), String(row.doi).trim()]),
+    );
+    const publicationRelations = lecturerPublications.rows.map((row) => {
+        const publicationDoi = publicationIdToDoi.get(String(row.publication_id));
+
+        if (!publicationDoi) {
+            throw new Error(
+                `Cannot resolve the DOI for legacy publication relation ${String(row.publication_id)}.`,
+            );
+        }
+
+        return {
+            ...row,
+            publication_doi: publicationDoi,
+        };
+    });
 
     return {
         clusters: clusters.rows,
@@ -157,10 +184,11 @@ async function loadLegacyData() {
         })),
         publications: publications.rows.map((row) => ({
             ...row,
+            doi: String(row.doi).trim(),
             slug: publicationSlug(row),
             deleted_at: null,
         })),
-        lecturerPublications: lecturerPublications.rows,
+        lecturerPublications: publicationRelations,
         metrics: metrics.rows,
         lecturerTags: lecturerTags.rows,
     };
@@ -245,7 +273,7 @@ async function importLegacyData() {
         await upsertRows(
             "publications",
             [
-                "id",
+                "doi",
                 "title",
                 "slug",
                 "year",
@@ -253,7 +281,6 @@ async function importLegacyData() {
                 "authors_text",
                 "venue",
                 "publication_type",
-                "doi",
                 "url",
                 "abstract",
                 "citation_count",
@@ -266,7 +293,7 @@ async function importLegacyData() {
                 "deleted_at",
             ],
             data.publications,
-            ["id"],
+            ["doi"],
             [
                 "title",
                 "slug",
@@ -275,7 +302,6 @@ async function importLegacyData() {
                 "authors_text",
                 "venue",
                 "publication_type",
-                "doi",
                 "url",
                 "abstract",
                 "citation_count",
@@ -289,9 +315,9 @@ async function importLegacyData() {
         );
         await upsertRows(
             "lecturer_publications",
-            ["lecturer_id", "publication_id", "author_order"],
+            ["lecturer_id", "publication_doi", "author_order"],
             data.lecturerPublications,
-            ["lecturer_id", "publication_id"],
+            ["lecturer_id", "publication_doi"],
             ["author_order"],
         );
         await upsertRows(
