@@ -18,7 +18,8 @@ export function AdminLogin() {
           KBK Informasi DTETI
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }} align="justify">
-          Sign in to manage lecturer, research, project, and publication data.
+          Sign in to manage academic records, website content, news, events,
+          scholarships, and media.
         </Typography>
       </Box>
       <Box sx={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", "& .MuiFormControl-root": { width: "100%", textAlign: "center" }, "& .MuiInputBase-input": { textAlign: "center" }, "& form": { width: "100%", display: "flex", flexDirection: "column", alignItems: "center" } }}>

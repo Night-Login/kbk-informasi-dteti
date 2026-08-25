@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Title, useDataProvider, useGetIdentity } from "react-admin";
+import { Link as RouterLink } from "react-router-dom";
 import {
   Alert,
   Box,
@@ -17,16 +18,26 @@ type DashboardStats = {
   publications: number;
   clusters: number;
   tags: number;
+  news: number;
+  events: number;
+  programs: number;
+  scholarships: number;
+  media: number;
   admins: number;
 };
 
 const statLabels: Array<[keyof DashboardStats, string, string]> = [
-  ["lecturers", "Lecturers", "/admin/lecturers"],
-  ["projects", "Projects", "/admin/projects"],
-  ["publications", "Publications", "/admin/publications"],
-  ["clusters", "Research clusters", "/admin/research/clusters"],
-  ["tags", "Research tags", "/admin/research/tags"],
-  ["admins", "Administrators", "/admin/admins"],
+  ["lecturers", "Lecturers", "/lecturers"],
+  ["projects", "Projects", "/projects"],
+  ["publications", "Publications", "/publications"],
+  ["clusters", "Research clusters", "/research/clusters"],
+  ["tags", "Research tags", "/research/tags"],
+  ["news", "News articles", "/content/news"],
+  ["events", "Events", "/content/events"],
+  ["programs", "Academic programs", "/content/programs"],
+  ["scholarships", "Scholarships", "/content/scholarships"],
+  ["media", "Media assets", "/content/media"],
+  ["admins", "Administrators", "/admins"],
 ];
 
 export function AdminDashboard() {
@@ -62,19 +73,61 @@ export function AdminDashboard() {
         sort: { field: "name", order: "ASC" },
         filter: {},
       }),
+      dataProvider.getList("content/news", {
+        pagination: { page: 1, perPage: 1 },
+        sort: { field: "published_at", order: "DESC" },
+        filter: {},
+      }),
+      dataProvider.getList("content/events", {
+        pagination: { page: 1, perPage: 1 },
+        sort: { field: "starts_at", order: "ASC" },
+        filter: {},
+      }),
+      dataProvider.getList("content/programs", {
+        pagination: { page: 1, perPage: 1 },
+        sort: { field: "sort_order", order: "ASC" },
+        filter: {},
+      }),
+      dataProvider.getList("content/scholarships", {
+        pagination: { page: 1, perPage: 1 },
+        sort: { field: "sort_order", order: "ASC" },
+        filter: {},
+      }),
+      dataProvider.getList("content/media", {
+        pagination: { page: 1, perPage: 1 },
+        sort: { field: "created_at", order: "DESC" },
+        filter: {},
+      }),
       dataProvider.getList("admins", {
         pagination: { page: 1, perPage: 1 },
         sort: { field: "createdAt", order: "DESC" },
         filter: {},
       }),
     ])
-      .then(([lecturers, projects, publications, clusters, tags, admins]) => {
+      .then(([
+        lecturers,
+        projects,
+        publications,
+        clusters,
+        tags,
+        news,
+        events,
+        programs,
+        scholarships,
+        media,
+        admins,
+      ]) => {
         setStats({
           lecturers: lecturers.total || 0,
           projects: projects.total || 0,
           publications: publications.total || 0,
           clusters: clusters.total || 0,
           tags: tags.total || 0,
+          news: news.total || 0,
+          events: events.total || 0,
+          programs: programs.total || 0,
+          scholarships: scholarships.total || 0,
+          media: media.total || 0,
           admins: admins.total || 0,
         });
       })
@@ -135,7 +188,13 @@ export function AdminDashboard() {
               <Typography variant="h5" color="primary.dark">
                 {stats[key]}
               </Typography>
-              <Link href={href} underline="hover" color="text.secondary" sx={{ fontSize: 14 }}>
+              <Link
+                component={RouterLink}
+                to={href}
+                underline="hover"
+                color="text.secondary"
+                sx={{ fontSize: 14 }}
+              >
                 {label}
               </Link>
             </Box>
@@ -144,8 +203,11 @@ export function AdminDashboard() {
       )}
 
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mt: 4 }}>
-        <Link href="/admin/trash" underline="hover" sx={{ fontWeight: 700 }}>
+        <Link component={RouterLink} to="/trash" underline="hover" sx={{ fontWeight: 700 }}>
           Review deleted records
+        </Link>
+        <Link component={RouterLink} to="/content/settings" underline="hover" sx={{ fontWeight: 700 }}>
+          Manage website content
         </Link>
         <Link href="/" underline="hover" sx={{ fontWeight: 700 }}>
           Open public website

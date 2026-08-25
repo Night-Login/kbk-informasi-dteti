@@ -3,27 +3,28 @@ import path from "path";
 import fs from "fs";
 import { Request } from "express";
 
-const UPLOAD_DIR = path.join(process.cwd(), "uploads", "lecturers");
+function createStorage(directory: "lecturers" | "media", prefix: string) {
+    const uploadDirectory = path.join(process.cwd(), "uploads", directory);
+    const extensionByMimeType: Record<string, string> = {
+        "image/jpeg": ".jpg",
+        "image/jpg": ".jpg",
+        "image/png": ".png",
+        "image/webp": ".webp",
+        "image/gif": ".gif",
+    };
 
-// Ensure upload directory exists
-if (!fs.existsSync(UPLOAD_DIR)) {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    return multer.diskStorage({
+        destination: (_req: Request, _file: Express.Multer.File, callback) => {
+            fs.mkdirSync(uploadDirectory, { recursive: true });
+            callback(null, uploadDirectory);
+        },
+        filename: (_req: Request, file: Express.Multer.File, callback) => {
+            const extension = extensionByMimeType[file.mimetype] || ".jpg";
+            const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+            callback(null, `${prefix}-${uniqueSuffix}${extension}`);
+        },
+    });
 }
-
-// Configure disk storage
-const storage = multer.diskStorage({
-    destination: (req: Request, file: Express.Multer.File, cb) => {
-        if (!fs.existsSync(UPLOAD_DIR)) {
-            fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-        }
-        cb(null, UPLOAD_DIR);
-    },
-    filename: (req: Request, file: Express.Multer.File, cb) => {
-        const ext = path.extname(file.originalname) || ".jpg";
-        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        cb(null, `lecturer-${uniqueSuffix}${ext}`);
-    }
-});
 
 // File filter to allow only image files
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
@@ -37,7 +38,7 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
 
 // Multer upload instance configured with 5MB file size limit
 export const upload = multer({
-    storage,
+    storage: createStorage("lecturers", "lecturer"),
     limits: {
         fileSize: 5 * 1024 * 1024 // 5 MB limit
     },
@@ -48,3 +49,9 @@ export const upload = multer({
  * Middleware for single lecturer profile photo upload (field name: 'photo')
  */
 export const uploadPhoto = upload.single("photo");
+
+export const uploadContentImage = multer({
+    storage: createStorage("media", "content"),
+    limits: { fileSize: 10 * 1024 * 1024 },
+    fileFilter,
+}).single("image");

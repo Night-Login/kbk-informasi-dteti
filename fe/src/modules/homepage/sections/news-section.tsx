@@ -2,9 +2,15 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ButtonLink } from "@/components/global/button";
-import { newsItems } from "@/modules/homepage/data/home.data";
+import { getApiAssetUrl, type NewsArticle } from "@/lib/api";
 
-export default function NewsSection() {
+export default function NewsSection({
+  items,
+  archiveUrl,
+}: {
+  items: NewsArticle[];
+  archiveUrl?: string;
+}) {
   return (
     <section id="news" className="section-space bg-white">
       <div className="page-container">
@@ -12,40 +18,55 @@ export default function NewsSection() {
           Latest News
         </h2>
 
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
-          {newsItems.map((item, index) => (
-            <article
-              key={`${item.title}-${index}`}
-              className="overflow-hidden rounded-xl border border-line bg-white shadow-[0_4px_8px_rgb(0_0_0_/_0.18)] transition-colors duration-200 hover:border-dteti-blue/45"
-            >
-              <div className="relative h-52 bg-surface-strong">
-                <Image
-                  src={item.image}
-                  alt="Ilustrasi gambar berita"
-                  fill
-                  sizes="(min-width: 768px) 33vw, 100vw"
-                  className="object-cover grayscale"
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="text-base font-extrabold leading-5 text-dteti-blue">
-                  <Link href="#news" className="hover:underline">
-                    {item.title}
-                  </Link>
-                </h3>
-                <p className="mt-3 line-clamp-4 text-xs leading-4 text-ink">
-                  {item.excerpt}
-                </p>
-              </div>
-            </article>
-          ))}
-        </div>
+        {items.length > 0 ? (
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {items.map((item) => {
+              const image = getApiAssetUrl(item.media?.file_url || item.image_url);
 
-        <div className="mt-7 flex justify-center">
-          <ButtonLink href="#news" variant="outline" size="sm">
-            More News <ArrowRight size={16} aria-hidden="true" />
-          </ButtonLink>
-        </div>
+              return (
+                <article
+                  key={item.id}
+                  className="overflow-hidden rounded-xl border border-line bg-white transition-colors duration-200 hover:border-dteti-blue/45"
+                >
+                  {image ? (
+                    <div className="relative h-52 bg-surface-strong">
+                      <Image
+                        src={image}
+                        alt={item.media?.alt_text || item.title}
+                        fill
+                        sizes="(min-width: 768px) 33vw, 100vw"
+                        className="object-cover grayscale"
+                        unoptimized={image.startsWith("http") || image.startsWith("/uploads/")}
+                      />
+                    </div>
+                  ) : null}
+                  <div className="p-4">
+                    <h3 className="text-base font-extrabold leading-5 text-dteti-blue">
+                      <Link href={item.link_url || "#news"} className="hover:underline">
+                        {item.title}
+                      </Link>
+                    </h3>
+                    <p className="mt-3 line-clamp-4 text-xs leading-4 text-ink">
+                      {item.excerpt}
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="mx-auto mt-8 max-w-xl border border-line bg-surface px-6 py-8 text-center text-sm text-muted">
+            News and research updates will appear here when they are published.
+          </p>
+        )}
+
+        {archiveUrl ? (
+          <div className="mt-7 flex justify-center">
+            <ButtonLink href={archiveUrl} variant="outline" size="sm">
+              More News <ArrowRight size={16} aria-hidden="true" />
+            </ButtonLink>
+          </div>
+        ) : null}
       </div>
     </section>
   );

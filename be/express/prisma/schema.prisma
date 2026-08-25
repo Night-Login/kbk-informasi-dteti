@@ -257,3 +257,99 @@ model LecturerSupervisionQuota {
 
   @@map("lecturer_supervision_quota")
 }
+
+model MediaAsset {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  alt_text    String?
+  file_url    String?
+  file_name   String?
+  mime_type   String?
+  file_size   Int?
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  settings    SiteSetting[]
+  news        NewsArticle[]
+
+  @@map("media_assets")
+}
+
+model SiteSetting {
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key         String      @unique
+  label       String
+  value       String?
+  description String?
+  field_type  String      @default("TEXT")
+  sort_order  Int         @default(0)
+  media_id    String?     @db.Uuid
+  media       MediaAsset? @relation(fields: [media_id], references: [id], onDelete: SetNull)
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+
+  @@map("site_settings")
+}
+
+model AcademicProgram {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String
+  overview     String
+  information  String?
+  link_url     String
+  sort_order   Int      @default(0)
+  is_published Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("academic_programs")
+}
+
+model Scholarship {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String
+  overview     String
+  information  String?
+  link_url     String
+  sort_order   Int      @default(0)
+  is_published Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("scholarships")
+}
+
+model NewsArticle {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String
+  slug         String      @unique
+  excerpt      String
+  body         String?
+  link_url     String?
+  image_url    String?
+  media_id     String?     @db.Uuid
+  media        MediaAsset? @relation(fields: [media_id], references: [id], onDelete: SetNull)
+  published_at DateTime    @default(now())
+  is_published Boolean     @default(true)
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
+
+  @@index([is_published, published_at])
+  @@map("news_articles")
+}
+
+model Event {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String
+  slug         String   @unique
+  description  String?
+  starts_at    DateTime
+  ends_at      DateTime?
+  location     String
+  link_url     String?
+  is_published Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@index([is_published, starts_at])
+  @@map("events")
+}

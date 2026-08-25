@@ -17,6 +17,7 @@ import {
   Typography,
   Box,
   IconButton,
+  Stack,
 } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
@@ -276,6 +277,48 @@ export function ListActions({ resource }: { resource: string }) {
       <ExportButton />
       <CreateButton />
     </TopToolbar>
+  );
+}
+
+export function ImportEmptyState({
+  resource,
+  label,
+}: {
+  resource: string;
+  label: string;
+}) {
+  return (
+    <Box
+      sx={{
+        maxWidth: 600,
+        mx: "auto",
+        mt: 6,
+        p: { xs: 3, sm: 5 },
+        textAlign: "center",
+        bgcolor: "background.paper",
+        border: 1,
+        borderColor: "divider",
+        borderRadius: 2,
+      }}
+    >
+      <UploadFileIcon sx={{ fontSize: 44, color: "primary.main", mb: 2 }} />
+      <Typography variant="h5" component="h2">
+        No {label.toLowerCase()} yet
+      </Typography>
+      <Typography color="text.secondary" sx={{ mt: 1 }}>
+        Create the first record manually or import a CSV / JSON file to add
+        multiple records at once.
+      </Typography>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={1}
+        useFlexGap
+        sx={{ mt: 3, justifyContent: "center", alignItems: "center", flexWrap: "wrap" }}
+      >
+        <CreateButton variant="contained" />
+        <ImportButton resource={resource} />
+      </Stack>
+    </Box>
   );
 }
 

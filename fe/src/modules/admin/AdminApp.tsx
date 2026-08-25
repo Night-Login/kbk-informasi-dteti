@@ -9,6 +9,12 @@ import ArticleIcon from "@mui/icons-material/Article";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import SellIcon from "@mui/icons-material/Sell";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import CollectionsIcon from "@mui/icons-material/Collections";
+import EventIcon from "@mui/icons-material/Event";
+import SchoolIcon from "@mui/icons-material/School";
+import SettingsIcon from "@mui/icons-material/Settings";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import NewspaperIcon from "@mui/icons-material/Newspaper";
 import { dataProvider } from "./dataProvider";
 import { authProvider } from "./authProvider";
 import { AdminDashboard } from "./components/AdminDashboard";
@@ -22,6 +28,26 @@ import { PublicationList, PublicationCreate, PublicationEdit } from "./resources
 import { ResearchClusterList, ResearchClusterCreate, ResearchClusterEdit } from "./resources/researchClusters";
 import { ResearchTagList, ResearchTagCreate, ResearchTagEdit } from "./resources/researchTags";
 import { AdminList, AdminCreate, AdminEdit } from "./resources/admins";
+import {
+  AcademicProgramCreate,
+  AcademicProgramEdit,
+  AcademicProgramList,
+  EventCreate,
+  EventEdit,
+  EventList,
+  MediaCreate,
+  MediaEdit,
+  MediaList,
+  NewsCreate,
+  NewsEdit,
+  NewsList,
+  ScholarshipCreate,
+  ScholarshipEdit,
+  ScholarshipList,
+  SiteSettingCreate,
+  SiteSettingEdit,
+  SiteSettingList,
+} from "./resources/content";
 
 export const AdminApp: React.FC = () => {
   return (
@@ -80,6 +106,60 @@ export const AdminApp: React.FC = () => {
         icon={SellIcon}
         recordRepresentation="name"
         options={{ label: "Research Tags" }}
+      />
+      <Resource
+        name="content/news"
+        list={NewsList}
+        create={NewsCreate}
+        edit={NewsEdit}
+        icon={NewspaperIcon}
+        recordRepresentation="title"
+        options={{ label: "News" }}
+      />
+      <Resource
+        name="content/events"
+        list={EventList}
+        create={EventCreate}
+        edit={EventEdit}
+        icon={EventIcon}
+        recordRepresentation="title"
+        options={{ label: "Events" }}
+      />
+      <Resource
+        name="content/programs"
+        list={AcademicProgramList}
+        create={AcademicProgramCreate}
+        edit={AcademicProgramEdit}
+        icon={SchoolIcon}
+        recordRepresentation="title"
+        options={{ label: "Academic Programs" }}
+      />
+      <Resource
+        name="content/scholarships"
+        list={ScholarshipList}
+        create={ScholarshipCreate}
+        edit={ScholarshipEdit}
+        icon={WorkspacePremiumIcon}
+        recordRepresentation="title"
+        options={{ label: "Scholarships" }}
+      />
+      <Resource
+        name="content/media"
+        list={MediaList}
+        create={MediaCreate}
+        edit={MediaEdit}
+        icon={CollectionsIcon}
+        recordRepresentation="title"
+        options={{ label: "Media Library" }}
+      />
+      <Resource
+        name="content/settings"
+        list={SiteSettingList}
+        create={SiteSettingCreate}
+        edit={SiteSettingEdit}
+        icon={SettingsIcon}
+        recordRepresentation="label"
+        options={{ label: "Website Settings" }}
       />
       <Resource
         name="admins"

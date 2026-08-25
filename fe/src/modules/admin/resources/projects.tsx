@@ -20,7 +20,7 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
-import { ListActions } from "../components/ImportButton";
+import { ImportEmptyState, ListActions } from "../components/ImportButton";
 import { SlugInput } from "../components/SlugInput";
 
 const statusChoices = [
@@ -154,6 +154,7 @@ export const ProjectList: React.FC = () => (
   <List
     filters={projectFilters}
     actions={<ListActions resource="projects" />}
+    empty={<ImportEmptyState resource="projects" label="Projects" />}
     sort={{ field: "created_at", order: "DESC" }}
   >
     <Datagrid rowClick="edit">

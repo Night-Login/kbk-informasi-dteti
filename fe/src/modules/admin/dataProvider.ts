@@ -46,13 +46,15 @@ function getResourcePath(resource: string, isPaginated = false): string {
 
   if (
     isPaginated &&
-    [
-      "lecturers",
-      "projects",
-      "publications",
-      "research/clusters",
-      "research/tags",
-    ].includes(resource)
+    (
+      [
+        "lecturers",
+        "projects",
+        "publications",
+        "research/clusters",
+        "research/tags",
+      ].includes(resource) || resource.startsWith("content/")
+    )
   ) {
     return `${resource}/paginated`;
   }
@@ -138,6 +140,15 @@ function normalizeRecord<RecordType extends RaRecord = ApiRecord>(
       .filter(Boolean);
   }
 
+  if (baseResource.startsWith("content/")) {
+    const media = raw.media as { file_url?: string | null } | null | undefined;
+    const imageUrl = media?.file_url ||
+      (typeof raw.image_url === "string" ? raw.image_url : undefined) ||
+      (typeof raw.file_url === "string" ? raw.file_url : undefined) ||
+      (raw.field_type === "IMAGE" && typeof raw.value === "string" ? raw.value : undefined);
+    record.image_preview = getApiAssetUrl(imageUrl);
+  }
+
   return record as unknown as RecordType;
 }
 
@@ -153,9 +164,10 @@ function rawFile(value: unknown): File | undefined {
 function preparePayload(
   resource: string,
   input: Record<string, unknown>,
-): { payload: Record<string, unknown>; photo?: File } {
+): { payload: Record<string, unknown>; photo?: File; image?: File } {
   const data = { ...input };
   const photo = rawFile(data.photo);
+  const image = rawFile(data.image);
 
   [
     "id",
@@ -173,6 +185,13 @@ function preparePayload(
     "_count",
     "photo",
     "photo_preview",
+    "image",
+    "image_preview",
+    "media",
+    "file_url",
+    "file_name",
+    "mime_type",
+    "file_size",
   ].forEach((key) => delete data[key]);
 
   if (resource === "projects") {
@@ -210,13 +229,23 @@ function preparePayload(
     if (data[key] === undefined) delete data[key];
   });
 
-  return { payload: data, photo };
+  return { payload: data, photo, image };
 }
 
 async function uploadLecturerPhoto(id: Identifier, photo: File) {
   const form = new FormData();
   form.append("photo", photo);
   const { json } = await httpClient(`${API_URL}/lecturers/${id}/photo`, {
+    method: "PUT",
+    body: form,
+  });
+  return json.data || json;
+}
+
+async function uploadContentImage(resource: string, id: Identifier, image: File) {
+  const form = new FormData();
+  form.append("image", image);
+  const { json } = await httpClient(`${API_URL}/${resource}/${id}/image`, {
     method: "PUT",
     body: form,
   });
@@ -314,7 +343,7 @@ const baseProvider: DataProvider = {
   },
 
   update: async (resource, params) => {
-    const { payload, photo } = preparePayload(resource, params.data);
+    const { payload, photo, image } = preparePayload(resource, params.data);
     const { json } = await httpClient(`${API_URL}/${resource}/${params.id}`, {
       method: "PUT",
       body: JSON.stringify(payload),
@@ -322,6 +351,9 @@ const baseProvider: DataProvider = {
     let updated = json.data || json;
     if (resource === "lecturers" && photo) {
       updated = await uploadLecturerPhoto(params.id, photo);
+    }
+    if (resource.startsWith("content/") && image) {
+      updated = await uploadContentImage(resource, params.id, image);
     }
     return { data: normalizeRecord(resource, updated) };
   },
@@ -340,7 +372,7 @@ const baseProvider: DataProvider = {
   },
 
   create: async (resource, params) => {
-    const { payload, photo } = preparePayload(resource, params.data);
+    const { payload, photo, image } = preparePayload(resource, params.data);
     const { json } = await httpClient(`${API_URL}/${resource}`, {
       method: "POST",
       body: JSON.stringify(payload),
@@ -348,6 +380,9 @@ const baseProvider: DataProvider = {
     let created = json.data || json;
     if (resource === "lecturers" && photo) {
       created = await uploadLecturerPhoto(recordId(created), photo);
+    }
+    if (resource.startsWith("content/") && image) {
+      created = await uploadContentImage(resource, recordId(created), image);
     }
     return { data: normalizeRecord(resource, created) };
   },

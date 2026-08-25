@@ -13,7 +13,7 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
-import { ListActions } from "../components/ImportButton";
+import { ImportEmptyState, ListActions } from "../components/ImportButton";
 import { SlugInput } from "../components/SlugInput";
 
 const clusterFilters = [
@@ -46,6 +46,7 @@ export const ResearchClusterList: React.FC = () => (
   <List
     filters={clusterFilters}
     actions={<ListActions resource="research/clusters" />}
+    empty={<ImportEmptyState resource="research/clusters" label="Research clusters" />}
     sort={{ field: "sort_order", order: "ASC" }}
   >
     <Datagrid rowClick="edit">

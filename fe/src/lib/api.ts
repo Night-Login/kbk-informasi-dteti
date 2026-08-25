@@ -62,7 +62,65 @@ export async function apiRequest<T>(
 export function getApiAssetUrl(path?: string | null): string | undefined {
   if (!path) return undefined;
   if (/^(https?:|data:|blob:)/.test(path)) return path;
+  if (path.startsWith("/images/")) return path;
   return `${API_ORIGIN}/${path.replace(/^\//, "")}`;
+}
+
+export interface MediaAsset {
+  id: string;
+  title: string;
+  alt_text?: string | null;
+  file_url?: string | null;
+  file_name?: string | null;
+  mime_type?: string | null;
+  file_size?: number | null;
+}
+
+export interface AcademicContentItem {
+  id: string;
+  title: string;
+  overview: string;
+  information?: string | null;
+  link_url: string;
+  sort_order?: number;
+  is_published?: boolean;
+}
+
+export interface NewsArticle {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  body?: string | null;
+  link_url?: string | null;
+  image_url?: string | null;
+  media?: MediaAsset | null;
+  published_at: string;
+  is_published?: boolean;
+}
+
+export interface WebsiteEvent {
+  id: string;
+  title: string;
+  slug: string;
+  description?: string | null;
+  starts_at: string;
+  ends_at?: string | null;
+  location: string;
+  link_url?: string | null;
+  is_published?: boolean;
+}
+
+export interface HomepageContent {
+  settings: Record<string, string>;
+  news: NewsArticle[];
+  events: WebsiteEvent[];
+}
+
+export interface AcademicPageContent {
+  settings: Record<string, string>;
+  programs: AcademicContentItem[];
+  scholarships: AcademicContentItem[];
 }
 
 export interface PaginatedResult<T> {

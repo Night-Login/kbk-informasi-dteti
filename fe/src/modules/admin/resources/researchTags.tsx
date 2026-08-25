@@ -16,7 +16,7 @@ import {
   TextInput,
   required,
 } from "react-admin";
-import { ListActions } from "../components/ImportButton";
+import { ImportEmptyState, ListActions } from "../components/ImportButton";
 import { SlugInput } from "../components/SlugInput";
 
 const tagFilters = [
@@ -73,6 +73,7 @@ export const ResearchTagList: React.FC = () => (
   <List
     filters={tagFilters}
     actions={<ListActions resource="research/tags" />}
+    empty={<ImportEmptyState resource="research/tags" label="Research tags" />}
     sort={{ field: "name", order: "ASC" }}
   >
     <Datagrid rowClick="edit">

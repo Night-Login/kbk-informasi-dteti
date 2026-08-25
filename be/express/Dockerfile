@@ -21,7 +21,7 @@ ENV PORT=5000
 ENV HOST=0.0.0.0
 
 RUN addgroup -S nodejs && adduser -S express -G nodejs
-RUN mkdir -p /app/uploads/lecturers && chown -R express:nodejs /app/uploads
+RUN mkdir -p /app/uploads/lecturers /app/uploads/media && chown -R express:nodejs /app/uploads
 
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force

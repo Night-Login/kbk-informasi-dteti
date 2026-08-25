@@ -21,7 +21,7 @@ import {
   TextField,
 } from "react-admin";
 import { TextInput } from "react-admin";
-import { ListActions } from "../components/ImportButton";
+import { ImportEmptyState, ListActions } from "../components/ImportButton";
 import { SlugInput } from "../components/SlugInput";
 
 const supervisionChoices = [
@@ -143,6 +143,7 @@ export const LecturerList: React.FC = () => (
   <List
     filters={lecturerFilters}
     actions={<ListActions resource="lecturers" />}
+    empty={<ImportEmptyState resource="lecturers" label="Lecturers" />}
     sort={{ field: "full_name", order: "ASC" }}
   >
     <Datagrid rowClick="edit">

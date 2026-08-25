@@ -1,33 +1,3 @@
-export const academicPrograms = [
-  {
-    title: "Master’s Program (S2)",
-    overview: "Program overview singkat",
-    info: "Informasi relevan",
-    href: "#masters-program",
-  },
-  {
-    title: "Doctoral Program (S3)",
-    overview: "Program overview singkat",
-    info: "Informasi relevan",
-    href: "#doctoral-program",
-  },
-] as const;
-
-export const scholarships = [
-  {
-    title: "Fully Funded Scholarship ABC",
-    overview: "Program overview singkat",
-    info: "Informasi relevan",
-    href: "#fully-funded-scholarship",
-  },
-  {
-    title: "Partially Funded Scholarship DEF",
-    overview: "Program overview singkat",
-    info: "Informasi relevan",
-    href: "#partially-funded-scholarship",
-  },
-] as const;
-
 export const supervisorSteps = [
   {
     title: "Explore Research Areas",

@@ -19,7 +19,7 @@ import {
   TextField,
   TextInput,
 } from "react-admin";
-import { ListActions } from "../components/ImportButton";
+import { ImportEmptyState, ListActions } from "../components/ImportButton";
 import { SlugInput } from "../components/SlugInput";
 
 const verifiedChoices = [
@@ -138,6 +138,7 @@ export const PublicationList: React.FC = () => (
   <List
     filters={publicationFilters}
     actions={<ListActions resource="publications" />}
+    empty={<ImportEmptyState resource="publications" label="Publications" />}
     sort={{ field: "year", order: "DESC" }}
   >
     <Datagrid rowClick="edit">

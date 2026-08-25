@@ -7,10 +7,11 @@ import { useState } from "react";
 import BrandMark from "@/components/global/brand-mark";
 
 const navigation = [
+  { label: "Home", href: "/" },
   { label: "Research", href: "/research", dropdown: true },
   { label: "People", href: "/people" },
   { label: "Publication", href: "/publication" },
-  { label: "Academic", href: "/academics" },
+  { label: "Academic", href: "/academic" },
   { label: "Update", href: "/#news", dropdown: true },
   { label: "Contact", href: "/contact" },
 ];
@@ -28,7 +29,7 @@ export default function Navbar() {
       <div className="page-container flex h-16 items-center justify-between sm:h-20">
         <BrandMark compact />
 
-        <nav className="hidden items-center gap-7 lg:flex" aria-label="Navigasi utama">
+        <nav className="hidden items-center gap-5 xl:gap-7 lg:flex" aria-label="Navigasi utama">
           {navigation.map((item) => (
             <Link
               key={item.href}
