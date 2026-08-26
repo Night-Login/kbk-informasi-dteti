@@ -188,8 +188,19 @@ export default function TagResearchAreasPage() {
             </p>
           ) : null}
           <p className="mt-4 text-base text-muted">
-            {lecturers?.total || 0} lecturers <span aria-hidden="true">·</span>{" "}
-            {publications?.total || 0} publications
+            <a
+              href="#lecturers-heading"
+              className="hover:text-dteti-blue hover:underline transition-colors"
+            >
+              {lecturers?.total || 0} lecturers
+            </a>{" "}
+            <span aria-hidden="true">·</span>{" "}
+            <a
+              href="#related-publication-heading"
+              className="hover:text-dteti-blue hover:underline transition-colors"
+            >
+              {publications?.total || 0} publications
+            </a>
           </p>
         </header>
 
