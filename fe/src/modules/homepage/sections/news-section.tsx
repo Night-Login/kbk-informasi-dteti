@@ -35,7 +35,7 @@ export default function NewsSection({
                         alt={item.media?.alt_text || item.title}
                         fill
                         sizes="(min-width: 768px) 33vw, 100vw"
-                        className="object-cover grayscale"
+                        className="object-cover"
                         unoptimized={image.startsWith("http") || image.startsWith("/uploads/")}
                       />
                     </div>

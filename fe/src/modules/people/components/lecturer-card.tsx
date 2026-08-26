@@ -22,7 +22,7 @@ export default function LecturerCard({ lecturer, priority = false }: LecturerCar
             alt={lecturer.fullName}
             fill
             sizes="280px"
-            className="object-cover grayscale"
+            className="object-cover"
             unoptimized
             priority={priority}
           />

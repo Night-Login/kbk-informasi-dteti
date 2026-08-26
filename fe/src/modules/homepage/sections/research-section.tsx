@@ -44,7 +44,7 @@ function ResearchCard({
         fill
         sizes="(min-width: 1024px) 320px, 100vw"
         unoptimized={image.startsWith("http") || image.startsWith("/uploads/")}
-        className="object-cover grayscale transition-transform duration-300 group-hover:scale-[1.02]"
+        className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
       />
       <span className="absolute inset-x-0 bottom-0 bg-white/95 px-3 py-2 text-sm font-extrabold text-dteti-ink">
         {item.name}
