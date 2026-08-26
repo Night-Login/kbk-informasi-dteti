@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { researchController } from "../controllers/index.js";
-import { authenticateJWT, requireRole } from "../middleware/index.js";
+import { authenticateJWT, requireRole, uploadContentImage } from "../middleware/index.js";
 
 const router = Router();
 
@@ -46,6 +46,9 @@ router.post("/clusters/import", authenticateJWT, requireRole(["SUPERADMIN", "ADM
 
 // PUT /api/v1/research/clusters/:id    
 router.put("/clusters/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), researchController.updateResearchCluster);
+
+// PUT /api/v1/research/clusters/:id/image
+router.put("/clusters/:id/image", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), uploadContentImage, researchController.uploadResearchClusterImage);
 
 // DELETE /api/v1/research/clusters/:id    
 router.delete("/clusters/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), researchController.deleteResearchCluster);

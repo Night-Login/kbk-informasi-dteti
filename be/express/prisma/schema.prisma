@@ -43,6 +43,9 @@ model ResearchCluster {
   slug        String        @unique
   description String?
   sort_order  Int?
+  image_url   String?
+  media_id    String?       @db.Uuid
+  media       MediaAsset?   @relation(fields: [media_id], references: [id], onDelete: SetNull)
   deleted_at  DateTime?
   tags        ResearchTag[]
   primary_lecturers Lecturer[]
@@ -269,6 +272,7 @@ model MediaAsset {
   updated_at  DateTime     @updatedAt
   settings    SiteSetting[]
   news        NewsArticle[]
+  research_clusters ResearchCluster[]
 
   @@map("media_assets")
 }

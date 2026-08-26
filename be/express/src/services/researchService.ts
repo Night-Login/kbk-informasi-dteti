@@ -11,11 +11,13 @@ import {
     PaginatedResult
 } from "../types/index.js";
 import { Prisma, Visibility } from "@prisma/client";
+import { removeUploadedFile } from "./contentService.js";
 
 /**
  * Common include clause for ResearchCluster queries
  */
 const clusterIncludeClause = {
+    media: true,
     tags: {
         where: { deleted_at: null },
         include: {
@@ -78,6 +80,7 @@ export const getResearch = async (filters?: any): Promise<any> => {
             where: { AND: clusterConditions },
             orderBy: { sort_order: "asc" },
             include: {
+                media: true,
                 tags: {
                     where: tagWhere,
                     include: {
@@ -164,6 +167,8 @@ export const getResearch = async (filters?: any): Promise<any> => {
                 slug: cluster.slug,
                 description: cluster.description,
                 sort_order: cluster.sort_order,
+                image_url: cluster.media?.file_url || cluster.image_url,
+                media_id: cluster.media_id,
                 lecturer_count: lecturerCount,
                 project_count: projectCount,
                 publication_count: publicationCount,
@@ -321,7 +326,9 @@ export const createResearchCluster = async (data: CreateResearchClusterDTO): Pro
             name: data.name,
             slug: data.slug,
             description: data.description,
-            sort_order: data.sort_order
+            sort_order: data.sort_order,
+            image_url: data.image_url,
+            media_id: data.media_id
         },
         include: clusterIncludeClause
     });
@@ -346,12 +353,72 @@ export const updateResearchCluster = async (id: string, data: UpdateResearchClus
             name: data.name,
             slug: data.slug,
             description: data.description,
-            sort_order: data.sort_order
+            sort_order: data.sort_order,
+            image_url: data.image_url,
+            media_id: data.media_id
         },
         include: clusterIncludeClause
     });
 
     return cluster as unknown as ResearchCluster;
+};
+
+/**
+ * Attach an uploaded image to a research cluster and register it in the media library.
+ */
+export const attachResearchClusterImage = async (
+    id: string,
+    file: Express.Multer.File
+): Promise<ResearchCluster> => {
+    const fileUrl = `/uploads/media/${file.filename}`;
+    let existing;
+
+    try {
+        existing = await prisma.researchCluster.findFirst({
+            where: { id, deleted_at: null }
+        });
+    } catch (error) {
+        await removeUploadedFile(fileUrl);
+        throw error;
+    }
+
+    if (!existing) {
+        await removeUploadedFile(fileUrl);
+        throw Object.assign(new Error("Research cluster not found"), { status: 404 });
+    }
+
+    let createdMediaId: string | undefined;
+
+    try {
+        const media = await prisma.mediaAsset.create({
+            data: {
+                title: existing.name,
+                alt_text: `${existing.name} research cluster`,
+                file_url: fileUrl,
+                file_name: file.originalname,
+                mime_type: file.mimetype,
+                file_size: file.size
+            }
+        });
+        createdMediaId = media.id;
+
+        const cluster = await prisma.researchCluster.update({
+            where: { id },
+            data: {
+                image_url: fileUrl,
+                media_id: media.id
+            },
+            include: clusterIncludeClause
+        });
+
+        return cluster as unknown as ResearchCluster;
+    } catch (error) {
+        if (createdMediaId) {
+            await prisma.mediaAsset.delete({ where: { id: createdMediaId } }).catch(() => undefined);
+        }
+        await removeUploadedFile(fileUrl);
+        throw error;
+    }
 };
 
 /**
@@ -651,6 +718,8 @@ export const importResearchClustersCSV = async (
                         slug: slug || existing.slug,
                         description: item.description !== undefined ? item.description : existing.description,
                         sort_order: item.sort_order !== undefined ? Number(item.sort_order) : existing.sort_order,
+                        image_url: item.image_url !== undefined ? item.image_url || null : existing.image_url,
+                        media_id: item.media_id !== undefined ? item.media_id || null : existing.media_id,
                         deleted_at: null
                     }
                 });
@@ -661,7 +730,9 @@ export const importResearchClustersCSV = async (
                         name: item.name,
                         slug,
                         description: item.description || null,
-                        sort_order: item.sort_order ? Number(item.sort_order) : null
+                        sort_order: item.sort_order ? Number(item.sort_order) : null,
+                        image_url: item.image_url || null,
+                        media_id: item.media_id || null
                     }
                 });
                 imported++;

@@ -211,7 +211,7 @@ export async function updateContentRecord(
     return getDelegate(resource).update({ where: { id }, data, ...getInclude(resource) });
 }
 
-async function removeUploadedFile(fileUrl: unknown) {
+export async function removeUploadedFile(fileUrl: unknown) {
     if (typeof fileUrl !== "string" || !fileUrl.startsWith("/uploads/media/")) {
         return;
     }
@@ -225,14 +225,15 @@ async function removeUploadedFile(fileUrl: unknown) {
 
 export async function deleteContentRecord(resource: ContentResource, id: string) {
     if (resource === "media") {
-        const [settingsUsingImage, newsUsingImage] = await Promise.all([
+        const [settingsUsingImage, newsUsingImage, clustersUsingImage] = await Promise.all([
             prisma.siteSetting.count({ where: { media_id: id } }),
             prisma.newsArticle.count({ where: { media_id: id } }),
+            prisma.researchCluster.count({ where: { media_id: id } }),
         ]);
 
-        if (settingsUsingImage > 0 || newsUsingImage > 0) {
+        if (settingsUsingImage > 0 || newsUsingImage > 0 || clustersUsingImage > 0) {
             throw Object.assign(
-                new Error("This image is still used by website settings or news articles. Remove it from those records before deleting it."),
+                new Error("This image is still used by website settings, news articles, or research clusters. Remove it from those records before deleting it."),
                 { status: 409 },
             );
         }

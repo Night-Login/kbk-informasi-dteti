@@ -144,6 +144,13 @@ function normalizeRecord<RecordType extends RaRecord = ApiRecord>(
       .filter(Boolean);
   }
 
+  if (baseResource === "research/clusters") {
+    const media = raw.media as { file_url?: string | null } | null | undefined;
+    const imageUrl = media?.file_url ||
+      (typeof raw.image_url === "string" ? raw.image_url : undefined);
+    record.image_preview = getApiAssetUrl(imageUrl);
+  }
+
   if (baseResource.startsWith("content/")) {
     const media = raw.media as { file_url?: string | null } | null | undefined;
     const imageUrl = media?.file_url ||
@@ -356,7 +363,7 @@ const baseProvider: DataProvider = {
     if (resource === "lecturers" && photo) {
       updated = await uploadLecturerPhoto(params.id, photo);
     }
-    if (resource.startsWith("content/") && image) {
+    if ((resource.startsWith("content/") || resource === "research/clusters") && image) {
       updated = await uploadContentImage(resource, params.id, image);
     }
     return { data: normalizeRecord(resource, updated) };
@@ -385,7 +392,7 @@ const baseProvider: DataProvider = {
     if (resource === "lecturers" && photo) {
       created = await uploadLecturerPhoto(recordId(created), photo);
     }
-    if (resource.startsWith("content/") && image) {
+    if ((resource.startsWith("content/") || resource === "research/clusters") && image) {
       created = await uploadContentImage(resource, recordId(created), image);
     }
     return { data: normalizeRecord(resource, created) };

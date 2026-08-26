@@ -156,6 +156,9 @@ export interface ResearchCluster {
   slug: string;
   description?: string | null;
   sort_order?: number | null;
+  image_url?: string | null;
+  media_id?: string | null;
+  media?: MediaAsset | null;
   lecturer_count?: number;
   project_count?: number;
   publication_count?: number;

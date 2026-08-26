@@ -7,6 +7,12 @@ export interface ResearchCluster {
     slug: string;
     description?: string | null;
     sort_order?: number | null;
+    image_url?: string | null;
+    media_id?: string | null;
+    media?: {
+        id: string;
+        file_url?: string | null;
+    } | null;
     deleted_at?: Date | string | null;
     tags?: ResearchTag[];
     [key: string]: any;
@@ -52,6 +58,8 @@ export interface CreateResearchClusterDTO {
     slug: string;
     description?: string | null;
     sort_order?: number | null;
+    image_url?: string | null;
+    media_id?: string | null;
 }
 
 export interface UpdateResearchClusterDTO extends Partial<CreateResearchClusterDTO> {}

@@ -4,7 +4,12 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ButtonLink } from "@/components/global/button";
-import { apiRequest, type ResearchCluster, type ResearchSummary } from "@/lib/api";
+import {
+  apiRequest,
+  getApiAssetUrl,
+  type ResearchCluster,
+  type ResearchSummary,
+} from "@/lib/api";
 import { useEffect, useState } from "react";
 
 const researchImages = [
@@ -22,6 +27,8 @@ function ResearchCard({
   index: number;
 }) {
   const firstTag = item.tags?.[0];
+  const image = getApiAssetUrl(item.media?.file_url || item.image_url) ||
+    researchImages[index % researchImages.length];
   return (
     <Link
       href={
@@ -32,10 +39,11 @@ function ResearchCard({
       className="group relative min-h-28 overflow-hidden rounded-xl bg-white"
     >
       <Image
-        src={researchImages[index % researchImages.length]}
+        src={image}
         alt=""
         fill
         sizes="(min-width: 1024px) 320px, 100vw"
+        unoptimized={image.startsWith("http") || image.startsWith("/uploads/")}
         className="object-cover grayscale transition-transform duration-300 group-hover:scale-[1.02]"
       />
       <span className="absolute inset-x-0 bottom-0 bg-white/95 px-3 py-2 text-sm font-extrabold text-dteti-ink">

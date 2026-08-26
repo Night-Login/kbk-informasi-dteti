@@ -63,7 +63,7 @@ const resourceHeaderGuides: Record<string, { csv: string; json: string }> = {
 ]`,
   },
   "research/clusters": {
-    csv: "name,slug,description,sort_order",
+    csv: "name,slug,description,sort_order,image_url,media_id",
     json: `[
   {
     "name": "Sistem Informasi & Data",

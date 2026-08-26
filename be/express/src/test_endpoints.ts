@@ -313,6 +313,31 @@ async function runTests() {
                 logFail(`PUT /api/v1/research/clusters/${testClusterId}`, e);
             }
 
+            try {
+                const imageForm = new FormData();
+                const png = Buffer.from(
+                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+                    "base64",
+                );
+                imageForm.append("image", new Blob([png], { type: "image/png" }), "cluster-test.png");
+                const res = await axios.put(
+                    `${API_URL}/research/clusters/${testClusterId}/image`,
+                    imageForm,
+                    authHeaders,
+                );
+                if (
+                    res.data?.success &&
+                    res.data?.data?.image_url?.startsWith("/uploads/media/") &&
+                    res.data?.data?.media?.file_url === res.data.data.image_url
+                ) {
+                    logPass(`PUT /api/v1/research/clusters/${testClusterId}/image`);
+                } else {
+                    throw new Error("Research cluster image was not stored correctly");
+                }
+            } catch (e) {
+                logFail(`PUT /api/v1/research/clusters/${testClusterId}/image`, e);
+            }
+
             // Create tag under this cluster
             try {
                 const tagSlug = `tag-${Date.now()}`;

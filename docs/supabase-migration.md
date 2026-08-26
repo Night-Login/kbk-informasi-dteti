@@ -260,16 +260,16 @@ Jangan pernah menaruh salah satu nilai berikut di `NEXT_PUBLIC_*`:
 - Supabase secret key atau service-role key
 - `JWT_SECRET`
 
-## 6. Foto dosen bukan bagian dari database
+## 6. File upload bukan bagian dari database
 
-Saat ini upload foto disimpan ke disk backend di `be/express/uploads/lecturers`, sedangkan database hanya menyimpan URL `/uploads/lecturers/...`. `pg_dump` tidak memindahkan file tersebut.
+Saat ini foto dosen disimpan di `be/express/uploads/lecturers`, sedangkan gambar website—termasuk gambar research cluster—disimpan di `be/express/uploads/media`. Database hanya menyimpan URL dan metadata file. `pg_dump` tidak memindahkan file tersebut.
 
 Sebelum production, pilih salah satu:
 
 1. Migrasikan file ke Supabase Storage/object storage dan ubah upload handler agar menyimpan URL objek.
-2. Gunakan persistent volume pada host Express, lalu salin seluruh folder `uploads/lecturers`.
+2. Gunakan persistent volume pada host Express, lalu salin seluruh folder `uploads/lecturers` dan `uploads/media`.
 
-Tanpa salah satu langkah ini, foto akan hilang saat filesystem deployment di-rebuild.
+Tanpa salah satu langkah ini, file upload akan hilang saat filesystem deployment di-rebuild.
 
 ## 7. Cutover production dan rollback
 

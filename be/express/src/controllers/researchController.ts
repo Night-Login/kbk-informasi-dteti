@@ -267,6 +267,42 @@ export async function updateResearchCluster(req: Request, res: Response, next: N
     }
 }
 
+/**
+ * Upload or replace the image displayed for a research cluster.
+ */
+export async function uploadResearchClusterImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const id = typeof req.params.id === "string"
+            ? req.params.id
+            : (Array.isArray(req.params.id) ? req.params.id[0] : undefined);
+
+        if (!id) {
+            res.status(400).json({
+                success: false,
+                message: "Invalid research cluster ID parameter"
+            });
+            return;
+        }
+
+        if (!req.file) {
+            res.status(400).json({
+                success: false,
+                message: "Select an image to upload."
+            });
+            return;
+        }
+
+        const updated = await researchService.attachResearchClusterImage(id, req.file);
+        res.status(200).json({
+            success: true,
+            message: "Research cluster image updated successfully",
+            data: updated
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 /*
     Name           : Soft delete a research cluster controller
     Description    : Soft deletes research cluster data
