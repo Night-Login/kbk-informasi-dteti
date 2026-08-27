@@ -30,20 +30,25 @@ export default function Navbar() {
         <BrandMark compact />
 
         <nav className="hidden items-center gap-5 xl:gap-7 lg:flex" aria-label="Navigasi utama">
-          {navigation.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`nav-link inline-flex items-center gap-1.5 text-xs font-semibold text-white/90 hover:text-white ${
-                pathname === item.href ? "text-white" : ""
-              }`}
-            >
-              {item.label}
-              {item.dropdown ? (
-                <ChevronDown size={13} aria-hidden="true" />
-              ) : null}
-            </Link>
-          ))}
+          {navigation.map((item) => {
+            const isActive = pathname === item.href ||
+              (item.href === "/academic" && pathname === "/scholarships");
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`nav-link inline-flex items-center gap-1.5 text-xs font-semibold text-white/90 hover:text-white ${
+                  isActive ? "text-white" : ""
+                }`}
+              >
+                {item.label}
+                {item.dropdown ? (
+                  <ChevronDown size={13} aria-hidden="true" />
+                ) : null}
+              </Link>
+            );
+          })}
         </nav>
 
         <button

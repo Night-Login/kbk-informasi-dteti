@@ -161,7 +161,7 @@ export const ProjectList: React.FC = () => (
       <TextField
         source="title"
         label="Title"
-        sx={{ fontWeight: 700, maxW: 300, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+        sx={{ display: "block", fontWeight: 700, maxWidth: 300, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
       />
       <TextField source="status" label="Status" />
       <NumberField source="start_year" label="Start Year" />

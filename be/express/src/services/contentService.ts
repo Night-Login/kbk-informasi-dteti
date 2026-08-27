@@ -320,6 +320,16 @@ export async function getPublicSettings() {
     ) as Record<string, string>;
 }
 
+export async function getPublicNewsBySlug(slug: string) {
+    return prisma.newsArticle.findFirst({
+        where: {
+            slug,
+            is_published: true,
+        },
+        include: { media: true },
+    });
+}
+
 export async function getHomepageContent() {
     const [settings, news, events] = await Promise.all([
         getPublicSettings(),

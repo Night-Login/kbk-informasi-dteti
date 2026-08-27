@@ -1,8 +1,12 @@
+"use client";
+
 import Breadcrumbs from "@/components/global/breadcrumbs";
-import WireframePlaceholder from "@/components/global/wireframe-placeholder";
+import { apiRequest, getApiAssetUrl, type ResearchCluster, type ResearchSummary } from "@/lib/api";
 import { researchLandingCards } from "@/modules/research/data/research.data";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 function ResearchLandingCard({
   card,
@@ -33,6 +37,44 @@ function ResearchLandingCard({
 }
 
 export default function ResearchPage() {
+  const [clusters, setClusters] = useState<ResearchCluster[]>([]);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    apiRequest<ResearchSummary>("research", { signal: controller.signal })
+      .then((result) => setClusters(result.clusters || []))
+      .catch(() => {
+        if (!controller.signal.aborted) setClusters([]);
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  const researchSlides = useMemo(() => clusters
+    .map((cluster) => ({
+      cluster,
+      image: getApiAssetUrl(cluster.media?.file_url || cluster.image_url),
+    }))
+    .filter((slide): slide is { cluster: ResearchCluster; image: string } => Boolean(slide.image)), [clusters]);
+  const selectedSlideIndex = researchSlides.length > 0
+    ? Math.min(activeSlide, researchSlides.length - 1)
+    : 0;
+  const selectedSlide = researchSlides[selectedSlideIndex];
+
+  const showPrevious = () => {
+    setActiveSlide((current) =>
+      researchSlides.length > 0 ? (current - 1 + researchSlides.length) % researchSlides.length : 0,
+    );
+  };
+
+  const showNext = () => {
+    setActiveSlide((current) =>
+      researchSlides.length > 0 ? (current + 1) % researchSlides.length : 0,
+    );
+  };
+
   return (
     <main id="main-content" className="bg-white pb-20 pt-24 text-ink sm:pt-28">
       <div className="page-container">
@@ -48,16 +90,83 @@ export default function ResearchPage() {
         </p>
       </section>
 
-      <section aria-label="Featured research" className="relative">
-        <WireframePlaceholder className="h-[clamp(20rem,39vw,34rem)] w-full" />
-        <div
-          className="absolute inset-x-0 bottom-5 flex justify-center gap-1.5"
-          aria-hidden="true"
-        >
-          <span className="size-3 rounded-full bg-ink" />
-          <span className="size-3 rounded-full border-2 border-ink bg-white" />
-          <span className="size-3 rounded-full border-2 border-ink bg-white" />
-        </div>
+      <section aria-label="Featured research" className="relative overflow-hidden bg-dteti-blue-deep">
+        {selectedSlide ? (
+          <>
+            <div className="relative h-[clamp(20rem,39vw,34rem)] w-full">
+              <Image
+                src={selectedSlide.image}
+                alt={selectedSlide.cluster.name}
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
+                unoptimized={selectedSlide.image.startsWith("http") || selectedSlide.image.startsWith("/uploads/")}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-dteti-blue-deep/90 via-dteti-blue-deep/10 to-transparent" />
+              <div className="page-container absolute inset-x-0 bottom-0 pb-10 text-left text-white sm:pb-12">
+                <h2 className="max-w-3xl text-2xl font-extrabold text-white sm:text-4xl">
+                  {selectedSlide.cluster.name}
+                </h2>
+                {selectedSlide.cluster.description ? (
+                  <p className="mt-3 line-clamp-2 max-w-2xl text-sm leading-6 text-white/90 sm:text-base">
+                    {selectedSlide.cluster.description}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+
+            {researchSlides.length > 1 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={showPrevious}
+                  aria-label="Previous research image"
+                  className="absolute left-4 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-dteti-blue-deep transition-colors hover:bg-dteti-yellow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow sm:left-8"
+                >
+                  <ChevronLeft aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={showNext}
+                  aria-label="Next research image"
+                  className="absolute right-4 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-dteti-blue-deep transition-colors hover:bg-dteti-yellow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow sm:right-8"
+                >
+                  <ChevronRight aria-hidden="true" />
+                </button>
+                <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2" aria-label="Choose research image">
+                  {researchSlides.map((slide, index) => (
+                    <button
+                      type="button"
+                      key={slide.cluster.id}
+                      onClick={() => setActiveSlide(index)}
+                      aria-label={`Show ${slide.cluster.name}`}
+                      aria-current={index === selectedSlideIndex ? "true" : undefined}
+                      className={`size-3 rounded-full border-2 border-white transition-colors ${
+                        index === selectedSlideIndex ? "bg-dteti-yellow" : "bg-dteti-blue-deep/50 hover:bg-white"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : null}
+          </>
+        ) : (
+          <div className="brand-gradient grid h-[clamp(20rem,39vw,34rem)] place-items-center px-6 text-center text-white">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Research at DTETI</h2>
+              <p className="mt-4 text-base leading-7 text-white/90">
+                Explore research clusters, expertise, and active work across the Information Engineering Research Group.
+              </p>
+              <Link
+                href="/research-areas"
+                className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-lg bg-dteti-yellow px-5 text-sm font-bold text-dteti-ink"
+              >
+                Browse Research Areas <ArrowRight size={17} aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="page-container grid gap-x-14 gap-y-12 pb-8 pt-12 md:grid-cols-2">

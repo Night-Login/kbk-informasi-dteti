@@ -31,6 +31,8 @@ let testLecturerRequiredFields: {
 } | null = null;
 let testProjectId: string | null = null;
 let testPublicationId: string | null = null;
+let testNewsId: string | null = null;
+let testNewsSlug: string | null = null;
 let testEventId: string | null = null;
 let testEventMediaId: string | null = null;
 
@@ -676,6 +678,39 @@ async function runTests() {
         console.log("\n--- 7. Website Content Routes ---");
 
         try {
+            testNewsSlug = `news-${Date.now()}`;
+            const res = await axios.post(`${API_URL}/content/news`, {
+                title: "Test Information Engineering News",
+                slug: testNewsSlug,
+                excerpt: "Endpoint test for the public news detail page.",
+                body: "This article verifies that a published news item can be opened by slug.",
+                published_at: new Date().toISOString(),
+                is_published: true
+            }, authHeaders);
+            if (res.data?.success && res.data?.data?.id) {
+                testNewsId = res.data.data.id;
+                logPass("POST /api/v1/content/news (Create News)");
+            } else {
+                throw new Error("Failed to create news article");
+            }
+        } catch (e) {
+            logFail("POST /api/v1/content/news (Create News)", e);
+        }
+
+        if (testNewsSlug) {
+            try {
+                const res = await axios.get(`${API_URL}/content/news/slug/${testNewsSlug}`);
+                if (res.data?.success && res.data?.data?.slug === testNewsSlug) {
+                    logPass(`GET /api/v1/content/news/slug/${testNewsSlug}`);
+                } else {
+                    throw new Error("Public news detail did not return the created article");
+                }
+            } catch (e) {
+                logFail(`GET /api/v1/content/news/slug/${testNewsSlug}`, e);
+            }
+        }
+
+        try {
             const eventSlug = `event-${Date.now()}`;
             const startsAt = new Date(Date.now() + 86_400_000).toISOString();
             const res = await axios.post(`${API_URL}/content/events`, {
@@ -742,6 +777,15 @@ async function runTests() {
         // 8. Deletion & Restoration Cleanup
         // -------------------------------------------------------------
         console.log("\n--- 8. Deletion & Restoration Endpoints ---");
+
+        if (testNewsId) {
+            try {
+                await axios.delete(`${API_URL}/content/news/${testNewsId}`, authHeaders);
+                logPass(`DELETE /api/v1/content/news/${testNewsId}`);
+            } catch (e) {
+                logFail(`DELETE /api/v1/content/news/${testNewsId}`, e);
+            }
+        }
 
         if (testEventId) {
             try {

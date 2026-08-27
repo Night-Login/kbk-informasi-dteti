@@ -157,19 +157,19 @@ export const PublicationList: React.FC = () => (
       <TextField
         source="title"
         label="Title"
-        sx={{ fontWeight: 700, maxW: 280, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+        sx={{ display: "block", fontWeight: 700, maxWidth: 280, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
       />
       <NumberField source="year" label="Year" />
       <TextField
         source="venue"
         label="Venue"
-        sx={{ maxW: 180, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+        sx={{ display: "block", maxWidth: 180, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
       />
       <TextField source="publication_type" label="Type" />
       <TextField
         source="doi"
         label="DOI"
-        sx={{ maxW: 160, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+        sx={{ display: "block", maxWidth: 160, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
       />
       <NumberField source="citation_count" label="Citations" />
       <TextField source="source" label="Source" />

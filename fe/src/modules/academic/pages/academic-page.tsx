@@ -103,30 +103,37 @@ export default function AcademicPage() {
 
         <div className="mx-auto mt-16 max-w-6xl sm:mt-20">
           <h2 className="text-2xl font-extrabold text-dteti-blue sm:text-3xl">Scholarships</h2>
-          <div className="brand-gradient mt-6 grid gap-10 rounded-2xl px-8 py-12 text-white md:grid-cols-2 md:px-16">
-            {scholarships.length === 0 ? (
-              <p className="text-sm text-white/90">
-                Scholarship opportunities will appear once they are published.
+          <div className="brand-gradient mt-6 grid gap-10 rounded-2xl px-8 py-12 text-white md:grid-cols-[0.85fr_1.15fr] md:px-12 lg:px-16">
+            <div>
+              <p className="max-w-xl text-sm leading-6 text-white/90">
+                Explore funding opportunities for master&apos;s and doctoral study. The dedicated
+                Scholarships page collects every opportunity published by the admin team.
               </p>
-            ) : null}
-            {scholarships.map((scholarship) => (
-              <article key={scholarship.id}>
-                <h3 className="text-2xl font-extrabold text-white">
-                  {scholarship.title}
-                </h3>
-                <p className="mt-2 text-sm text-white/90">
-                  {scholarship.overview}
+              <LargeWireframeLink
+                href="/scholarships"
+                label="View All Scholarships"
+                tone="white"
+              />
+            </div>
+            <div className="divide-y divide-white/25 border-y border-white/25">
+              {scholarships.length === 0 ? (
+                <p className="py-5 text-sm text-white/90">
+                  Scholarship opportunities will appear once they are published.
                 </p>
-                {scholarship.information ? (
-                  <p className="mt-4 text-sm text-white/90">{scholarship.information}</p>
-                ) : null}
-                <LargeWireframeLink
-                  href={scholarship.link_url}
-                  label="View Scholarship Information"
-                  tone="white"
-                />
-              </article>
-            ))}
+              ) : (
+                scholarships.slice(0, 3).map((scholarship) => (
+                  <article key={scholarship.id} className="py-5 first:pt-0 last:pb-0">
+                    <h3 className="text-lg font-extrabold text-white">{scholarship.title}</h3>
+                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-white/85">{scholarship.overview}</p>
+                  </article>
+                ))
+              )}
+              {scholarships.length > 3 ? (
+                <p className="pt-5 text-xs font-bold text-white/80">
+                  +{scholarships.length - 3} more published opportunities
+                </p>
+              ) : null}
+            </div>
           </div>
         </div>
 

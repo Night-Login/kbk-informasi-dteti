@@ -104,7 +104,7 @@ export const ResearchClusterList: React.FC = () => (
       />
       <TextField source="name" label="Cluster Name" sx={{ fontWeight: 700 }} />
       <TextField source="slug" label="Slug" />
-      <TextField source="description" label="Description" sx={{ maxW: 350, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} />
+      <TextField source="description" label="Description" sx={{ display: "block", maxWidth: 350, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} />
       <NumberField source="sort_order" label="Display Order" />
       <EditButton />
       <DeleteButton />

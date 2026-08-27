@@ -3,7 +3,7 @@
 import Breadcrumbs from "@/components/global/breadcrumbs";
 import { DropdownSelect } from "@/components/global/dropdown-select";
 import { apiRequest, getApiAssetUrl, type NewsArticle } from "@/lib/api";
-import { ArrowUpRight, CalendarDays, LoaderCircle, Search } from "lucide-react";
+import { ArrowRight, CalendarDays, LoaderCircle, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -132,10 +132,15 @@ export default function NewsPage() {
                 <article
                   id={item.slug}
                   key={item.id}
-                  className="brand-gradient flex scroll-mt-28 flex-col overflow-hidden rounded-xl border border-dteti-blue-deep/20 text-white transition-transform duration-200 hover:-translate-y-1"
+                  className="scroll-mt-28 transition-transform duration-200 hover:-translate-y-1"
                 >
-                  {image ? (
-                    <div className="relative h-56 bg-dteti-blue-deep">
+                  <Link
+                    href={`/news/${encodeURIComponent(item.slug)}`}
+                    aria-label={`Read ${item.title}`}
+                    className="brand-gradient group flex h-full flex-col overflow-hidden rounded-xl border border-dteti-blue-deep/20 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow focus-visible:ring-offset-2"
+                  >
+                    {image ? (
+                      <div className="relative h-56 bg-dteti-blue-deep">
                       <Image
                         src={image}
                         alt={item.media?.alt_text || item.title}
@@ -145,26 +150,21 @@ export default function NewsPage() {
                         className="object-cover"
                         unoptimized={image.startsWith("http") || image.startsWith("/uploads/")}
                       />
-                    </div>
-                  ) : null}
-                  <div className="flex flex-1 flex-col p-6">
-                    <time dateTime={item.published_at} className="text-xs font-bold uppercase tracking-wider text-white/75">
-                      {formatPublishedDate(item.published_at)}
-                    </time>
-                    <h2 className="mt-3 text-xl font-bold leading-7 text-white">
-                      {item.link_url ? (
-                        <Link href={item.link_url} className="hover:underline">
-                          {item.title}
-                        </Link>
-                      ) : item.title}
-                    </h2>
-                    <p className="mt-3 line-clamp-5 text-sm leading-6 text-white/90">{item.excerpt}</p>
-                    {item.link_url ? (
-                      <Link href={item.link_url} className="mt-6 inline-flex items-center gap-1.5 self-start text-sm font-bold text-dteti-yellow hover:underline">
-                        Read more <ArrowUpRight size={16} aria-hidden="true" />
-                      </Link>
+                      </div>
                     ) : null}
-                  </div>
+                    <div className="flex flex-1 flex-col p-6">
+                      <time dateTime={item.published_at} className="text-xs font-bold uppercase tracking-wider text-white/75">
+                        {formatPublishedDate(item.published_at)}
+                      </time>
+                      <h2 className="mt-3 text-xl font-bold leading-7 text-white group-hover:underline">
+                        {item.title}
+                      </h2>
+                      <p className="mt-3 line-clamp-5 text-sm leading-6 text-white/90">{item.excerpt}</p>
+                      <span className="mt-6 inline-flex items-center gap-1.5 self-start text-sm font-bold text-dteti-yellow group-hover:underline">
+                        Read article <ArrowRight size={16} aria-hidden="true" />
+                      </span>
+                    </div>
+                  </Link>
                 </article>
               );
             })}

@@ -80,7 +80,7 @@ export const ResearchTagList: React.FC = () => (
       <TextField source="name" label="Tag Name" sx={{ fontWeight: 700 }} />
       <TextField source="slug" label="Slug" />
       <TextField source="cluster.name" label="Cluster" />
-      <TextField source="description" label="Description" sx={{ maxW: 300, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} />
+      <TextField source="description" label="Description" sx={{ display: "block", maxWidth: 300, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} />
       <BooleanField source="is_active" label="Active" />
       <EditButton />
       <DeleteButton />

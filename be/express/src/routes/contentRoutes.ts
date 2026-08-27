@@ -8,6 +8,7 @@ import {
     getAcademicContent,
     getContentRecord,
     getHomepageContent,
+    getPublicNewsBySlug,
     getPublicSettings,
     listContent,
     listPaginatedContent,
@@ -127,6 +128,15 @@ router.get("/academic", handle(async (_request, response) => {
 
 router.get("/settings/public", handle(async (_request, response) => {
     response.json({ success: true, data: await getPublicSettings() });
+}));
+
+router.get("/news/slug/:slug", handle(async (request, response) => {
+    const article = await getPublicNewsBySlug(String(request.params.slug));
+    if (!article) {
+        response.status(404).json({ success: false, message: "Published news article not found." });
+        return;
+    }
+    response.json({ success: true, data: article });
 }));
 
 for (const resource of Object.keys(schemas) as ContentResource[]) {

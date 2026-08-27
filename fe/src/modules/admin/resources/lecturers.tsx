@@ -150,7 +150,7 @@ export const LecturerList: React.FC = () => (
       <TextField
         source="full_name"
         label="Full Name"
-        sx={{ fontWeight: 700, maxW: 240, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+        sx={{ display: "block", fontWeight: 700, maxWidth: 240, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
       />
       <TextField source="academic_title" label="Title" />
       <TextField source="nip_or_staff_id" label="NIP / Staff ID" />
@@ -158,7 +158,7 @@ export const LecturerList: React.FC = () => (
       <TextField
         source="email"
         label="Email"
-        sx={{ maxW: 200, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+        sx={{ display: "block", maxWidth: 200, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
       />
       <TextField source="supervision_status" label="Supervision" />
       <BooleanField source="is_active" label="Active" />

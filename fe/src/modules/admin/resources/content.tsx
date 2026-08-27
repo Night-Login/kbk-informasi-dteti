@@ -184,10 +184,10 @@ function AcademicItemFields() {
       <TextInput source="title" label="Title" validate={required()} />
       <TextInput
         source="link_url"
-        label="Information / scholarship link"
+        label="Official information / application link"
         type="url"
         validate={required()}
-        helperText="Visitors open this link from the public website."
+        helperText="Visitors open this official page to read details or apply."
       />
       <Box sx={{ gridColumn: "1 / -1" }}>
         <TextInput source="overview" label="Overview" multiline rows={3} validate={required()} />
@@ -220,12 +220,13 @@ export function SiteSettingList() {
       <Datagrid rowClick="edit" bulkActionButtons={false}>
         <TextField source="label" label="Setting" sx={{ fontWeight: 700 }} />
         <TextField source="key" label="Key" />
-        <SelectField source="field_type" label="Type" choices={fieldTypeChoices} />
         <TextField
-          source="value"
-          label="Current value"
-          sx={{ maxWidth: 320, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+          source="description"
+          label="Description"
+          emptyText="—"
+          sx={{ display: "block", maxWidth: 360, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
         />
+        <SelectField source="field_type" label="Type" choices={fieldTypeChoices} />
         <EditButton />
       </Datagrid>
     </List>
@@ -256,7 +257,13 @@ function SiteSettingFields({ editing = false }: { editing?: boolean }) {
       />
       <NumberInput source="sort_order" label="Display order" defaultValue={0} />
       <Box sx={{ gridColumn: "1 / -1" }}>
-        <TextInput source="description" label="Admin guidance" multiline rows={2} />
+        <TextInput
+          source="description"
+          label="Description"
+          multiline
+          rows={2}
+          helperText="Explain where this setting appears and what content should be entered."
+        />
       </Box>
       <FormDataConsumer>
         {({ formData }) => (
@@ -312,7 +319,7 @@ export function AcademicProgramList() {
       empty={<ContentEmptyState title="No academic programs yet" description="Add master’s or doctoral programs to publish on the Academic page." />}
     >
       <Datagrid rowClick="edit">
-        <TextField source="title" label="Program" sx={{ fontWeight: 700 }} />
+        <TextField source="title" label="Program" sx={{ display: "block", maxWidth: 280, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700 }} />
         <UrlField source="link_url" label="Information link" target="_blank" rel="noopener noreferrer" />
         <NumberField source="sort_order" label="Order" />
         <BooleanField source="is_published" label="Published" />
@@ -337,10 +344,10 @@ export function ScholarshipList() {
       actions={<ContentActions />}
       filters={publicationFilters}
       sort={{ field: "sort_order", order: "ASC" }}
-      empty={<ContentEmptyState title="No scholarships yet" description="Add a scholarship and its official link to publish it on the Academic page." />}
+      empty={<ContentEmptyState title="No scholarships yet" description="Add as many scholarship opportunities as needed. Published items appear on the dedicated Scholarships page." />}
     >
       <Datagrid rowClick="edit">
-        <TextField source="title" label="Scholarship" sx={{ fontWeight: 700 }} />
+        <TextField source="title" label="Scholarship" sx={{ display: "block", maxWidth: 280, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700 }} />
         <UrlField source="link_url" label="Scholarship link" target="_blank" rel="noopener noreferrer" />
         <NumberField source="sort_order" label="Order" />
         <BooleanField source="is_published" label="Published" />
@@ -395,7 +402,7 @@ export function NewsList() {
     >
       <Datagrid rowClick="edit">
         <ImageField source="image_preview" label="Image" sx={{ "& img": { maxHeight: 48, borderRadius: 1 } }} />
-        <TextField source="title" label="Headline" sx={{ fontWeight: 700 }} />
+        <TextField source="title" label="Headline" sx={{ display: "block", maxWidth: 340, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700 }} />
         <DateField source="published_at" label="Published on" showTime />
         <BooleanField source="is_published" label="Published" />
         <EditButton />
@@ -449,9 +456,9 @@ export function EventList() {
     >
       <Datagrid rowClick="edit">
         <ImageField source="image_preview" label="Image" sx={{ "& img": { width: 72, height: 48, objectFit: "cover", borderRadius: 1 } }} />
-        <TextField source="title" label="Event" sx={{ fontWeight: 700 }} />
+        <TextField source="title" label="Event" sx={{ display: "block", maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700 }} />
         <DateField source="starts_at" label="Starts" showTime />
-        <TextField source="location" label="Location" />
+        <TextField source="location" label="Location" sx={{ display: "block", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} />
         <BooleanField source="is_published" label="Published" />
         <EditButton />
         <DeleteButton />
@@ -517,9 +524,9 @@ export function MediaList() {
     >
       <Datagrid rowClick="edit">
         <ImageField source="image_preview" label="Preview" sx={{ "& img": { maxHeight: 64, borderRadius: 1 } }} />
-        <TextField source="title" label="Title" sx={{ fontWeight: 700 }} />
-        <TextField source="alt_text" label="Image description" />
-        <TextField source="file_name" label="Filename" />
+        <TextField source="title" label="Title" sx={{ display: "block", maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700 }} />
+        <TextField source="alt_text" label="Image description" sx={{ display: "block", maxWidth: 320, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} />
+        <TextField source="file_name" label="Filename" sx={{ display: "block", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} />
         <DateField source="created_at" label="Uploaded" />
         <EditButton />
         <DeleteButton />
