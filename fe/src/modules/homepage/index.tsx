@@ -26,8 +26,14 @@ export default function HomePage() {
     <main id="main-content">
       <HeroSection settings={content?.settings} />
       <ResearchSection />
-      <NewsSection items={content?.news || []} archiveUrl={content?.settings.news_archive_url} />
-      <EventsSection items={content?.events || []} archiveUrl={content?.settings.events_archive_url} />
+      <NewsSection
+        items={content?.news || []}
+        archiveUrl={content?.settings.news_archive_url || "/news"}
+      />
+      <EventsSection
+        items={content?.events || []}
+        archiveUrl={content?.settings.events_archive_url || "/events"}
+      />
     </main>
   );
 }

@@ -28,14 +28,15 @@ Please provide the following 6 files per update cycle:
    * **Description:** Unified base profile data for lecturers (names, IDs, academic titles) **merged with** their fluctuating metrics (h-index, citations, etc.). 
 3. `Publications_Base_{Source}_{Date}.csv`
    * **Description:** Core publication data (DOIs, titles, abstracts, year, citation count).
-   * **Primary key:** `doi` is required for every publication. Reusing an existing DOI updates that publication; missing DOI values are skipped.
+   * **Identity:** `id` is the internal UUID primary key. Keep the crawler/source UUID stable when one is available. `doi` is optional and unique when provided.
+   * **Upsert order:** The importer first matches a non-empty DOI, then a valid source UUID. Rows without either identifier use their slug only as a last-resort fallback, so crawler exports should always retain their UUID.
 
 ### Relational (Link) Data
-*Lecturers use UUIDs, while publications are identified by their DOI. Link tables bridge source data to those database entities.*
+*Lecturers and publications use UUIDs internally. DOI remains a useful optional external identifier.*
 
 4. `Link_Lecturer-Publications_{Source}_{Date}.csv`
-   * **Description:** Maps a lecturer's original row reference (e.g., `dosen_source.csv:2`) to the target publication's DOI using a `publication_doi` or `doi` column.
-   * **Legacy compatibility:** Existing `publication_id` columns remain supported when their values match an `id` in the same publications CSV; the importer resolves those legacy IDs to the corresponding DOI.
+   * **Description:** Maps a lecturer's original row reference (e.g., `dosen_source.csv:2`) to the publication UUID using `publication_id`.
+   * **Compatibility:** `publication_doi` and `doi` columns are also accepted when a DOI exists. The importer resolves all supported references to the publication UUID stored in the relation table.
 5. `Link_Lecturer-Clusters_{Source}_{Date}.csv`
    * **Description:** Maps a lecturer's `full_name` to their primary `cluster_slug`. (Updates the primary research cluster on the lecturer profile).
 6. `Link_Lecturer-Tags_{Source}_{Date}.csv`

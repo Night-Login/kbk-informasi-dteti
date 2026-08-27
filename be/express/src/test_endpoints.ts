@@ -30,7 +30,7 @@ let testLecturerRequiredFields: {
     sinta_id: string;
 } | null = null;
 let testProjectId: string | null = null;
-let testPublicationDoi: string | null = null;
+let testPublicationId: string | null = null;
 
 let passedTests = 0;
 let failedTests = 0;
@@ -577,25 +577,46 @@ async function runTests() {
         // 6. Publication Routes
         // -------------------------------------------------------------
         console.log("\n--- 6. Publication Routes ---");
+        let testPublicationSlug: string | null = null;
         try {
             const pubSlug = `publication-${Date.now()}`;
-            const pubDoi = `10.1109/test.${Date.now()}`;
             const res = await axios.post(`${API_URL}/publications`, {
                 title: "Deep Learning Architectures for Smart Grids",
                 slug: pubSlug,
                 year: 2026,
                 venue: "IEEE Transactions on Smart Grid",
-                doi: pubDoi,
                 source: "OPENALEX"
             }, authHeaders);
-            if (res.data?.success && res.data?.data?.doi) {
-                testPublicationDoi = res.data.data.doi;
-                logPass("POST /api/v1/publications (Create Publication)");
+            if (res.data?.success && res.data?.data?.id && !res.data?.data?.doi) {
+                testPublicationId = res.data.data.id;
+                testPublicationSlug = pubSlug;
+                logPass("POST /api/v1/publications (Create Publication without DOI)");
             } else {
-                throw new Error("Failed to create publication");
+                throw new Error("Failed to create publication without DOI");
             }
         } catch (e) {
-            logFail("POST /api/v1/publications (Create Publication)", e);
+            logFail("POST /api/v1/publications (Create Publication without DOI)", e);
+        }
+
+        if (testPublicationId && testPublicationSlug) {
+            try {
+                const res = await axios.post(`${API_URL}/publications/import`, {
+                    items: [{
+                        id: testPublicationId,
+                        title: "Deep Learning Architectures for Smart Grids (Crawler Refresh)",
+                        slug: testPublicationSlug,
+                        year: 2026,
+                        source: "OPENALEX"
+                    }]
+                }, authHeaders);
+                if (res.data?.success && res.data?.data?.updated === 1) {
+                    logPass("POST /api/v1/publications/import (UUID upsert without DOI)");
+                } else {
+                    throw new Error("Publication UUID import did not update the existing row");
+                }
+            } catch (e) {
+                logFail("POST /api/v1/publications/import (UUID upsert without DOI)", e);
+            }
         }
 
         try {
@@ -614,35 +635,35 @@ async function runTests() {
             logFail("GET /api/v1/publications/paginated", e);
         }
 
-        if (testPublicationDoi) {
-            const encodedPublicationDoi = encodeURIComponent(testPublicationDoi);
+        if (testPublicationId) {
+            const encodedPublicationId = encodeURIComponent(testPublicationId);
             try {
-                const res = await axios.get(`${API_URL}/publications/${encodedPublicationDoi}`);
-                if (res.data?.success) logPass(`GET /api/v1/publications/${testPublicationDoi}`);
+                const res = await axios.get(`${API_URL}/publications/${encodedPublicationId}`);
+                if (res.data?.success) logPass(`GET /api/v1/publications/${testPublicationId}`);
                 else throw new Error("Publication not found");
             } catch (e) {
-                logFail(`GET /api/v1/publications/${testPublicationDoi}`, e);
+                logFail(`GET /api/v1/publications/${testPublicationId}`, e);
             }
 
             try {
-                const res = await axios.put(`${API_URL}/publications/${encodedPublicationDoi}`, {
+                const res = await axios.put(`${API_URL}/publications/${encodedPublicationId}`, {
                     abstract: "An exhaustive survey of deep learning techniques applied to grid anomaly detection."
                 }, authHeaders);
-                if (res.data?.success) logPass(`PUT /api/v1/publications/${testPublicationDoi}`);
+                if (res.data?.success) logPass(`PUT /api/v1/publications/${testPublicationId}`);
                 else throw new Error("Failed to update publication");
             } catch (e) {
-                logFail(`PUT /api/v1/publications/${testPublicationDoi}`, e);
+                logFail(`PUT /api/v1/publications/${testPublicationId}`, e);
             }
 
             if (testLecturerId) {
                 try {
-                    const res = await axios.put(`${API_URL}/publications/${encodedPublicationDoi}/lecturers`, {
+                    const res = await axios.put(`${API_URL}/publications/${encodedPublicationId}/lecturers`, {
                         lecturers: [{ lecturer_id: testLecturerId, author_order: 1 }]
                     }, authHeaders);
-                    if (res.data?.success) logPass(`PUT /api/v1/publications/${testPublicationDoi}/lecturers`);
+                    if (res.data?.success) logPass(`PUT /api/v1/publications/${testPublicationId}/lecturers`);
                     else throw new Error("Failed to assign lecturers to publication");
                 } catch (e) {
-                    logFail(`PUT /api/v1/publications/${testPublicationDoi}/lecturers`, e);
+                    logFail(`PUT /api/v1/publications/${testPublicationId}/lecturers`, e);
                 }
             }
         }
@@ -652,19 +673,19 @@ async function runTests() {
         // -------------------------------------------------------------
         console.log("\n--- 7. Deletion & Restoration Endpoints ---");
         
-        if (testPublicationDoi) {
-            const encodedPublicationDoi = encodeURIComponent(testPublicationDoi);
+        if (testPublicationId) {
+            const encodedPublicationId = encodeURIComponent(testPublicationId);
             try {
-                await axios.delete(`${API_URL}/publications/${encodedPublicationDoi}`, authHeaders);
-                logPass(`DELETE /api/v1/publications/${testPublicationDoi}`);
+                await axios.delete(`${API_URL}/publications/${encodedPublicationId}`, authHeaders);
+                logPass(`DELETE /api/v1/publications/${testPublicationId}`);
             } catch (e) {
-                logFail(`DELETE /api/v1/publications/${testPublicationDoi}`, e);
+                logFail(`DELETE /api/v1/publications/${testPublicationId}`, e);
             }
             try {
-                await axios.patch(`${API_URL}/publications/${encodedPublicationDoi}/restore`, {}, authHeaders);
-                logPass(`PATCH /api/v1/publications/${testPublicationDoi}/restore`);
+                await axios.patch(`${API_URL}/publications/${encodedPublicationId}/restore`, {}, authHeaders);
+                logPass(`PATCH /api/v1/publications/${testPublicationId}/restore`);
             } catch (e) {
-                logFail(`PATCH /api/v1/publications/${testPublicationDoi}/restore`, e);
+                logFail(`PATCH /api/v1/publications/${testPublicationId}/restore`, e);
             }
         }
 

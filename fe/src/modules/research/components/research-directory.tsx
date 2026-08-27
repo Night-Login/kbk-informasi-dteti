@@ -2,6 +2,7 @@
 
 import Breadcrumbs from "@/components/global/breadcrumbs";
 import { FileText, Search, UserRound } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -9,6 +10,7 @@ type ResearchDirectoryItem = {
   slug: string;
   title: string;
   description?: string;
+  imageUrl?: string;
   tags: readonly { name: string; slug: string }[];
   lecturers: number;
   publications: number;
@@ -23,38 +25,51 @@ type ResearchDirectoryProps = {
 
 function ResearchDirectoryCard({ item }: { item: ResearchDirectoryItem }) {
   return (
-    <article className="rounded-xl border border-line bg-white px-6 py-8 sm:px-10 sm:py-9">
-      <div>
-        <h2 className="text-2xl font-bold text-dteti-blue sm:text-3xl">
-          {item.title}
-        </h2>
-        {item.description ? (
-          <p className="mt-3 max-w-4xl text-sm leading-6 text-muted">
-            {item.description}
-          </p>
+    <article className="overflow-hidden rounded-xl border border-line bg-white">
+      <div className={item.imageUrl ? "grid lg:grid-cols-[minmax(250px,32%)_1fr]" : ""}>
+        {item.imageUrl ? (
+          <div className="relative min-h-52 bg-surface-strong sm:min-h-64 lg:min-h-full">
+            <Image
+              src={item.imageUrl}
+              alt={`${item.title} research area`}
+              fill
+              sizes="(min-width: 1024px) 32vw, 100vw"
+              className="object-cover"
+              unoptimized={item.imageUrl.startsWith("http") || item.imageUrl.startsWith("/uploads/")}
+            />
+          </div>
         ) : null}
-        <div className="mt-6 flex flex-wrap gap-3">
-          {item.tags.map((tag) => (
-            <Link
-              key={tag.slug}
-              href={`/tag-research-areas/${tag.slug}`}
-              className="inline-flex min-h-9 items-center border border-dteti-ink/70 bg-dteti-yellow px-3.5 text-sm font-semibold text-dteti-ink transition-colors hover:bg-dteti-yellow/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
-            >
-              {tag.name}
-            </Link>
-          ))}
+        <div className="px-6 py-8 sm:px-10 sm:py-9">
+          <h2 className="text-2xl font-bold text-dteti-blue sm:text-3xl">
+            {item.title}
+          </h2>
+          {item.description ? (
+            <p className="mt-3 max-w-4xl text-sm leading-6 text-muted">
+              {item.description}
+            </p>
+          ) : null}
+          <div className="mt-6 flex flex-wrap gap-3">
+            {item.tags.map((tag) => (
+              <Link
+                key={tag.slug}
+                href={`/tag-research-areas/${tag.slug}`}
+                className="inline-flex min-h-9 items-center border border-dteti-ink/70 bg-dteti-yellow px-3.5 text-sm font-semibold text-dteti-ink transition-colors hover:bg-dteti-yellow/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+              >
+                {tag.name}
+              </Link>
+            ))}
+          </div>
+          <div className="mt-7 flex flex-wrap items-center gap-6 border-t border-line pt-5 text-sm font-semibold text-ink sm:gap-8">
+            <span className="inline-flex items-center gap-2 text-dteti-ink" title="Lecturers">
+              <UserRound size={19} className="text-dteti-blue" aria-hidden="true" />
+              <span>{item.lecturers} Lecturers</span>
+            </span>
+            <span className="inline-flex items-center gap-2 text-dteti-ink" title="Publications">
+              <FileText size={19} className="text-dteti-blue" aria-hidden="true" />
+              <span>{item.publications} Publications</span>
+            </span>
+          </div>
         </div>
-      </div>
-
-      <div className="mt-7 flex flex-wrap items-center gap-6 border-t border-line pt-5 text-sm font-semibold text-ink sm:gap-8">
-        <span className="inline-flex items-center gap-2 text-dteti-ink" title="Lecturers">
-          <UserRound size={19} className="text-dteti-blue" aria-hidden="true" />
-          <span>{item.lecturers} Lecturers</span>
-        </span>
-        <span className="inline-flex items-center gap-2 text-dteti-ink" title="Publications">
-          <FileText size={19} className="text-dteti-blue" aria-hidden="true" />
-          <span>{item.publications} Publications</span>
-        </span>
       </div>
     </article>
   );

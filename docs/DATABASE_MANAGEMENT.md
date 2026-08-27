@@ -2,27 +2,11 @@
 
 This guide covers the procedures for seeding data (upserting), as well as triggering and restoring database backups.
 
-## Publication DOI migration preflight
+## Publication identity
 
-The publication DOI migration replaces UUID publication identifiers with DOI primary keys while preserving lecturer-publication relationships. Before applying the migration to an existing database, confirm every publication has a non-empty DOI:
+Publications use an internal UUID `id` as their primary key. DOI is optional because crawler output does not always contain one; a DOI must still be unique when it is present. Lecturer-publication relations store `publication_id`, so adding or correcting a DOI does not change relation keys.
 
-```sql
-SELECT id, title, doi
-FROM publications
-WHERE doi IS NULL OR btrim(doi) = '';
-```
-
-Also check for DOI values that would become duplicates after surrounding whitespace is removed:
-
-```sql
-SELECT btrim(doi) AS normalized_doi, count(*) AS publication_count
-FROM publications
-WHERE doi IS NOT NULL
-GROUP BY btrim(doi)
-HAVING count(*) > 1;
-```
-
-Both queries must return zero rows. Fill in missing real DOIs and resolve duplicates before running `npm run db:migrate` from `be/express`. The migration stops without changing data when either condition is not met.
+CSV/JSON imports match an existing publication by DOI first and then by a valid source UUID. Keep crawler UUIDs stable between data drops. A row without either DOI or UUID falls back to its slug, which is intended only for simple manual imports.
 
 ## 1. Data Upserting (Seeding)
 
@@ -31,8 +15,8 @@ The database is seeded using a set of TypeScript scripts inside the `database_in
 When executed, the script will:
 - Insert static vocabulary (Research Clusters and Tags).
 - Parse the CSVs and JSON files located in the `seed_data` directory.
-- **Upsert** (Update or Insert) Lecturers by their lecturer identifiers and Publications by their required DOI primary key.
-- Resolve lecturer-publication links from `publication_doi`/`doi`, with compatibility for legacy `publication_id` references present in the same publications CSV.
+- **Upsert** (Update or Insert) Lecturers by their lecturer identifiers and Publications by DOI or stable UUID without rejecting publications that have no DOI.
+- Resolve lecturer-publication links to UUID `publication_id`, with compatibility for `publication_doi`/`doi` references when present.
 - Link Lecturers to Publications and Tags, skipping any relationships that already exist.
 
 ### How to Trigger the Upsert:

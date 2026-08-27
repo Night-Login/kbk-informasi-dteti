@@ -56,11 +56,9 @@ export default function EventsSection({
                   </time>
                   <div>
                     <h3 className="text-base font-extrabold text-white">
-                      {event.link_url ? (
-                        <Link href={event.link_url} className="hover:underline">
-                          {event.title}
-                        </Link>
-                      ) : event.title}
+                      <Link href={event.link_url || `/events#${event.slug}`} className="hover:underline">
+                        {event.title}
+                      </Link>
                     </h3>
                     <p className="mt-4 text-xs text-white/90">
                       {date.time} <span aria-hidden="true">|</span>{" "}

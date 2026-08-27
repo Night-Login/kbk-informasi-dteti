@@ -12,7 +12,7 @@ const navigation = [
   { label: "People", href: "/people" },
   { label: "Publication", href: "/publication" },
   { label: "Academic", href: "/academic" },
-  { label: "Update", href: "/#news", dropdown: true },
+  { label: "Update", href: "/news" },
   { label: "Contact", href: "/contact" },
 ];
 

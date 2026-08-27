@@ -91,15 +91,19 @@ function PublicationFormFields({ editing = false }: { editing?: boolean }) {
       <TextInput source="publication_type" label="Publication Type" placeholder="e.g. Journal / Conference / Book Chapter" />
 
       <SectionTitle title="2. Identifiers & Review Status" />
+      {editing ? (
+        <TextInput
+          source="id"
+          label="Internal UUID"
+          disabled
+          helperText="Stable database identifier used when a DOI is unavailable."
+        />
+      ) : null}
       <TextInput
         source="doi"
-        label="DOI (primary key)"
+        label="DOI (optional)"
         placeholder="e.g. 10.1109/ACCESS.2024.123456"
-        required
-        disabled={editing}
-        helperText={editing
-          ? "The DOI identifies this publication and cannot be changed."
-          : "Required. CSV imports update existing publications using this DOI."}
+        helperText="Leave blank when the crawler cannot find a DOI. DOI values must be unique when provided."
       />
       <TextInput source="url" label="Publication URL" type="url" placeholder="https://..." />
       <NumberInput source="citation_count" label="Citation Count" defaultValue={0} min={0} />

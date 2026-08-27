@@ -19,6 +19,11 @@ import {
 } from "react-admin";
 import { ImportEmptyState, ListActions } from "../components/ImportButton";
 import { SlugInput } from "../components/SlugInput";
+import {
+  MediaChoice,
+  mediaChoiceInputText,
+  mediaChoiceMatchSuggestion,
+} from "../components/MediaChoice";
 
 const imageAcceptance = {
   "image/*": [".png", ".jpg", ".jpeg", ".webp", ".gif"],
@@ -51,9 +56,11 @@ function ClusterFormFields({ editing = false }: { editing?: boolean }) {
           perPage={100}
         >
           <AutocompleteInput
-            optionText="title"
+            optionText={<MediaChoice />}
+            inputText={mediaChoiceInputText}
+            matchSuggestion={mediaChoiceMatchSuggestion}
             label="Choose image from media library"
-            helperText="Select an existing image, or upload a new file below."
+            helperText="Search by title or filename. Thumbnails load only while choosing an image."
           />
         </ReferenceInput>
       </Box>

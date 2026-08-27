@@ -287,15 +287,31 @@ export const getPublicationByDoi = async (
 };
 
 /**
+ * Get a single publication by its internal UUID.
+ */
+export const getPublicationById = async (
+    id: string,
+    includeDeleted = false
+): Promise<Publication | null> => {
+    const publication = await prisma.publication.findFirst({
+        where: { id, ...(includeDeleted ? {} : { deleted_at: null }) },
+        include: includeClause
+    });
+
+    return (publication as unknown as Publication) || null;
+};
+
+/**
  * Create a new publication along with optional author relations
  */
 export const createPublication = async (data: CreatePublicationDTO): Promise<Publication> => {
     const { lecturers, ...pubData } = data;
-    const doi = pubData.doi.trim();
+    const doi = typeof pubData.doi === "string" ? pubData.doi.trim() || null : null;
 
     const publication = await prisma.$transaction(async (tx) => {
         const created = await tx.publication.create({
             data: {
+                ...(pubData.id ? { id: pubData.id } : {}),
                 doi,
                 title: pubData.title,
                 slug: pubData.slug,
@@ -319,7 +335,7 @@ export const createPublication = async (data: CreatePublicationDTO): Promise<Pub
                 lecturers.map((item, index) =>
                     tx.lecturerPublication.create({
                         data: {
-                            publication_doi: created.doi,
+                            publication_id: created.id,
                             lecturer_id: item.lecturer_id,
                             author_order: item.author_order !== undefined ? item.author_order : index + 1
                         }
@@ -329,7 +345,7 @@ export const createPublication = async (data: CreatePublicationDTO): Promise<Pub
         }
 
         return tx.publication.findUnique({
-            where: { doi: created.doi },
+            where: { id: created.id },
             include: includeClause
         });
     });
@@ -340,12 +356,12 @@ export const createPublication = async (data: CreatePublicationDTO): Promise<Pub
 /**
  * Update an existing publication
  */
-export const updatePublication = async (doi: string, data: UpdatePublicationDTO): Promise<Publication> => {
+export const updatePublication = async (id: string, data: UpdatePublicationDTO): Promise<Publication> => {
     const existing = await prisma.publication.findFirst({
-        where: { doi, deleted_at: null }
+        where: { id, deleted_at: null }
     });
     if (!existing) {
-        throw new Error(`Publication with DOI ${doi} not found or deleted.`);
+        throw new Error(`Publication with id ${id} not found or deleted.`);
     }
 
     const { lecturers, ...pubData } = data;
@@ -360,6 +376,9 @@ export const updatePublication = async (doi: string, data: UpdatePublicationDTO)
         if (pubData.authors_text !== undefined) updateData.authors_text = pubData.authors_text;
         if (pubData.venue !== undefined) updateData.venue = pubData.venue;
         if (pubData.publication_type !== undefined) updateData.publication_type = pubData.publication_type;
+        if (pubData.doi !== undefined) {
+            updateData.doi = typeof pubData.doi === "string" ? pubData.doi.trim() || null : null;
+        }
         if (pubData.url !== undefined) updateData.url = pubData.url;
         if (pubData.abstract !== undefined) updateData.abstract = pubData.abstract;
         if (pubData.citation_count !== undefined) updateData.citation_count = pubData.citation_count;
@@ -369,13 +388,13 @@ export const updatePublication = async (doi: string, data: UpdatePublicationDTO)
         if (pubData.fetch_batch_id !== undefined) updateData.fetch_batch_id = pubData.fetch_batch_id;
 
         await tx.publication.update({
-            where: { doi },
+            where: { id },
             data: updateData
         });
 
         if (lecturers !== undefined) {
             await tx.lecturerPublication.deleteMany({
-                where: { publication_doi: doi }
+                where: { publication_id: id }
             });
 
             if (lecturers.length > 0) {
@@ -383,7 +402,7 @@ export const updatePublication = async (doi: string, data: UpdatePublicationDTO)
                     lecturers.map((item, index) =>
                         tx.lecturerPublication.create({
                             data: {
-                                publication_doi: doi,
+                                publication_id: id,
                                 lecturer_id: item.lecturer_id,
                                 author_order: item.author_order !== undefined ? item.author_order : index + 1
                             }
@@ -394,7 +413,7 @@ export const updatePublication = async (doi: string, data: UpdatePublicationDTO)
         }
 
         return tx.publication.findUnique({
-            where: { doi },
+            where: { id },
             include: includeClause
         });
     });
@@ -403,33 +422,33 @@ export const updatePublication = async (doi: string, data: UpdatePublicationDTO)
 };
 
 /**
- * Delete a publication by DOI (soft delete)
+ * Delete a publication by internal UUID (soft delete)
  */
-export const deletePublication = async (doi: string): Promise<boolean> => {
+export const deletePublication = async (id: string): Promise<boolean> => {
     try {
         await prisma.publication.update({
-            where: { doi },
+            where: { id },
             data: { deleted_at: new Date() }
         });
         return true;
     } catch (error) {
-        console.error(`Error deleting publication ${doi}:`, error);
+        console.error(`Error deleting publication ${id}:`, error);
         return false;
     }
 };
 
 /**
- * Restore a soft-deleted publication by DOI
+ * Restore a soft-deleted publication by internal UUID
  */
-export const restorePublication = async (doi: string): Promise<boolean> => {
+export const restorePublication = async (id: string): Promise<boolean> => {
     try {
         await prisma.publication.update({
-            where: { doi },
+            where: { id },
             data: { deleted_at: null }
         });
         return true;
     } catch (error) {
-        console.error(`Error restoring publication ${doi}:`, error);
+        console.error(`Error restoring publication ${id}:`, error);
         return false;
     }
 };
@@ -438,18 +457,18 @@ export const restorePublication = async (doi: string): Promise<boolean> => {
  * Assign or reassign lecturers to a publication
  */
 export const assignLecturersToPublication = async (
-    publicationDoi: string,
+    publicationId: string,
     lecturers: Array<{ lecturer_id: string; author_order?: number }>
 ): Promise<boolean> => {
     try {
         const existing = await prisma.publication.findFirst({
-            where: { doi: publicationDoi, deleted_at: null }
+            where: { id: publicationId, deleted_at: null }
         });
         if (!existing) return false;
 
         await prisma.$transaction(async (tx) => {
             await tx.lecturerPublication.deleteMany({
-                where: { publication_doi: publicationDoi }
+                where: { publication_id: publicationId }
             });
 
             if (lecturers.length > 0) {
@@ -457,7 +476,7 @@ export const assignLecturersToPublication = async (
                     lecturers.map((item, index) =>
                         tx.lecturerPublication.create({
                             data: {
-                                publication_doi: publicationDoi,
+                                publication_id: publicationId,
                                 lecturer_id: item.lecturer_id,
                                 author_order: item.author_order !== undefined ? item.author_order : index + 1
                             }
@@ -468,7 +487,7 @@ export const assignLecturersToPublication = async (
         });
         return true;
     } catch (error) {
-        console.error(`Error assigning lecturers to publication ${publicationDoi}:`, error);
+        console.error(`Error assigning lecturers to publication ${publicationId}:`, error);
         return false;
     }
 };
@@ -489,8 +508,13 @@ export const importPublicationsCSV = async (
 
     for (const item of items) {
         try {
-            const doi = typeof item.doi === "string" ? item.doi.trim() : "";
-            if (!doi || !item.title || !item.year) {
+            const doi = typeof item.doi === "string" ? item.doi.trim() || null : null;
+            const suppliedId = typeof item.id === "string" &&
+                /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(item.id.trim())
+                ? item.id.trim()
+                : null;
+
+            if (!item.title || !item.year) {
                 errors++;
                 continue;
             }
@@ -501,12 +525,26 @@ export const importPublicationsCSV = async (
                 .replace(/^-|-$/g, "");
 
             const wasUpdated = await prisma.$transaction(async (tx) => {
-                const existing = await tx.publication.findUnique({ where: { doi } });
+                let existing = doi
+                    ? await tx.publication.findUnique({ where: { doi } })
+                    : null;
 
-                if (existing) {
-                    await tx.publication.update({
-                        where: { doi },
+                if (!existing && suppliedId) {
+                    existing = await tx.publication.findUnique({ where: { id: suppliedId } });
+                }
+
+                // Manual imports without a DOI or crawler UUID remain idempotent
+                // through their slug. Crawler exports should keep their ID.
+                if (!existing && !doi && !suppliedId) {
+                    existing = await tx.publication.findFirst({ where: { slug } });
+                }
+
+                const wasExisting = Boolean(existing);
+                const publication = existing
+                    ? await tx.publication.update({
+                        where: { id: existing.id },
                         data: {
+                            doi: doi || existing.doi,
                             title: item.title || existing.title,
                             slug: slug || existing.slug,
                             year: Number(item.year) || existing.year,
@@ -518,13 +556,16 @@ export const importPublicationsCSV = async (
                             abstract: item.abstract !== undefined ? item.abstract : existing.abstract,
                             citation_count: item.citation_count !== undefined ? Number(item.citation_count) : existing.citation_count,
                             source: item.source || existing.source || "CSV_IMPORT",
+                            external_ids: item.external_ids !== undefined
+                                ? item.external_ids as Prisma.InputJsonValue
+                                : undefined,
                             verified_status: item.verified_status || existing.verified_status,
                             deleted_at: null
                         }
-                    });
-                } else {
-                    await tx.publication.create({
+                    })
+                    : await tx.publication.create({
                         data: {
+                            ...(suppliedId ? { id: suppliedId } : {}),
                             doi,
                             title: item.title,
                             slug,
@@ -537,14 +578,16 @@ export const importPublicationsCSV = async (
                             abstract: item.abstract || null,
                             citation_count: item.citation_count ? Number(item.citation_count) : 0,
                             source: item.source || "CSV_IMPORT",
+                            external_ids: item.external_ids
+                                ? item.external_ids as Prisma.InputJsonValue
+                                : undefined,
                             verified_status: item.verified_status || "VERIFIED"
                         }
                     });
-                }
 
                 if (Array.isArray(item.lecturers)) {
                     await tx.lecturerPublication.deleteMany({
-                        where: { publication_doi: doi }
+                        where: { publication_id: publication.id }
                     });
 
                     if (item.lecturers.length > 0) {
@@ -561,7 +604,7 @@ export const importPublicationsCSV = async (
 
                                 return tx.lecturerPublication.create({
                                     data: {
-                                        publication_doi: doi,
+                                        publication_id: publication.id,
                                         lecturer_id: lecturerId,
                                         author_order: authorOrder
                                     }
@@ -571,18 +614,18 @@ export const importPublicationsCSV = async (
                     }
                 } else if (item.lecturer_id) {
                     await tx.lecturerPublication.deleteMany({
-                        where: { publication_doi: doi }
+                        where: { publication_id: publication.id }
                     });
                     await tx.lecturerPublication.create({
                         data: {
-                            publication_doi: doi,
+                            publication_id: publication.id,
                             lecturer_id: item.lecturer_id,
                             author_order: item.author_order || 1
                         }
                     });
                 }
 
-                return Boolean(existing);
+                return wasExisting;
             });
 
             if (wasUpdated) updated++;

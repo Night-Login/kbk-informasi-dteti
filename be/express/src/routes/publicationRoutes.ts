@@ -21,8 +21,8 @@ router.get("/doi/:doi", publicationController.getPublicationByDoi);
 // GET /api/v1/publications/trash
 router.get("/trash", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.getDeletedPublications);
 
-// GET /api/v1/publications/:doi (DOI must be URL-encoded)
-router.get("/:doi", publicationController.getPublicationByDoi);
+// GET /api/v1/publications/:id
+router.get("/:id", publicationController.getPublicationById);
 
 /* #### Protected endpoints #### */
 
@@ -32,16 +32,16 @@ router.post("/", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicat
 // POST /api/v1/publications/import 
 router.post("/import", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.importPublicationsCSV);
 
-// PUT /api/v1/publications/:doi
-router.put("/:doi", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.updatePublication);
+// PUT /api/v1/publications/:id
+router.put("/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.updatePublication);
 
-// DELETE /api/v1/publications/:doi
-router.delete("/:doi", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.deletePublication);
+// DELETE /api/v1/publications/:id
+router.delete("/:id", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.deletePublication);
 
-// PATCH /api/v1/publications/:doi/restore
-router.patch("/:doi/restore", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.restorePublication);
+// PATCH /api/v1/publications/:id/restore
+router.patch("/:id/restore", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.restorePublication);
 
 // Protected relation assignment endpoint
-router.put("/:doi/lecturers", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.assignLecturersToPublication);
+router.put("/:id/lecturers", authenticateJWT, requireRole(["SUPERADMIN", "ADMIN"]), publicationController.assignLecturersToPublication);
 
 export default router;

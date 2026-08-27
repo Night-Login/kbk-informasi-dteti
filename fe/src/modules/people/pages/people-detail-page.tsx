@@ -448,7 +448,7 @@ export default function PeopleDetailPage() {
           {latestPublications.length > 0 ? (
             <ul className="mt-6 divide-y divide-line border-t border-line">
               {latestPublications.map((publication) => (
-                <li key={publication.doi} className="py-5">
+                <li key={publication.id} className="py-5">
                   <a
                     href={publication.url || `/publication#${publication.slug}`}
                     target={publication.url ? "_blank" : undefined}

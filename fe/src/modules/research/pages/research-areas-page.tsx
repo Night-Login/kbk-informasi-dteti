@@ -1,7 +1,7 @@
 "use client";
 
 import ResearchDirectory from "@/modules/research/components/research-directory";
-import { apiRequest, type ResearchSummary } from "@/lib/api";
+import { apiRequest, getApiAssetUrl, type ResearchSummary } from "@/lib/api";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -29,6 +29,7 @@ export default function ResearchAreasPage() {
         slug: cluster.slug,
         title: cluster.name,
         description: cluster.description || undefined,
+        imageUrl: getApiAssetUrl(cluster.media?.file_url || cluster.image_url),
         tags: (cluster.tags || []).map((tag) => ({
           name: tag.name,
           slug: tag.slug,

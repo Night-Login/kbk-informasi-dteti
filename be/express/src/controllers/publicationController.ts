@@ -208,6 +208,28 @@ export async function getPublicationByDoi(req: Request, res: Response, next: Nex
     }
 }
 
+export async function getPublicationById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const id = typeof req.params.id === "string"
+            ? req.params.id
+            : (Array.isArray(req.params.id) ? req.params.id[0] : undefined);
+        if (!id) {
+            res.status(400).json({ success: false, message: "Invalid publication ID parameter" });
+            return;
+        }
+
+        const publication = await publicationService.getPublicationById(id);
+        if (!publication) {
+            res.status(404).json({ success: false, message: "Publication not found" });
+            return;
+        }
+
+        res.status(200).json({ success: true, data: publication });
+    } catch (error) {
+        next(error);
+    }
+}
+
 /*
     Name           : Create new publication controller
     Description    : Creates new publication data along with optional author relations
@@ -218,12 +240,12 @@ export async function getPublicationByDoi(req: Request, res: Response, next: Nex
 export async function createPublication(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
         const { title, slug, year } = req.body as CreatePublicationDTO;
-        const doi = typeof req.body.doi === "string" ? req.body.doi.trim() : "";
+        const doi = typeof req.body.doi === "string" ? req.body.doi.trim() || undefined : undefined;
 
-        if (!doi || !title || !slug || year === undefined || year === null) {
+        if (!title || !slug || year === undefined || year === null) {
             res.status(400).json({
                 success: false,
-                message: "DOI, title, slug, and year are required"
+                message: "Title, slug, and year are required"
             });
             return;
         }
@@ -237,18 +259,20 @@ export async function createPublication(req: Request, res: Response, next: NextF
             return;
         }
 
-        const existingDoi = await publicationService.getPublicationByDoi(doi, true);
-        if (existingDoi) {
-            res.status(409).json({
-                success: false,
-                message: "A publication with this DOI already exists"
-            });
-            return;
+        if (doi) {
+            const existingDoi = await publicationService.getPublicationByDoi(doi, true);
+            if (existingDoi) {
+                res.status(409).json({
+                    success: false,
+                    message: "A publication with this DOI already exists"
+                });
+                return;
+            }
         }
 
         const newPublication = await publicationService.createPublication({
             ...(req.body as CreatePublicationDTO),
-            doi
+            ...(doi ? { doi } : {})
         });
         res.status(201).json({
             success: true,
@@ -263,22 +287,22 @@ export async function createPublication(req: Request, res: Response, next: NextF
 /*
     Name           : Update an existing publication controller
     Description    : Updates existing publication data along with optional author relations
-    Request params : publication DOI
+    Request params : publication ID
     Action         : update publication data
     Response       : success or error message 
 */
 export async function updatePublication(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const doi = typeof req.params.doi === "string" ? req.params.doi : (Array.isArray(req.params.doi) ? req.params.doi[0] : undefined);
-        if (!doi) {
+        const id = typeof req.params.id === "string" ? req.params.id : (Array.isArray(req.params.id) ? req.params.id[0] : undefined);
+        if (!id) {
             res.status(400).json({
                 success: false,
-                message: "Invalid publication DOI parameter"
+                message: "Invalid publication ID parameter"
             });
             return;
         }
 
-        const existing = await publicationService.getPublicationByDoi(doi);
+        const existing = await publicationService.getPublicationById(id);
         if (!existing) {
             res.status(404).json({
                 success: false,
@@ -288,20 +312,26 @@ export async function updatePublication(req: Request, res: Response, next: NextF
         }
 
         const updateData = req.body as UpdatePublicationDTO;
-        if (
-            updateData.doi !== undefined &&
-            (typeof updateData.doi !== "string" || updateData.doi.trim() !== doi)
-        ) {
-            res.status(400).json({
-                success: false,
-                message: "The DOI is the publication primary key and cannot be changed."
-            });
-            return;
+        const normalizedDoi = typeof updateData.doi === "string"
+            ? updateData.doi.trim() || null
+            : updateData.doi === null
+                ? null
+                : undefined;
+        if (normalizedDoi && normalizedDoi !== existing.doi) {
+            const duplicateDoi = await publicationService.getPublicationByDoi(normalizedDoi, true);
+            if (duplicateDoi && duplicateDoi.id !== id) {
+                res.status(409).json({
+                    success: false,
+                    message: "A publication with this DOI already exists"
+                });
+                return;
+            }
         }
+        if (updateData.doi !== undefined) updateData.doi = normalizedDoi;
 
         if (updateData.slug && updateData.slug !== existing.slug) {
             const existingSlug = await publicationService.getPublicationBySlug(updateData.slug);
-            if (existingSlug && existingSlug.doi !== doi) {
+            if (existingSlug && existingSlug.id !== id) {
                 res.status(409).json({
                     success: false,
                     message: "A publication with this slug already exists"
@@ -310,7 +340,7 @@ export async function updatePublication(req: Request, res: Response, next: NextF
             }
         }
 
-        const updated = await publicationService.updatePublication(doi, updateData);
+        const updated = await publicationService.updatePublication(id, updateData);
 
         res.status(200).json({
             success: true,
@@ -325,22 +355,22 @@ export async function updatePublication(req: Request, res: Response, next: NextF
 /*
     Name           : Soft delete a publication controller
     Description    : Soft deletes publication data
-    Request params : publication DOI
+    Request params : publication ID
     Action         : delete publication data
     Response       : success or error message 
 */
 export async function deletePublication(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const doi = typeof req.params.doi === "string" ? req.params.doi : (Array.isArray(req.params.doi) ? req.params.doi[0] : undefined);
-        if (!doi) {
+        const id = typeof req.params.id === "string" ? req.params.id : (Array.isArray(req.params.id) ? req.params.id[0] : undefined);
+        if (!id) {
             res.status(400).json({
                 success: false,
-                message: "Invalid publication DOI parameter"
+                message: "Invalid publication ID parameter"
             });
             return;
         }
 
-        const existing = await publicationService.getPublicationByDoi(doi);
+        const existing = await publicationService.getPublicationById(id);
         if (!existing) {
             res.status(404).json({
                 success: false,
@@ -349,7 +379,7 @@ export async function deletePublication(req: Request, res: Response, next: NextF
             return;
         }
 
-        const success = await publicationService.deletePublication(doi);
+        const success = await publicationService.deletePublication(id);
         if (!success) {
             res.status(500).json({
                 success: false,
@@ -370,22 +400,22 @@ export async function deletePublication(req: Request, res: Response, next: NextF
 /*
     Name           : Restore a soft-deleted publication controller
     Description    : Restores soft-deleted publication data
-    Request params : publication DOI
+    Request params : publication ID
     Action         : restore publication data
     Response       : success or error message 
 */
 export async function restorePublication(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const doi = typeof req.params.doi === "string" ? req.params.doi : (Array.isArray(req.params.doi) ? req.params.doi[0] : undefined);
-        if (!doi) {
+        const id = typeof req.params.id === "string" ? req.params.id : (Array.isArray(req.params.id) ? req.params.id[0] : undefined);
+        if (!id) {
             res.status(400).json({
                 success: false,
-                message: "Invalid publication DOI parameter"
+                message: "Invalid publication ID parameter"
             });
             return;
         }
 
-        const success = await publicationService.restorePublication(doi);
+        const success = await publicationService.restorePublication(id);
         if (!success) {
             res.status(404).json({
                 success: false,
@@ -406,24 +436,24 @@ export async function restorePublication(req: Request, res: Response, next: Next
 /*
     Name           : Assign lecturers to publication controller
     Description    : Assigns or replaces authoring lecturers for a specific publication
-    Request params : publication DOI and lecturers array
+    Request params : publication ID and lecturers array
     Action         : update publication lecturers relation
     Response       : success or error message 
 */
 export async function assignLecturersToPublication(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const doi = typeof req.params.doi === "string" ? req.params.doi : (Array.isArray(req.params.doi) ? req.params.doi[0] : undefined);
+        const id = typeof req.params.id === "string" ? req.params.id : (Array.isArray(req.params.id) ? req.params.id[0] : undefined);
         const { lecturers } = req.body;
 
-        if (!doi || !Array.isArray(lecturers)) {
+        if (!id || !Array.isArray(lecturers)) {
             res.status(400).json({
                 success: false,
-                message: "Publication DOI and lecturers array are required"
+                message: "Publication ID and lecturers array are required"
             });
             return;
         }
 
-        const existing = await publicationService.getPublicationByDoi(doi);
+        const existing = await publicationService.getPublicationById(id);
         if (!existing) {
             res.status(404).json({
                 success: false,
@@ -432,7 +462,7 @@ export async function assignLecturersToPublication(req: Request, res: Response, 
             return;
         }
 
-        const success = await publicationService.assignLecturersToPublication(doi, lecturers);
+        const success = await publicationService.assignLecturersToPublication(id, lecturers);
         if (!success) {
             res.status(500).json({
                 success: false,

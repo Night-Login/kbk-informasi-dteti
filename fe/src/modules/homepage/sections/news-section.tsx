@@ -42,7 +42,7 @@ export default function NewsSection({
                   ) : null}
                   <div className="p-4">
                     <h3 className="text-base font-extrabold leading-5 text-dteti-blue">
-                      <Link href={item.link_url || "#news"} className="hover:underline">
+                      <Link href={item.link_url || `/news#${item.slug}`} className="hover:underline">
                         {item.title}
                       </Link>
                     </h3>

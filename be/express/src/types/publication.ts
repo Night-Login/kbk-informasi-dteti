@@ -2,7 +2,8 @@ import type { PaginationParams } from "./common.js";
 import type { LecturerPublication } from "./lecturer.js";
 
 export interface Publication {
-    doi: string;
+    id: string;
+    doi?: string | null;
     title: string;
     slug: string;
     year: number;
@@ -44,7 +45,8 @@ export interface PublicationFilters extends PaginationParams {
 
 // Data Transfer Objects (DTOs) for creating/updating
 export interface CreatePublicationDTO {
-    doi: string;
+    id?: string;
+    doi?: string | null;
     title: string;
     slug: string;
     year: number;

@@ -86,7 +86,7 @@ npm run db:status
 
 `db:migrate` menjalankan seluruh migration yang sudah disiapkan, termasuk
 pembuatan schema awal, aktivasi RLS, penyatuan model student, konten website yang
-dikelola admin, dan perubahan primary key publikasi menjadi DOI.
+dikelola admin, serta publication UUID dengan DOI opsional.
 
 Setelah seed selesai, ganti `SUPERADMIN_PASSWORD` di environment deployment bila nilainya masih sementara.
 
@@ -94,24 +94,19 @@ Setelah seed selesai, ganti `SUPERADMIN_PASSWORD` di environment deployment bila
 
 Gunakan project Supabase baru/kosong. Jangan menjalankan `db:migrate` sebelum restore karena tabel aplikasi akan bertabrakan.
 
-Sebelum menjalankan migration DOI terhadap database lama, cek bahwa seluruh
-publikasi memiliki DOI asli dan tidak ada duplikat setelah whitespace dihapus:
+DOI boleh kosong. Sebelum migrasi, cek hanya DOI non-kosong yang duplikat setelah
+whitespace dihapus:
 
 ```sql
-SELECT id, title, doi
-FROM publications
-WHERE doi IS NULL OR btrim(doi) = '';
-
 SELECT btrim(doi) AS normalized_doi, count(*) AS publication_count
 FROM publications
-WHERE doi IS NOT NULL
+WHERE doi IS NOT NULL AND btrim(doi) <> ''
 GROUP BY btrim(doi)
 HAVING count(*) > 1;
 ```
 
-Kedua query harus mengembalikan nol row. Jika tidak, lengkapi DOI asli dan
-selesaikan duplikat terlebih dahulu; migration sengaja berhenti tanpa mengubah
-data apabila syarat ini belum terpenuhi.
+Query harus mengembalikan nol row. Selesaikan DOI duplikat sebelum migration;
+jangan membuat DOI palsu untuk publikasi yang memang tidak memilikinya.
 
 Pastikan `pg_dump`/`pg_restore` berasal dari versi PostgreSQL client yang sama atau lebih baru daripada database sumber. Untuk database proyek ini yang relatif kecil, custom-format dump sudah memadai:
 
@@ -171,15 +166,14 @@ Gunakan jalur ini jika arsip lama berisi schema staging dan data SQL, tetapi
 strukturnya belum sama dengan schema Prisma terbaru. Script
 `scripts/import-legacy-database.ts` akan:
 
-- mempertahankan UUID dosen/data terkait dan memetakan UUID publikasi lama ke DOI yang menjadi primary key publikasi;
+- mempertahankan UUID dosen, publikasi, dan data terkait sebagai primary key internal;
 - membuat slug dosen dan publikasi yang stabil;
 - menambahkan kolom baru dengan nilai aman;
 - mengimpor data dalam satu transaksi;
-- melakukan upsert berdasarkan DOI sehingga aman dijalankan ulang untuk data publikasi yang sama.
+- melakukan upsert publikasi berdasarkan UUID, sementara DOI disimpan sebagai identifier eksternal opsional.
 
-Seluruh publikasi legacy wajib memiliki DOI. Import berhenti dengan aman jika
-masih ada DOI kosong; lengkapi DOI asli terlebih dahulu sebelum menjalankan
-migrasi atau import.
+Publikasi legacy tanpa DOI tetap diimpor. DOI non-kosong harus unik agar tidak
+bertentangan dengan constraint database.
 
 Restore schema dan data handoff ke database sumber sementara terlebih dahulu.
 Contoh berikut mengasumsikan database sementara sudah hidup di port `55432`:

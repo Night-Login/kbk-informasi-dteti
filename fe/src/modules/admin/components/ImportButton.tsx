@@ -51,14 +51,15 @@ const resourceHeaderGuides: Record<string, { csv: string; json: string }> = {
 ]`,
   },
   publications: {
-    csv: "doi,title,slug,year,venue,publication_type,url,citation_count,source,verified_status",
+    csv: "id,doi,title,slug,year,venue,publication_type,url,citation_count,source,verified_status",
     json: `[
   {
-    "doi": "10.1109/ACCESS.2024.12345",
+    "id": "9f156e70-75d4-4e4a-9aeb-b8d81e9ac642",
     "title": "Machine Learning for Smart Grid",
     "slug": "machine-learning-smart-grid",
     "year": 2024,
-    "venue": "IEEE Access"
+    "venue": "IEEE Access",
+    "doi": null
   }
 ]`,
   },
