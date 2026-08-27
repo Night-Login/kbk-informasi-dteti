@@ -70,7 +70,7 @@ const resourceConfiguration: Record<
         defaultSort: "starts_at",
         defaultDirection: "asc",
         publishable: true,
-        includesMedia: false,
+        includesMedia: true,
     },
     media: {
         searchableFields: ["title", "alt_text", "file_name"],
@@ -225,15 +225,16 @@ export async function removeUploadedFile(fileUrl: unknown) {
 
 export async function deleteContentRecord(resource: ContentResource, id: string) {
     if (resource === "media") {
-        const [settingsUsingImage, newsUsingImage, clustersUsingImage] = await Promise.all([
+        const [settingsUsingImage, newsUsingImage, eventsUsingImage, clustersUsingImage] = await Promise.all([
             prisma.siteSetting.count({ where: { media_id: id } }),
             prisma.newsArticle.count({ where: { media_id: id } }),
+            prisma.event.count({ where: { media_id: id } }),
             prisma.researchCluster.count({ where: { media_id: id } }),
         ]);
 
-        if (settingsUsingImage > 0 || newsUsingImage > 0 || clustersUsingImage > 0) {
+        if (settingsUsingImage > 0 || newsUsingImage > 0 || eventsUsingImage > 0 || clustersUsingImage > 0) {
             throw Object.assign(
-                new Error("This image is still used by website settings, news articles, or research clusters. Remove it from those records before deleting it."),
+                new Error("This image is still used by website settings, news articles, events, or research clusters. Remove it from those records before deleting it."),
                 { status: 409 },
             );
         }
@@ -247,7 +248,7 @@ export async function deleteContentRecord(resource: ContentResource, id: string)
 }
 
 export async function attachUploadedImage(
-    resource: "settings" | "news" | "media",
+    resource: "settings" | "news" | "events" | "media",
     id: string,
     file: Express.Multer.File,
 ) {

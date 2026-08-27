@@ -273,6 +273,7 @@ model MediaAsset {
   updated_at  DateTime     @updatedAt
   settings    SiteSetting[]
   news        NewsArticle[]
+  events      Event[]
   research_clusters ResearchCluster[]
 
   @@map("media_assets")
@@ -342,17 +343,20 @@ model NewsArticle {
 }
 
 model Event {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title        String
-  slug         String   @unique
+  slug         String      @unique
   description  String?
   starts_at    DateTime
   ends_at      DateTime?
   location     String
   link_url     String?
-  is_published Boolean  @default(true)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  image_url    String?
+  media_id     String?     @db.Uuid
+  media        MediaAsset? @relation(fields: [media_id], references: [id], onDelete: SetNull)
+  is_published Boolean     @default(true)
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
 
   @@index([is_published, starts_at])
   @@map("events")

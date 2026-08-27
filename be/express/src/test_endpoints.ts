@@ -31,6 +31,8 @@ let testLecturerRequiredFields: {
 } | null = null;
 let testProjectId: string | null = null;
 let testPublicationId: string | null = null;
+let testEventId: string | null = null;
+let testEventMediaId: string | null = null;
 
 let passedTests = 0;
 let failedTests = 0;
@@ -669,9 +671,95 @@ async function runTests() {
         }
 
         // -------------------------------------------------------------
-        // 7. Deletion & Restoration Cleanup
+        // 7. Website Content Routes
         // -------------------------------------------------------------
-        console.log("\n--- 7. Deletion & Restoration Endpoints ---");
+        console.log("\n--- 7. Website Content Routes ---");
+
+        try {
+            const eventSlug = `event-${Date.now()}`;
+            const startsAt = new Date(Date.now() + 86_400_000).toISOString();
+            const res = await axios.post(`${API_URL}/content/events`, {
+                title: "Test Information Engineering Seminar",
+                slug: eventSlug,
+                description: "Endpoint test for an admin-managed event image.",
+                starts_at: startsAt,
+                location: "DTETI UGM",
+                is_published: true
+            }, authHeaders);
+            if (res.data?.success && res.data?.data?.id) {
+                testEventId = res.data.data.id;
+                logPass("POST /api/v1/content/events (Create Event)");
+            } else {
+                throw new Error("Failed to create event");
+            }
+        } catch (e) {
+            logFail("POST /api/v1/content/events (Create Event)", e);
+        }
+
+        if (testEventId) {
+            try {
+                const imageForm = new FormData();
+                const png = Buffer.from(
+                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+                    "base64",
+                );
+                imageForm.append("image", new Blob([png], { type: "image/png" }), "event-test.png");
+                const res = await axios.put(
+                    `${API_URL}/content/events/${testEventId}/image`,
+                    imageForm,
+                    authHeaders,
+                );
+                if (
+                    res.data?.success &&
+                    res.data?.data?.image_url?.startsWith("/uploads/media/") &&
+                    res.data?.data?.media?.id
+                ) {
+                    testEventMediaId = res.data.data.media.id;
+                    logPass(`PUT /api/v1/content/events/${testEventId}/image`);
+                } else {
+                    throw new Error("Event image was not stored correctly");
+                }
+            } catch (e) {
+                logFail(`PUT /api/v1/content/events/${testEventId}/image`, e);
+            }
+        }
+
+        try {
+            const res = await axios.get(`${API_URL}/content/events?limit=100`);
+            const createdEvent = Array.isArray(res.data?.data)
+                ? res.data.data.find((event: any) => event.id === testEventId)
+                : null;
+            if (res.data?.success && createdEvent?.media?.id === testEventMediaId) {
+                logPass("GET /api/v1/content/events (Public list with image)");
+            } else {
+                throw new Error("Public events did not include the uploaded image");
+            }
+        } catch (e) {
+            logFail("GET /api/v1/content/events (Public list with image)", e);
+        }
+
+        // -------------------------------------------------------------
+        // 8. Deletion & Restoration Cleanup
+        // -------------------------------------------------------------
+        console.log("\n--- 8. Deletion & Restoration Endpoints ---");
+
+        if (testEventId) {
+            try {
+                await axios.delete(`${API_URL}/content/events/${testEventId}`, authHeaders);
+                logPass(`DELETE /api/v1/content/events/${testEventId}`);
+            } catch (e) {
+                logFail(`DELETE /api/v1/content/events/${testEventId}`, e);
+            }
+        }
+
+        if (testEventMediaId) {
+            try {
+                await axios.delete(`${API_URL}/content/media/${testEventMediaId}`, authHeaders);
+                logPass(`DELETE /api/v1/content/media/${testEventMediaId}`);
+            } catch (e) {
+                logFail(`DELETE /api/v1/content/media/${testEventMediaId}`, e);
+            }
+        }
         
         if (testPublicationId) {
             const encodedPublicationId = encodeURIComponent(testPublicationId);

@@ -419,7 +419,7 @@ export function NewsEdit() {
   return <Edit><SimpleForm><NewsFields editing /></SimpleForm></Edit>;
 }
 
-function EventFields() {
+function EventFields({ editing = false }: { editing?: boolean }) {
   return (
     <ContentFormLayout>
       <FormSection title="Event details" description="Published events appear in the homepage agenda." />
@@ -433,6 +433,8 @@ function EventFields() {
         <TextInput source="description" label="Event description" multiline rows={5} />
       </Box>
       <BooleanInput source="is_published" label="Published on website" defaultValue />
+      <FormSection title="Event image" description="Optional image shown on the Events page." />
+      <ImageControls editing={editing} />
     </ContentFormLayout>
   );
 }
@@ -446,6 +448,7 @@ export function EventList() {
       empty={<ContentEmptyState title="No events scheduled" description="Add a seminar, discussion, workshop, or other academic event." />}
     >
       <Datagrid rowClick="edit">
+        <ImageField source="image_preview" label="Image" sx={{ "& img": { width: 72, height: 48, objectFit: "cover", borderRadius: 1 } }} />
         <TextField source="title" label="Event" sx={{ fontWeight: 700 }} />
         <DateField source="starts_at" label="Starts" showTime />
         <TextField source="location" label="Location" />
@@ -462,7 +465,7 @@ export function EventCreate() {
 }
 
 export function EventEdit() {
-  return <Edit><SimpleForm><EventFields /></SimpleForm></Edit>;
+  return <Edit><SimpleForm><EventFields editing /></SimpleForm></Edit>;
 }
 
 function MediaFields({ editing = false }: { editing?: boolean }) {

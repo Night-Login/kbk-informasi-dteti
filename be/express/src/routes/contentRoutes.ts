@@ -70,6 +70,8 @@ const eventSchema = z.object({
     ),
     location: z.string().trim().min(1),
     link_url: z.union([safeLink, z.literal(""), z.null()]).optional(),
+    image_url: z.union([safeLink, z.literal(""), z.null()]).optional(),
+    media_id: optionalMediaId,
     is_published: z.boolean().default(true),
 });
 
@@ -180,7 +182,7 @@ for (const resource of Object.keys(schemas) as ContentResource[]) {
         response.json({ success: true, data: record });
     }));
 
-    if (resource === "settings" || resource === "news" || resource === "media") {
+    if (resource === "settings" || resource === "news" || resource === "events" || resource === "media") {
         router.put(
             `/${resource}/:id/image`,
             ...requireAdmin,

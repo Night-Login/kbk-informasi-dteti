@@ -108,6 +108,8 @@ export interface WebsiteEvent {
   ends_at?: string | null;
   location: string;
   link_url?: string | null;
+  image_url?: string | null;
+  media?: MediaAsset | null;
   is_published?: boolean;
 }
 
