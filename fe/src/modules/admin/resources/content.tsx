@@ -104,7 +104,10 @@ function FormSection({
 }) {
   return (
     <Box sx={{ gridColumn: "1 / -1", pt: 1, pb: 0.5 }}>
-      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "primary.dark" }}>
+      <Typography
+        variant="subtitle1"
+        sx={{ fontWeight: 800, color: "primary.dark" }}
+      >
         {title}
       </Typography>
       {description ? (
@@ -166,7 +169,10 @@ function ImageControls({ editing = false }: { editing?: boolean }) {
           <ImageField
             source="image_preview"
             label="Current image"
-            sx={{ mt: 1, "& img": { maxHeight: 160, maxWidth: "100%", borderRadius: 1 } }}
+            sx={{
+              mt: 1,
+              "& img": { maxHeight: 160, maxWidth: "100%", borderRadius: 1 },
+            }}
           />
         ) : null}
       </Box>
@@ -190,13 +196,28 @@ function AcademicItemFields() {
         helperText="Visitors open this official page to read details or apply."
       />
       <Box sx={{ gridColumn: "1 / -1" }}>
-        <TextInput source="overview" label="Overview" multiline rows={3} validate={required()} />
+        <TextInput
+          source="overview"
+          label="Overview"
+          multiline
+          rows={3}
+          validate={required()}
+        />
       </Box>
       <Box sx={{ gridColumn: "1 / -1" }}>
-        <TextInput source="information" label="Additional information" multiline rows={3} />
+        <TextInput
+          source="information"
+          label="Additional information"
+          multiline
+          rows={3}
+        />
       </Box>
       <NumberInput source="sort_order" label="Display order" defaultValue={0} />
-      <BooleanInput source="is_published" label="Published on website" defaultValue />
+      <BooleanInput
+        source="is_published"
+        label="Published on website"
+        defaultValue
+      />
     </ContentFormLayout>
   );
 }
@@ -207,8 +228,18 @@ export function SiteSettingList() {
       actions={<ContentActions />}
       sort={{ field: "sort_order", order: "ASC" }}
       filters={[
-        <TextInput key="search" source="search" label="Search setting" alwaysOn />,
-        <SelectInput key="type" source="field_type" label="Field type" choices={fieldTypeChoices} />,
+        <TextInput
+          key="search"
+          source="search"
+          label="Search setting"
+          alwaysOn
+        />,
+        <SelectInput
+          key="type"
+          source="field_type"
+          label="Field type"
+          choices={fieldTypeChoices}
+        />,
       ]}
       empty={
         <ContentEmptyState
@@ -224,9 +255,19 @@ export function SiteSettingList() {
           source="description"
           label="Description"
           emptyText="—"
-          sx={{ display: "block", maxWidth: 360, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+          sx={{
+            display: "block",
+            maxWidth: 360,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
         />
-        <SelectField source="field_type" label="Type" choices={fieldTypeChoices} />
+        <SelectField
+          source="field_type"
+          label="Type"
+          choices={fieldTypeChoices}
+        />
         <EditButton />
       </Datagrid>
     </List>
@@ -271,7 +312,11 @@ function SiteSettingFields({ editing = false }: { editing?: boolean }) {
             <Box sx={{ gridColumn: "1 / -1" }}>
               <TextInput
                 source="value"
-                label={formData.field_type === "IMAGE" ? "Existing image URL / path" : "Value"}
+                label={
+                  formData.field_type === "IMAGE"
+                    ? "Existing image URL / path"
+                    : "Value"
+                }
                 type={formData.field_type === "URL" ? "url" : "text"}
                 multiline={formData.field_type === "MULTILINE"}
                 rows={formData.field_type === "MULTILINE" ? 4 : undefined}
@@ -316,11 +361,32 @@ export function AcademicProgramList() {
       actions={<ContentActions />}
       filters={publicationFilters}
       sort={{ field: "sort_order", order: "ASC" }}
-      empty={<ContentEmptyState title="No academic programs yet" description="Add master’s or doctoral programs to publish on the Academic page." />}
+      empty={
+        <ContentEmptyState
+          title="No academic programs yet"
+          description="Add master’s or doctoral programs to publish on the Academic page."
+        />
+      }
     >
       <Datagrid rowClick="edit">
-        <TextField source="title" label="Program" sx={{ display: "block", maxWidth: 280, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700 }} />
-        <UrlField source="link_url" label="Information link" target="_blank" rel="noopener noreferrer" />
+        <TextField
+          source="title"
+          label="Program"
+          sx={{
+            display: "block",
+            maxWidth: 280,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontWeight: 700,
+          }}
+        />
+        <UrlField
+          source="link_url"
+          label="Information link"
+          target="_blank"
+          rel="noopener noreferrer"
+        />
         <NumberField source="sort_order" label="Order" />
         <BooleanField source="is_published" label="Published" />
         <EditButton />
@@ -331,11 +397,23 @@ export function AcademicProgramList() {
 }
 
 export function AcademicProgramCreate() {
-  return <Create redirect="list"><SimpleForm><AcademicItemFields /></SimpleForm></Create>;
+  return (
+    <Create redirect="list">
+      <SimpleForm>
+        <AcademicItemFields />
+      </SimpleForm>
+    </Create>
+  );
 }
 
 export function AcademicProgramEdit() {
-  return <Edit><SimpleForm><AcademicItemFields /></SimpleForm></Edit>;
+  return (
+    <Edit>
+      <SimpleForm>
+        <AcademicItemFields />
+      </SimpleForm>
+    </Edit>
+  );
 }
 
 export function ScholarshipList() {
@@ -344,11 +422,32 @@ export function ScholarshipList() {
       actions={<ContentActions />}
       filters={publicationFilters}
       sort={{ field: "sort_order", order: "ASC" }}
-      empty={<ContentEmptyState title="No scholarships yet" description="Add as many scholarship opportunities as needed. Published items appear on the dedicated Scholarships page." />}
+      empty={
+        <ContentEmptyState
+          title="No scholarships yet"
+          description="Add as many scholarship opportunities as needed. Published items appear on the dedicated Scholarships page."
+        />
+      }
     >
       <Datagrid rowClick="edit">
-        <TextField source="title" label="Scholarship" sx={{ display: "block", maxWidth: 280, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700 }} />
-        <UrlField source="link_url" label="Scholarship link" target="_blank" rel="noopener noreferrer" />
+        <TextField
+          source="title"
+          label="Scholarship"
+          sx={{
+            display: "block",
+            maxWidth: 280,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontWeight: 700,
+          }}
+        />
+        <UrlField
+          source="link_url"
+          label="Scholarship link"
+          target="_blank"
+          rel="noopener noreferrer"
+        />
         <NumberField source="sort_order" label="Order" />
         <BooleanField source="is_published" label="Published" />
         <EditButton />
@@ -359,17 +458,77 @@ export function ScholarshipList() {
 }
 
 export function ScholarshipCreate() {
-  return <Create redirect="list"><SimpleForm><AcademicItemFields /></SimpleForm></Create>;
+  return (
+    <Create redirect="list">
+      <SimpleForm>
+        <AcademicItemFields />
+      </SimpleForm>
+    </Create>
+  );
 }
 
 export function ScholarshipEdit() {
-  return <Edit><SimpleForm><AcademicItemFields /></SimpleForm></Edit>;
+  return (
+    <Edit>
+      <SimpleForm>
+        <AcademicItemFields />
+      </SimpleForm>
+    </Edit>
+  );
+}
+
+/**
+ * Converts a Date or ISO string into a local "YYYY-MM-DDTHH:mm" format for DateTimeInput
+ */
+function formatLocalDateTime(value?: string | Date | null): string {
+  if (!value) return "";
+  const date = typeof value === "string" ? new Date(value) : value;
+  if (isNaN(date.getTime())) return "";
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+/**
+ * Converts local "YYYY-MM-DDTHH:mm" from DateTimeInput into a full ISO string for API submission
+ */
+function parseLocalDateTime(value?: string | null): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+/**
+ * Generates sensible default start and end times for new events (Tomorrow 09:00 - 11:00)
+ */
+function getDefaultEventValues() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(9, 0, 0, 0);
+
+  const end = new Date(tomorrow);
+  end.setHours(11, 0, 0, 0);
+
+  return {
+    starts_at: formatLocalDateTime(tomorrow),
+    ends_at: formatLocalDateTime(end),
+    is_published: true,
+  };
 }
 
 function NewsFields({ editing = false }: { editing?: boolean }) {
   return (
     <ContentFormLayout>
-      <FormSection title="News article" description="Published articles are displayed on the homepage." />
+      <FormSection
+        title="News article"
+        description="Published articles are displayed on the homepage."
+      />
       <TextInput source="title" label="Headline" validate={required()} />
       <SlugInput source="slug" sourceToWatch="title" label="URL slug" />
       <TextInput
@@ -378,14 +537,29 @@ function NewsFields({ editing = false }: { editing?: boolean }) {
         type="url"
         helperText="Optional external article or full news page URL."
       />
-      <DateTimeInput source="published_at" label="Publication date" />
+      <DateTimeInput
+        source="published_at"
+        label="Publication date"
+        format={formatLocalDateTime}
+        parse={parseLocalDateTime}
+      />
       <Box sx={{ gridColumn: "1 / -1" }}>
-        <TextInput source="excerpt" label="Homepage summary" multiline rows={4} validate={required()} />
+        <TextInput
+          source="excerpt"
+          label="Homepage summary"
+          multiline
+          rows={4}
+          validate={required()}
+        />
       </Box>
       <Box sx={{ gridColumn: "1 / -1" }}>
         <TextInput source="body" label="Full article text" multiline rows={8} />
       </Box>
-      <BooleanInput source="is_published" label="Published on website" defaultValue />
+      <BooleanInput
+        source="is_published"
+        label="Published on website"
+        defaultValue
+      />
       <FormSection title="Article image" />
       <ImageControls editing={editing} />
     </ContentFormLayout>
@@ -398,11 +572,31 @@ export function NewsList() {
       actions={<ContentActions />}
       filters={publicationFilters}
       sort={{ field: "published_at", order: "DESC" }}
-      empty={<ContentEmptyState title="No news articles yet" description="Create an article, upload its image, and publish it on the homepage." />}
+      empty={
+        <ContentEmptyState
+          title="No news articles yet"
+          description="Create an article, upload its image, and publish it on the homepage."
+        />
+      }
     >
       <Datagrid rowClick="edit">
-        <ImageField source="image_preview" label="Image" sx={{ "& img": { maxHeight: 48, borderRadius: 1 } }} />
-        <TextField source="title" label="Headline" sx={{ display: "block", maxWidth: 340, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700 }} />
+        <ImageField
+          source="image_preview"
+          label="Image"
+          sx={{ "& img": { maxHeight: 48, borderRadius: 1 } }}
+        />
+        <TextField
+          source="title"
+          label="Headline"
+          sx={{
+            display: "block",
+            maxWidth: 340,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontWeight: 700,
+          }}
+        />
         <DateField source="published_at" label="Published on" showTime />
         <BooleanField source="is_published" label="Published" />
         <EditButton />
@@ -415,7 +609,12 @@ export function NewsList() {
 export function NewsCreate() {
   return (
     <Create redirect="list">
-      <SimpleForm defaultValues={{ published_at: new Date().toISOString(), is_published: true }}>
+      <SimpleForm
+        defaultValues={{
+          published_at: formatLocalDateTime(new Date()),
+          is_published: true,
+        }}
+      >
         <NewsFields />
       </SimpleForm>
     </Create>
@@ -423,24 +622,64 @@ export function NewsCreate() {
 }
 
 export function NewsEdit() {
-  return <Edit><SimpleForm><NewsFields editing /></SimpleForm></Edit>;
+  return (
+    <Edit>
+      <SimpleForm>
+        <NewsFields editing />
+      </SimpleForm>
+    </Edit>
+  );
 }
 
 function EventFields({ editing = false }: { editing?: boolean }) {
   return (
     <ContentFormLayout>
-      <FormSection title="Event details" description="Published events appear in the homepage agenda." />
+      <FormSection
+        title="Event details"
+        description="Published events appear in the homepage agenda."
+      />
       <TextInput source="title" label="Event title" validate={required()} />
       <SlugInput source="slug" sourceToWatch="title" label="URL slug" />
-      <DateTimeInput source="starts_at" label="Start date and time" validate={required()} />
-      <DateTimeInput source="ends_at" label="End date and time" />
-      <TextInput source="location" label="Location / meeting platform" validate={required()} />
-      <TextInput source="link_url" label="Event / registration link" type="url" />
+      <DateTimeInput
+        source="starts_at"
+        label="Start date and time"
+        validate={required()}
+        format={formatLocalDateTime}
+        parse={parseLocalDateTime}
+      />
+      <DateTimeInput
+        source="ends_at"
+        label="End date and time"
+        format={formatLocalDateTime}
+        parse={parseLocalDateTime}
+      />
+      <TextInput
+        source="location"
+        label="Location / meeting platform"
+        validate={required()}
+      />
+      <TextInput
+        source="link_url"
+        label="Event / registration link"
+        type="url"
+      />
       <Box sx={{ gridColumn: "1 / -1" }}>
-        <TextInput source="description" label="Event description" multiline rows={5} />
+        <TextInput
+          source="description"
+          label="Event description"
+          multiline
+          rows={5}
+        />
       </Box>
-      <BooleanInput source="is_published" label="Published on website" defaultValue />
-      <FormSection title="Event image" description="Optional image shown on the Events page." />
+      <BooleanInput
+        source="is_published"
+        label="Published on website"
+        defaultValue
+      />
+      <FormSection
+        title="Event image"
+        description="Optional image shown on the Events page."
+      />
       <ImageControls editing={editing} />
     </ContentFormLayout>
   );
@@ -452,13 +691,50 @@ export function EventList() {
       actions={<ContentActions />}
       filters={publicationFilters}
       sort={{ field: "starts_at", order: "ASC" }}
-      empty={<ContentEmptyState title="No events scheduled" description="Add a seminar, discussion, workshop, or other academic event." />}
+      empty={
+        <ContentEmptyState
+          title="No events scheduled"
+          description="Add a seminar, discussion, workshop, or other academic event."
+        />
+      }
     >
       <Datagrid rowClick="edit">
-        <ImageField source="image_preview" label="Image" sx={{ "& img": { width: 72, height: 48, objectFit: "cover", borderRadius: 1 } }} />
-        <TextField source="title" label="Event" sx={{ display: "block", maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700 }} />
+        <ImageField
+          source="image_preview"
+          label="Image"
+          sx={{
+            "& img": {
+              width: 72,
+              height: 48,
+              objectFit: "cover",
+              borderRadius: 1,
+            },
+          }}
+        />
+        <TextField
+          source="title"
+          label="Event"
+          sx={{
+            display: "block",
+            maxWidth: 300,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontWeight: 700,
+          }}
+        />
         <DateField source="starts_at" label="Starts" showTime />
-        <TextField source="location" label="Location" sx={{ display: "block", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} />
+        <TextField
+          source="location"
+          label="Location"
+          sx={{
+            display: "block",
+            maxWidth: 220,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        />
         <BooleanField source="is_published" label="Published" />
         <EditButton />
         <DeleteButton />
@@ -468,11 +744,23 @@ export function EventList() {
 }
 
 export function EventCreate() {
-  return <Create redirect="list"><SimpleForm><EventFields /></SimpleForm></Create>;
+  return (
+    <Create redirect="list">
+      <SimpleForm defaultValues={getDefaultEventValues()}>
+        <EventFields />
+      </SimpleForm>
+    </Create>
+  );
 }
 
 export function EventEdit() {
-  return <Edit><SimpleForm><EventFields editing /></SimpleForm></Edit>;
+  return (
+    <Edit>
+      <SimpleForm>
+        <EventFields editing />
+      </SimpleForm>
+    </Edit>
+  );
 }
 
 function MediaFields({ editing = false }: { editing?: boolean }) {
@@ -499,12 +787,19 @@ function MediaFields({ editing = false }: { editing?: boolean }) {
           <ImageField
             source="image_preview"
             label="Current image"
-            sx={{ mt: 1, "& img": { maxHeight: 240, maxWidth: "100%", borderRadius: 1 } }}
+            sx={{
+              mt: 1,
+              "& img": { maxHeight: 240, maxWidth: "100%", borderRadius: 1 },
+            }}
           />
         ) : null}
       </Box>
       {editing ? (
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ gridColumn: "1 / -1" }}>
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          sx={{ gridColumn: "1 / -1" }}
+        >
           <TextInput source="file_name" label="Filename" disabled />
           <TextInput source="mime_type" label="File type" disabled />
           <NumberInput source="file_size" label="File size (bytes)" disabled />
@@ -518,15 +813,62 @@ export function MediaList() {
   return (
     <List
       actions={<ContentActions />}
-      filters={[<TextInput key="search" source="search" label="Search image" alwaysOn />]}
+      filters={[
+        <TextInput
+          key="search"
+          source="search"
+          label="Search image"
+          alwaysOn
+        />,
+      ]}
       sort={{ field: "created_at", order: "DESC" }}
-      empty={<ContentEmptyState title="Your media library is empty" description="Upload an image to use it in the homepage hero, website settings, or news articles." />}
+      empty={
+        <ContentEmptyState
+          title="Your media library is empty"
+          description="Upload an image to use it in the homepage hero, website settings, or news articles."
+        />
+      }
     >
       <Datagrid rowClick="edit">
-        <ImageField source="image_preview" label="Preview" sx={{ "& img": { maxHeight: 64, borderRadius: 1 } }} />
-        <TextField source="title" label="Title" sx={{ display: "block", maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 700 }} />
-        <TextField source="alt_text" label="Image description" sx={{ display: "block", maxWidth: 320, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} />
-        <TextField source="file_name" label="Filename" sx={{ display: "block", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} />
+        <ImageField
+          source="image_preview"
+          label="Preview"
+          sx={{ "& img": { maxHeight: 64, borderRadius: 1 } }}
+        />
+        <TextField
+          source="title"
+          label="Title"
+          sx={{
+            display: "block",
+            maxWidth: 240,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontWeight: 700,
+          }}
+        />
+        <TextField
+          source="alt_text"
+          label="Image description"
+          sx={{
+            display: "block",
+            maxWidth: 320,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        />
+        <TextField
+          source="file_name"
+          label="Filename"
+          sx={{
+            display: "block",
+            maxWidth: 220,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        />
         <DateField source="created_at" label="Uploaded" />
         <EditButton />
         <DeleteButton />
@@ -536,9 +878,21 @@ export function MediaList() {
 }
 
 export function MediaCreate() {
-  return <Create redirect="list"><SimpleForm><MediaFields /></SimpleForm></Create>;
+  return (
+    <Create redirect="list">
+      <SimpleForm>
+        <MediaFields />
+      </SimpleForm>
+    </Create>
+  );
 }
 
 export function MediaEdit() {
-  return <Edit><SimpleForm><MediaFields editing /></SimpleForm></Edit>;
+  return (
+    <Edit>
+      <SimpleForm>
+        <MediaFields editing />
+      </SimpleForm>
+    </Edit>
+  );
 }
