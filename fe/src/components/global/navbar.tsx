@@ -24,6 +24,7 @@ const navigation: NavItem[] = [
   { label: "People", href: "/people" },
   { label: "Publication", href: "/publication" },
   { label: "Academic", href: "/academic" },
+  { label: "FAQ", href: "/faq" },
   {
     label: "Updates",
     href: "/news",
@@ -101,7 +102,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <nav
-            className="hidden items-center gap-5 xl:gap-7 lg:flex"
+            className="hidden items-center gap-4 xl:gap-6 lg:flex"
             aria-label="Navigasi utama"
           >
             {navigation.map((item) => {

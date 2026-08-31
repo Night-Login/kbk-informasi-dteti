@@ -49,10 +49,10 @@ function ExpandableText({ text, maxLength = 400 }: { text: string; maxLength?: n
   );
 }
 
-export default function PublicationPage() {
+export default function PublicationPage({ initialLecturer = "" }: { initialLecturer?: string }) {
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState("");
-  const [lecturer, setLecturer] = useState("");
+  const [lecturer, setLecturer] = useState(initialLecturer);
   const [year, setYear] = useState("");
   const [page, setPage] = useState(1);
   const [tags, setTags] = useState<ResearchTag[]>([]);

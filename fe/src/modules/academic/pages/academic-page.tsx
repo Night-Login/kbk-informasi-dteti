@@ -1,10 +1,9 @@
 "use client";
 
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Breadcrumbs from "@/components/global/breadcrumbs";
-import { supervisorSteps } from "@/modules/academic/data/academic.data";
 import { apiRequest, type AcademicPageContent } from "@/lib/api";
 
 function LargeWireframeLink({
@@ -55,7 +54,7 @@ export default function AcademicPage() {
 
   const programs = content?.programs || [];
   const scholarships = content?.scholarships || [];
-  const graduateWebsite = content?.settings.graduate_website_url ||
+  const postgraduateWebsite = content?.settings.graduate_website_url ||
     "https://pasca.jteti.ugm.ac.id/";
 
   return (
@@ -74,23 +73,36 @@ export default function AcademicPage() {
           Academic Programs and Scholarships
         </h1>
 
-        <div className="mx-auto mt-16 max-w-6xl">
-          <h2 className="text-2xl font-extrabold text-dteti-blue sm:text-3xl">Programs</h2>
+        <div className="mx-auto mt-16 max-w-6xl rounded-3xl bg-dteti-blue-soft/55 px-6 py-9 sm:px-10 sm:py-11 lg:px-12">
+          <div className="max-w-2xl">
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-dteti-blue">
+              Graduate study
+            </p>
+            <h2 className="mt-2 text-2xl font-extrabold text-dteti-blue-deep sm:text-3xl">
+              Programs
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-ink/75">
+              Compare DTETI graduate programs and open the official program page for detailed
+              curriculum and admission information.
+            </p>
+          </div>
           {programs.length > 0 ? (
-            <div className="mt-8 grid gap-10 md:grid-cols-2">
+            <div className={`mt-8 grid gap-6 ${programs.length === 3 ? "md:grid-cols-2 lg:grid-cols-3" : "md:grid-cols-2"}`}>
               {programs.map((program) => (
-                <article key={program.id}>
-                  <h3 className="text-2xl font-extrabold text-dteti-blue-deep">
-                    {program.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-ink">{program.overview}</p>
-                  {program.information ? (
-                    <p className="mt-4 text-sm text-ink">{program.information}</p>
-                  ) : null}
-                  <LargeWireframeLink
-                    href={program.link_url}
-                    label="View Program Information"
-                  />
+                <article
+                  key={program.id}
+                  className="flex h-full flex-col justify-between rounded-2xl border border-dteti-blue/15 bg-white p-6 shadow-xs"
+                >
+                  <div>
+                    <h3 className="text-xl font-extrabold leading-7 text-dteti-blue-deep sm:text-2xl">
+                      {program.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-ink">{program.overview}</p>
+                    {program.information ? (
+                      <p className="mt-4 text-sm leading-6 text-ink/75">{program.information}</p>
+                    ) : null}
+                  </div>
+                  <LargeWireframeLink href={program.link_url} label="View Program Information" />
                 </article>
               ))}
             </div>
@@ -137,44 +149,6 @@ export default function AcademicPage() {
           </div>
         </div>
 
-        {/* FAQ Section - Centered with proper spacing */}
-        <section className="mx-auto mt-20 max-w-4xl sm:mt-24">
-          <div className="text-center">
-            <h2 className="text-2xl font-extrabold text-dteti-blue sm:text-3xl">
-              Frequently Asked Questions (FAQs)
-            </h2>
-            <p className="mt-2 text-sm text-muted">
-              Find answers and guidance for common academic procedures
-            </p>
-          </div>
-
-          <div className="mt-10 rounded-2xl border border-line bg-surface p-6 sm:p-10 shadow-xs">
-            <h3 className="text-xl font-extrabold text-dteti-blue-deep sm:text-2xl">
-              How to contact a potential supervisor?
-            </h3>
-
-            <ol className="mt-6 space-y-4">
-              {supervisorSteps.map((step, index) => (
-                <li key={step.title} className="rounded-xl border border-line/70 bg-white p-5 shadow-xs">
-                  <h4 className="text-base font-extrabold text-ink sm:text-lg">
-                    {index + 1}. {step.title}
-                  </h4>
-                  <p className="mt-2 text-sm text-ink/80">{step.description}</p>
-                  {step.href ? (
-                    <Link
-                      href={step.href}
-                      className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg border border-line bg-surface px-4 text-xs font-bold text-dteti-blue transition-colors hover:border-dteti-blue hover:bg-dteti-blue-soft/30"
-                    >
-                      {step.actionLabel}
-                      <ArrowRight size={14} aria-hidden="true" />
-                    </Link>
-                  ) : null}
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
         {/* Need More Info Section - Centered Callout Banner */}
         <section className="mx-auto mt-20 max-w-4xl rounded-2xl brand-gradient p-8 text-center text-white sm:mt-24 sm:p-12">
           <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
@@ -185,12 +159,12 @@ export default function AcademicPage() {
             programs, admissions, academic information, and scholarship updates.
           </p>
           <Link
-            href={graduateWebsite}
+            href={postgraduateWebsite}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-6 text-sm font-extrabold text-dteti-blue-deep shadow-xs transition-transform hover:scale-105 hover:bg-dteti-blue-soft"
           >
-            Visit DTETI Graduate Website
+            Visit DTETI Postgraduate Website
             <ArrowUpRight size={16} aria-hidden="true" />
           </Link>
         </section>
