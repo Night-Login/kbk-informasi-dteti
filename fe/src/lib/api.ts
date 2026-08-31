@@ -326,7 +326,70 @@ export function lecturerIsAvailable(lecturer: Lecturer): boolean {
   const status = lecturer.supervision_status?.trim().toLowerCase();
   return Boolean(
     lecturer.is_active &&
-      status &&
-      !["unavailable", "not available", "closed", "tidak tersedia"].includes(status),
+    status &&
+    !["unavailable", "not available", "closed", "tidak tersedia"].includes(
+      status,
+    ),
   );
+}
+
+export interface UniversalSearchResult {
+  lecturers: Array<{
+    id: string;
+    slug: string;
+    full_name: string;
+    academic_title: string | null;
+    photo_url: string | null;
+    supervision_status: string | null;
+    primary_cluster: string | null;
+    tags: string[];
+  }>;
+  research_tags: Array<{
+    id: string;
+    slug: string;
+    name: string;
+    cluster_name: string | null;
+    cluster_slug: string | null;
+  }>;
+  publications: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    year: number;
+    authors_text: string | null;
+    venue: string | null;
+    doi: string | null;
+  }>;
+  projects: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    status: string;
+    lead_lecturer: string | null;
+    start_year: number | null;
+    end_year: number | null;
+  }>;
+  content: Array<{
+    id: string;
+    slug: string;
+    type: "NEWS" | "EVENT";
+    title: string;
+    date: string;
+    meta: string | null;
+  }>;
+  total_matches: number;
+}
+
+export async function searchUniversal(
+  query: string,
+  options: { limit?: number; type?: string; signal?: AbortSignal } = {},
+): Promise<UniversalSearchResult> {
+  return apiRequest<UniversalSearchResult>("search", {
+    query: {
+      q: query,
+      limit: options.limit || 5,
+      type: options.type,
+    },
+    signal: options.signal,
+  });
 }
