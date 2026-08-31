@@ -117,7 +117,9 @@ export function DropdownSelect({
   };
 
   // Keyboard navigation
-  const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement | HTMLDivElement>) => {
+  const handleKeyDown = (
+    e: KeyboardEvent<HTMLButtonElement | HTMLDivElement>,
+  ) => {
     if (disabled) return;
 
     if (e.key === "Escape") {
@@ -145,7 +147,11 @@ export function DropdownSelect({
         setFocusedIndex((prev) =>
           prev > 0 ? prev - 1 : filteredOptions.length - 1,
         );
-      } else if (e.key === "Enter" && focusedIndex >= 0 && focusedIndex < filteredOptions.length) {
+      } else if (
+        e.key === "Enter" &&
+        focusedIndex >= 0 &&
+        focusedIndex < filteredOptions.length
+      ) {
         e.preventDefault();
         handleSelect(filteredOptions[focusedIndex].value);
       }
@@ -242,22 +248,6 @@ export function DropdownSelect({
 
           {/* Option Items List */}
           <div className="max-h-56 overflow-y-auto space-y-0.5 custom-scrollbar">
-            {/* Default Placeholder Option (to deselect) */}
-            <div
-              role="option"
-              aria-selected={value === ""}
-              onClick={() => handleSelect("")}
-              className={[
-                "flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-colors",
-                value === ""
-                  ? "bg-dteti-blue-soft text-dteti-blue font-bold"
-                  : "text-muted hover:bg-surface hover:text-dteti-ink",
-              ].join(" ")}
-            >
-              <span>{placeholder}</span>
-              {value === "" && <Check size={14} className="text-dteti-blue" />}
-            </div>
-
             {/* List of Options */}
             {filteredOptions.length > 0 ? (
               filteredOptions.map((opt, idx) => {
@@ -276,8 +266,8 @@ export function DropdownSelect({
                       isSelected
                         ? "bg-dteti-blue-soft text-dteti-blue font-bold"
                         : isFocused
-                        ? "bg-surface text-dteti-ink"
-                        : "text-dteti-ink hover:bg-surface",
+                          ? "bg-surface text-dteti-ink"
+                          : "text-dteti-ink hover:bg-surface",
                     ].join(" ")}
                   >
                     <div className="flex items-center gap-2 truncate">

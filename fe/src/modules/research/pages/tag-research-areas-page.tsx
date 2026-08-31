@@ -21,7 +21,10 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const currentYear = new Date().getFullYear();
-const publicationYears = Array.from({ length: 25 }, (_, index) => currentYear - index);
+const publicationYears = Array.from(
+  { length: 25 },
+  (_, index) => currentYear - index,
+);
 
 function toPerson(lecturer: Lecturer): PersonLite {
   return {
@@ -49,7 +52,9 @@ export default function TagResearchAreasPage() {
   const [publicationQuery, setPublicationQuery] = useState("");
   const [fromYear, setFromYear] = useState("");
   const [toYear, setToYear] = useState("");
-  const [lecturers, setLecturers] = useState<PaginatedResult<Lecturer> | null>(null);
+  const [lecturers, setLecturers] = useState<PaginatedResult<Lecturer> | null>(
+    null,
+  );
   const [publications, setPublications] =
     useState<PaginatedResult<Publication> | null>(null);
   const [loadingTag, setLoadingTag] = useState(true);
@@ -131,7 +136,10 @@ export default function TagResearchAreasPage() {
 
   if (loadingTag) {
     return (
-      <main id="main-content" className="grid min-h-screen place-items-center bg-white pt-20">
+      <main
+        id="main-content"
+        className="grid min-h-screen place-items-center bg-white pt-20"
+      >
         <div className="flex items-center gap-3 text-dteti-blue" role="status">
           <LoaderCircle className="animate-spin" aria-hidden="true" />
           <span className="font-semibold">Loading research topic…</span>
@@ -205,7 +213,10 @@ export default function TagResearchAreasPage() {
         </header>
 
         <section aria-labelledby="lecturers-heading">
-          <h2 id="lecturers-heading" className="text-2xl font-bold text-ink sm:text-3xl">
+          <h2
+            id="lecturers-heading"
+            className="text-2xl font-bold text-ink sm:text-3xl"
+          >
             Lecturers
           </h2>
           <label className="relative mt-4 block max-w-sm">
@@ -246,7 +257,10 @@ export default function TagResearchAreasPage() {
           )}
         </section>
 
-        <section className="mt-16" aria-labelledby="related-publication-heading">
+        <section
+          className="mt-16"
+          aria-labelledby="related-publication-heading"
+        >
           <h2
             id="related-publication-heading"
             className="text-2xl font-bold text-dteti-blue sm:text-3xl"
@@ -286,7 +300,9 @@ export default function TagResearchAreasPage() {
                   }}
                   className="min-h-9 border border-line bg-white px-3 focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
                 >
-                  <option value="">From</option>
+                  <option value="" disabled hidden>
+                    From
+                  </option>
                   {publicationYears.map((year) => (
                     <option key={year} value={year}>
                       {year}
@@ -304,7 +320,9 @@ export default function TagResearchAreasPage() {
                   }}
                   className="min-h-9 border border-line bg-white px-3 focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
                 >
-                  <option value="">To</option>
+                  <option value="" disabled hidden>
+                    To
+                  </option>
                   {publicationYears.map((year) => (
                     <option key={year} value={year}>
                       {year}
@@ -338,7 +356,11 @@ export default function TagResearchAreasPage() {
                     >
                       {publication.title}
                       {external ? (
-                        <ExternalLink className="mt-1 shrink-0" size={15} aria-hidden="true" />
+                        <ExternalLink
+                          className="mt-1 shrink-0"
+                          size={15}
+                          aria-hidden="true"
+                        />
                       ) : null}
                     </a>
                     <p className="mt-1 text-sm leading-6 text-ink">
@@ -353,7 +375,9 @@ export default function TagResearchAreasPage() {
                     {publicationTags.length > 0 ? (
                       <div className="mt-3 flex flex-wrap gap-2">
                         {publicationTags.map((researchTag) => (
-                          <TopicTag key={researchTag.id}>{researchTag.name}</TopicTag>
+                          <TopicTag key={researchTag.id}>
+                            {researchTag.name}
+                          </TopicTag>
                         ))}
                       </div>
                     ) : null}
