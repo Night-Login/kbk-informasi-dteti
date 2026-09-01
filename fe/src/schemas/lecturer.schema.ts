@@ -7,6 +7,7 @@ export const lecturerSchemaBase = z.object({
   nip_or_staff_id: z.string().trim().min(5, "NIP or Staff ID must be at least 5 characters").max(50),
   email: z.string().email("Invalid email format").optional().nullable().or(z.literal('')),
   photo_url: z.string().url("Must be a valid URL").optional().nullable().or(z.literal('')),
+  photo: z.any().optional(),
   short_bio: z.string().max(500).optional().nullable(),
   bio: z.string().max(2000).optional().nullable(),
   sinta_id: z.string().trim().min(1, "Sinta ID is required"),
