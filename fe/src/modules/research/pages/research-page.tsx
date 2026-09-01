@@ -38,15 +38,22 @@ function ResearchLandingCard({
 
 export default function ResearchPage() {
   const [clusters, setClusters] = useState<ResearchCluster[]>([]);
+  const [settings, setSettings] = useState<Record<string, string>>({});
   const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
 
     apiRequest<ResearchSummary>("research", { signal: controller.signal })
-      .then((result) => setClusters(result.clusters || []))
+      .then((result) => {
+        setClusters(result.clusters || []);
+        setSettings(result.settings || {});
+      })
       .catch(() => {
-        if (!controller.signal.aborted) setClusters([]);
+        if (!controller.signal.aborted) {
+          setClusters([]);
+          setSettings({});
+        }
       });
 
     return () => controller.abort();
@@ -151,6 +158,25 @@ export default function ResearchPage() {
               </>
             ) : null}
           </>
+        ) : settings.research_featured_image ? (
+          <div className="relative h-[clamp(20rem,39vw,34rem)] w-full">
+            <Image
+              src={getApiAssetUrl(settings.research_featured_image) || settings.research_featured_image}
+              alt="Research at DTETI"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+              unoptimized={settings.research_featured_image.startsWith("http") || settings.research_featured_image.startsWith("/uploads/")}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-dteti-blue-deep/90 via-dteti-blue-deep/10 to-transparent" />
+            <div className="page-container absolute inset-x-0 bottom-0 pb-10 text-center text-white sm:pb-12">
+              <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Research at DTETI</h2>
+              <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-white/90">
+                Explore research clusters, expertise, and active work across the Information Engineering Research Group.
+              </p>
+            </div>
+          </div>
         ) : (
           <div className="brand-gradient grid h-[clamp(20rem,39vw,34rem)] place-items-center px-6 text-center text-white">
             <div className="max-w-2xl">

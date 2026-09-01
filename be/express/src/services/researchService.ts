@@ -12,6 +12,8 @@ import {
 } from "../types/index.js";
 import { Prisma, Visibility } from "@prisma/client";
 import { removeUploadedFile } from "./contentService.js";
+import fs from "fs";
+import path from "path";
 
 /**
  * Common include clause for ResearchCluster queries
@@ -184,6 +186,9 @@ export const getResearch = async (filters?: any): Promise<any> => {
         })
     );
 
+    const { getPublicSettings } = await import("./contentService.js");
+    const settings = await getPublicSettings();
+
     return {
         summary: {
             total_clusters: clusters.length,
@@ -193,6 +198,7 @@ export const getResearch = async (filters?: any): Promise<any> => {
             total_projects: totalProjects,
             total_publications: totalPublications
         },
+        settings,
         clusters: enrichedClusters
     };
 };
@@ -385,6 +391,23 @@ export const attachResearchClusterImage = async (
     if (!existing) {
         await removeUploadedFile(fileUrl);
         throw Object.assign(new Error("Research cluster not found"), { status: 404 });
+    }
+
+    // Clean up old file from local disk if it starts with /uploads/
+    if (existing.image_url && existing.image_url.startsWith("/uploads/")) {
+        try {
+            const oldFilePath = path.join(process.cwd(), existing.image_url);
+            if (fs.existsSync(oldFilePath)) {
+                fs.unlinkSync(oldFilePath);
+            }
+        } catch (err) {
+            console.error(`Error removing old image for research cluster ${id}:`, err);
+        }
+    }
+
+    // Delete old media asset if exists
+    if (existing.media_id) {
+        await prisma.mediaAsset.delete({ where: { id: existing.media_id } }).catch(() => undefined);
     }
 
     let createdMediaId: string | undefined;

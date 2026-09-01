@@ -280,6 +280,15 @@ export async function attachUploadedImage(
         return updated;
     }
 
+    // Clean up old media if not a media asset itself
+    const oldFileUrl = resource === "settings" ? existing.value : (existing as any).image_url;
+    if (typeof oldFileUrl === "string" && oldFileUrl.startsWith("/uploads/")) {
+        await removeUploadedFile(oldFileUrl).catch((err) => console.error("Failed to clean up old content file", err));
+    }
+    if ((existing as any).media_id) {
+        await prisma.mediaAsset.delete({ where: { id: (existing as any).media_id } }).catch(() => undefined);
+    }
+
     let createdMediaId: string | undefined;
 
     try {

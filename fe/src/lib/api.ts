@@ -185,6 +185,7 @@ export interface ResearchSummary {
     total_projects?: number;
     total_publications?: number;
   };
+  settings?: Record<string, string>;
   clusters: ResearchCluster[];
 }
 
