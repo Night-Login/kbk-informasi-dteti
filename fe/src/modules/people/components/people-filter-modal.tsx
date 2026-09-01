@@ -56,7 +56,8 @@ export default function PeopleFilterModal({
     { label: "Human Computer Interaction", value: "hci" },
   ],
 }: PeopleFilterModalProps) {
-  const [draftFilters, setDraftFilters] = useState<PeopleFilterValues>(currentFilters);
+  const [draftFilters, setDraftFilters] =
+    useState<PeopleFilterValues>(currentFilters);
 
   if (!isOpen) return null;
 
@@ -89,7 +90,9 @@ export default function PeopleFilterModal({
               <SlidersHorizontal size={18} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-dteti-ink">Filter Lecturers</h2>
+              <h2 className="text-lg font-bold text-dteti-ink">
+                Filter Lecturers
+              </h2>
               <p className="text-xs text-muted">
                 {draftActiveCount > 0
                   ? `${draftActiveCount} filter(s) currently selected`
@@ -121,7 +124,8 @@ export default function PeopleFilterModal({
                 { label: "Available / Kuota Tersedia", value: "available" },
                 { label: "Unavailable / Penuh", value: "unavailable" },
               ].map((item) => {
-                const isSelected = draftFilters.supervisionStatus === item.value;
+                const isSelected =
+                  draftFilters.supervisionStatus === item.value;
                 return (
                   <button
                     key={item.value}
@@ -190,10 +194,16 @@ export default function PeopleFilterModal({
             <select
               value={draftFilters.tagSlug}
               onChange={(e) =>
-                setDraftFilters((prev) => ({ ...prev, tagSlug: e.target.value }))
+                setDraftFilters((prev) => ({
+                  ...prev,
+                  tagSlug: e.target.value,
+                }))
               }
               className="w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-xs font-semibold text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
             >
+              <option value="" disabled hidden>
+                Select topic tag...
+              </option>
               {availableTags.map((tag) => (
                 <option key={tag.value} value={tag.value}>
                   {tag.label}
@@ -246,10 +256,16 @@ export default function PeopleFilterModal({
               <select
                 value={draftFilters.sortBy}
                 onChange={(e) =>
-                  setDraftFilters((prev) => ({ ...prev, sortBy: e.target.value }))
+                  setDraftFilters((prev) => ({
+                    ...prev,
+                    sortBy: e.target.value,
+                  }))
                 }
                 className="w-full rounded-lg border border-line bg-white px-3 py-2 text-xs font-semibold text-ink focus:border-dteti-blue focus:outline-none focus:ring-2 focus:ring-focus"
               >
+                <option value="" disabled hidden>
+                  Select sort field...
+                </option>
                 <option value="name">Name</option>
                 <option value="sinta_score">SINTA Score</option>
                 <option value="publications">Publication Count</option>

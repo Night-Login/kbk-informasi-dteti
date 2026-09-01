@@ -16,6 +16,7 @@ import {
   type Publication,
 } from "@/lib/api";
 import {
+  ArrowRight,
   BarChart3,
   ExternalLink,
   GraduationCap,
@@ -444,9 +445,18 @@ export default function PeopleDetailPage() {
         </section>
 
         <section className="mt-14" aria-labelledby="publications-heading">
-          <h2 id="publications-heading" className="text-2xl font-bold text-dteti-blue sm:text-3xl">
-            Latest Publications
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h2 id="publications-heading" className="text-2xl font-bold text-dteti-blue sm:text-3xl">
+              Latest Publications
+            </h2>
+            <Link
+              href={`/publication?lecturer=${encodeURIComponent(lecturer.slug)}`}
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-dteti-yellow px-5 text-sm font-bold text-dteti-ink transition-colors hover:bg-dteti-yellow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-blue focus-visible:ring-offset-2"
+            >
+              View all publications
+              <ArrowRight size={17} aria-hidden="true" />
+            </Link>
+          </div>
           {latestPublications.length > 0 ? (
             <ul className="mt-6 divide-y divide-line border-t border-line">
               {latestPublications.map((publication) => (

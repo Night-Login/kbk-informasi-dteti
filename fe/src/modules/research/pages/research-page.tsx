@@ -158,12 +158,6 @@ export default function ResearchPage() {
               <p className="mt-4 text-base leading-7 text-white/90">
                 Explore research clusters, expertise, and active work across the Information Engineering Research Group.
               </p>
-              <Link
-                href="/research-areas"
-                className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-lg bg-dteti-yellow px-5 text-sm font-bold text-dteti-ink"
-              >
-                Browse Research Areas <ArrowRight size={17} aria-hidden="true" />
-              </Link>
             </div>
           </div>
         )}
