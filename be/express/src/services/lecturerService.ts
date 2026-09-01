@@ -26,6 +26,16 @@ const includeClause = {
         include: {
             publication: true
         }
+    },
+    education: {
+        orderBy: { year: "desc" as const }
+    },
+    awards: {
+        orderBy: { year: "desc" as const }
+    },
+    supervised_students: {
+        where: { deleted_at: null },
+        orderBy: { start_date: "desc" as const }
     }
 };
 
@@ -54,6 +64,16 @@ const detailedIncludeClause = {
                 year: "desc" as const
             }
         }
+    },
+    education: {
+        orderBy: { year: "desc" as const }
+    },
+    awards: {
+        orderBy: { year: "desc" as const }
+    },
+    supervised_students: {
+        where: { deleted_at: null },
+        orderBy: { start_date: "desc" as const }
     }
 };
 
@@ -265,7 +285,7 @@ export const getLecturerBySintaId = async (sintaId: string): Promise<Lecturer | 
  * Create a new lecturer along with optional metrics and tags
  */
 export const createLecturer = async (data: CreateLecturerDTO): Promise<Lecturer> => {
-    const { metrics, tag_ids, ...lecturerData } = data;
+    const { metrics, tag_ids, education, awards, supervised_students, ...lecturerData } = data;
 
     const lecturer = await prisma.$transaction(async (tx) => {
         const created = await tx.lecturer.create({
@@ -317,6 +337,46 @@ export const createLecturer = async (data: CreateLecturerDTO): Promise<Lecturer>
             );
         }
 
+        if (education && education.length > 0) {
+            await tx.lecturerEducation.createMany({
+                data: education.map(edu => ({
+                    lecturer_id: created.id,
+                    degree: edu.degree,
+                    institution: edu.institution,
+                    field: edu.field,
+                    year: edu.year
+                }))
+            });
+        }
+
+        if (awards && awards.length > 0) {
+            await tx.lecturerAward.createMany({
+                data: awards.map(award => ({
+                    lecturer_id: created.id,
+                    name: award.name,
+                    institution: award.institution,
+                    year: award.year,
+                    description: award.description
+                }))
+            });
+        }
+
+        if (supervised_students && supervised_students.length > 0) {
+            await tx.supervisedStudent.createMany({
+                data: supervised_students.map(student => ({
+                    lecturer_id: created.id,
+                    student_name: student.student_name,
+                    student_id_number: student.student_id_number,
+                    program_level: student.program_level,
+                    thesis_title: student.thesis_title,
+                    start_date: student.start_date ? new Date(student.start_date) : null,
+                    end_date: student.end_date ? new Date(student.end_date) : null,
+                    supervision_role: student.supervision_role,
+                    status: student.status
+                }))
+            });
+        }
+
         return tx.lecturer.findUnique({
             where: { id: created.id },
             include: includeClause
@@ -337,7 +397,7 @@ export const updateLecturer = async (id: string, data: UpdateLecturerDTO): Promi
         throw new Error(`Lecturer with id ${id} not found or deleted.`);
     }
 
-    const { metrics, tag_ids, ...lecturerData } = data;
+    const { metrics, tag_ids, education, awards, supervised_students, ...lecturerData } = data;
 
     const lecturer = await prisma.$transaction(async (tx) => {
         await tx.lecturer.update({
@@ -382,6 +442,64 @@ export const updateLecturer = async (id: string, data: UpdateLecturerDTO): Promi
                         })
                     )
                 );
+            }
+        }
+
+        if (education !== undefined) {
+            await tx.lecturerEducation.deleteMany({
+                where: { lecturer_id: id }
+            });
+
+            if (education.length > 0) {
+                await tx.lecturerEducation.createMany({
+                    data: education.map(edu => ({
+                        lecturer_id: id,
+                        degree: edu.degree,
+                        institution: edu.institution,
+                        field: edu.field,
+                        year: edu.year
+                    }))
+                });
+            }
+        }
+
+        if (awards !== undefined) {
+            await tx.lecturerAward.deleteMany({
+                where: { lecturer_id: id }
+            });
+
+            if (awards.length > 0) {
+                await tx.lecturerAward.createMany({
+                    data: awards.map(award => ({
+                        lecturer_id: id,
+                        name: award.name,
+                        institution: award.institution,
+                        year: award.year,
+                        description: award.description
+                    }))
+                });
+            }
+        }
+
+        if (supervised_students !== undefined) {
+            await tx.supervisedStudent.deleteMany({
+                where: { lecturer_id: id }
+            });
+
+            if (supervised_students.length > 0) {
+                await tx.supervisedStudent.createMany({
+                    data: supervised_students.map(student => ({
+                        lecturer_id: id,
+                        student_name: student.student_name,
+                        student_id_number: student.student_id_number,
+                        program_level: student.program_level,
+                        thesis_title: student.thesis_title,
+                        start_date: student.start_date ? new Date(student.start_date) : null,
+                        end_date: student.end_date ? new Date(student.end_date) : null,
+                        supervision_role: student.supervision_role,
+                        status: student.status
+                    }))
+                });
             }
         }
 

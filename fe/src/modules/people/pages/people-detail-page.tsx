@@ -116,21 +116,20 @@ export default function PeopleDetailPage() {
   );
   const adviseeRows = useMemo<DataTableRow[]>(
     () =>
-      (lecturer?.advisees || []).map((advisee, index) => ({
-        id: advisee.id,
-        filterValue: advisee.level,
+      (lecturer?.supervised_students || []).map((student, index) => ({
+        id: student.id,
+        filterValue: student.program_level || "",
         cells: {
           no: index + 1,
-          name: advisee.full_name,
-          level: advisee.level,
-          project: advisee.project || "—",
-          researchArea: advisee.research_area || "—",
+          name: student.student_name,
+          level: student.program_level || "—",
+          project: student.thesis_title || "—",
+          researchArea: student.supervision_role || "—",
         },
-        actionHref: advisee.profile_href || undefined,
       })),
     [lecturer],
   );
-  const degrees = lecturer?.degrees || [];
+  const education = lecturer?.education || [];
   const teachingAssistants = lecturer?.teaching_assistants || [];
   const awards = lecturer?.awards || [];
 
@@ -409,10 +408,13 @@ export default function PeopleDetailPage() {
               <h2 id="education-heading" className="text-lg font-bold text-dteti-blue">
                 Education
               </h2>
-              {degrees.length > 0 ? (
-                <ul className="mt-3 space-y-3 text-sm leading-6 text-ink">
-                  {degrees.map((degree) => (
-                    <li key={degree}>{degree}</li>
+              {education.length > 0 ? (
+                <ul className="mt-3 space-y-4 text-sm leading-6 text-ink">
+                  {education.map((edu) => (
+                    <li key={edu.id}>
+                      <p className="font-semibold">{edu.degree} in {edu.field || 'General'}</p>
+                      <p className="text-muted">{edu.institution}{edu.year ? ` (${edu.year})` : ''}</p>
+                    </li>
                   ))}
                 </ul>
               ) : (
@@ -479,7 +481,13 @@ export default function PeopleDetailPage() {
           {awards.length > 0 ? (
             <ul className="mt-6 space-y-4 text-base text-ink">
               {awards.map((award) => (
-                <li key={award}>{award}</li>
+                <li key={award.id}>
+                  <p className="font-semibold">{award.name}</p>
+                  <p className="text-sm text-muted">
+                    {award.institution} {award.year ? `· ${award.year}` : ''}
+                  </p>
+                  {award.description && <p className="mt-1 text-sm">{award.description}</p>}
+                </li>
               ))}
             </ul>
           ) : (

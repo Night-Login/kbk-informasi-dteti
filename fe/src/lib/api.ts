@@ -198,11 +198,30 @@ export interface LecturerMetric {
 
 export interface LecturerAdvisee {
   id: string;
-  full_name: string;
-  level: "S1" | "S2" | "S3";
-  project?: string | null;
-  research_area?: string | null;
-  profile_href?: string | null;
+  student_name: string;
+  student_id_number?: string | null;
+  program_level?: string | null;
+  thesis_title?: string | null;
+  supervision_role?: string | null;
+  status?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+}
+
+export interface LecturerEducation {
+  id: string;
+  degree: string;
+  institution: string;
+  field?: string | null;
+  year?: string | null;
+}
+
+export interface LecturerAward {
+  id: string;
+  name: string;
+  institution?: string | null;
+  year?: string | null;
+  description?: string | null;
 }
 
 export interface LecturerTeachingAssistant {
@@ -232,10 +251,10 @@ export interface Lecturer {
   supervision_status?: string | null;
   is_active?: boolean;
   metrics?: LecturerMetric | null;
-  degrees?: string[];
+  education?: LecturerEducation[];
   teaching_assistants?: LecturerTeachingAssistant[];
-  advisees?: LecturerAdvisee[];
-  awards?: string[];
+  supervised_students?: LecturerAdvisee[];
+  awards?: LecturerAward[];
   research_tags?: Array<{
     lecturer_id?: string;
     tag_id?: string;

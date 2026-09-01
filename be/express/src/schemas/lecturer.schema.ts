@@ -18,6 +18,31 @@ export const lecturerSchemaBase = z.object({
   semantic_scholar_id: z.string().optional().nullable(),
   supervision_status: z.string().optional().nullable(),
   is_active: z.boolean().optional().default(true),
+  education: z.array(z.object({
+    id: z.string().optional(),
+    degree: z.string().min(1, "Degree is required"),
+    institution: z.string().min(1, "Institution is required"),
+    field: z.string().optional().nullable(),
+    year: z.string().optional().nullable()
+  })).optional(),
+  awards: z.array(z.object({
+    id: z.string().optional(),
+    name: z.string().min(1, "Award name is required"),
+    institution: z.string().optional().nullable(),
+    year: z.string().optional().nullable(),
+    description: z.string().optional().nullable()
+  })).optional(),
+  supervised_students: z.array(z.object({
+    id: z.string().optional(),
+    student_name: z.string().min(1, "Student name is required"),
+    student_id_number: z.string().optional().nullable(),
+    program_level: z.string().optional().nullable(),
+    thesis_title: z.string().optional().nullable(),
+    start_date: z.string().optional().nullable(),
+    end_date: z.string().optional().nullable(),
+    supervision_role: z.string().optional().nullable(),
+    status: z.string().optional().nullable()
+  })).optional(),
 });
 
 export const lecturerSchema = z.object({

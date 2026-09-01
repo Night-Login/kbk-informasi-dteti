@@ -45,6 +45,9 @@ export interface Lecturer {
     metrics?: LecturerMetric | null;
     publications?: LecturerPublication[] | any[];
     research_tags?: LecturerResearchTag[] | ResearchTag[] | any[];
+    education?: LecturerEducation[];
+    awards?: LecturerAward[];
+    supervised_students?: SupervisedStudent[];
     [key: string]: any;
 }
 
@@ -57,6 +60,43 @@ export interface LecturerFilters extends PaginationParams {
     supervision_status?: string;
     is_active?: boolean;
     sinta_id?: string;
+}
+
+export interface LecturerEducation {
+    id?: string;
+    lecturer_id?: string;
+    degree: string;
+    institution: string;
+    field?: string | null;
+    year?: string | null;
+    created_at?: Date | string;
+    updated_at?: Date | string;
+}
+
+export interface LecturerAward {
+    id?: string;
+    lecturer_id?: string;
+    name: string;
+    institution?: string | null;
+    year?: string | null;
+    description?: string | null;
+    created_at?: Date | string;
+    updated_at?: Date | string;
+}
+
+export interface SupervisedStudent {
+    id?: string;
+    lecturer_id?: string;
+    student_name: string;
+    student_id_number?: string | null;
+    program_level?: string | null;
+    thesis_title?: string | null;
+    supervision_role?: string | null;
+    status?: string | null;
+    start_date?: Date | string | null;
+    end_date?: Date | string | null;
+    created_at?: Date | string;
+    updated_at?: Date | string;
 }
 
 // Data Transfer Objects (DTOs) for creating/updating
@@ -81,6 +121,9 @@ export interface CreateLecturerDTO {
     source_csv_row_ref?: string | null;
     metrics?: LecturerMetric;
     tag_ids?: string[];
+    education?: LecturerEducation[];
+    awards?: LecturerAward[];
+    supervised_students?: SupervisedStudent[];
 }
 
 export interface UpdateLecturerDTO extends Partial<CreateLecturerDTO> {}

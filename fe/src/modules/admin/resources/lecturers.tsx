@@ -8,6 +8,7 @@ import {
   BooleanInput,
   Create,
   Datagrid,
+  DateInput,
   DeleteButton,
   Edit,
   EditButton,
@@ -18,9 +19,10 @@ import {
   ReferenceArrayInput,
   SelectInput,
   SimpleForm,
+  SimpleFormIterator,
   TextField,
 } from "react-admin";
-import { TextInput } from "react-admin";
+import { TextInput, ArrayInput } from "react-admin";
 import { ImportEmptyState, ListActions } from "../components/ImportButton";
 import { SlugInput } from "../components/SlugInput";
 
@@ -135,6 +137,54 @@ function LecturerFormFields({ editing = false }: { editing?: boolean }) {
       <NumberInput source="metrics.total_citations" label="Total Citations" min={0} />
       <NumberInput source="metrics.sinta_score" label="SINTA Score" min={0} />
       <TextInput source="metrics.source" label="Metric Source" placeholder="e.g. SINTA / Manual" />
+
+      <SectionTitle title="6. Education History" />
+      <Box sx={{ gridColumn: "1 / -1" }}>
+        <ArrayInput source="education" label="">
+          <SimpleFormIterator inline>
+            <TextInput source="degree" label="Degree" required />
+            <TextInput source="institution" label="Institution" required />
+            <TextInput source="field" label="Field of Study" />
+            <TextInput source="year" label="Year (e.g. 2010 - 2014)" />
+          </SimpleFormIterator>
+        </ArrayInput>
+      </Box>
+
+      <SectionTitle title="7. Awards & Honors" />
+      <Box sx={{ gridColumn: "1 / -1" }}>
+        <ArrayInput source="awards" label="">
+          <SimpleFormIterator inline>
+            <TextInput source="name" label="Award Name" required />
+            <TextInput source="institution" label="Institution" />
+            <TextInput source="year" label="Year" />
+            <TextInput source="description" label="Description" multiline rows={2} />
+          </SimpleFormIterator>
+        </ArrayInput>
+      </Box>
+
+      <SectionTitle title="8. Advisees (Supervised Students)" />
+      <Box sx={{ gridColumn: "1 / -1" }}>
+        <ArrayInput source="supervised_students" label="">
+          <SimpleFormIterator>
+            <TextInput source="student_name" label="Student Name" required sx={{ width: '48%', mr: 2 }} />
+            <TextInput source="student_id_number" label="Student ID (NIM)" sx={{ width: '48%' }} />
+            <SelectInput source="program_level" label="Program Level" choices={[
+              { id: 'S1', name: 'S1 (Sarjana)' },
+              { id: 'S2', name: 'S2 (Magister)' },
+              { id: 'S3', name: 'S3 (Doktor)' },
+            ]} sx={{ width: '48%', mr: 2 }} />
+            <TextInput source="supervision_role" label="Role (e.g. Main Supervisor)" sx={{ width: '48%' }} />
+            <TextInput source="thesis_title" label="Thesis Title" multiline rows={2} sx={{ width: '100%' }} />
+            <DateInput source="start_date" label="Start Date" sx={{ width: '48%', mr: 2 }} />
+            <DateInput source="end_date" label="End Date" sx={{ width: '48%' }} />
+            <SelectInput source="status" label="Status" choices={[
+              { id: 'Ongoing', name: 'Ongoing' },
+              { id: 'Completed', name: 'Completed' },
+              { id: 'Dropped', name: 'Dropped' },
+            ]} sx={{ width: '100%' }} />
+          </SimpleFormIterator>
+        </ArrayInput>
+      </Box>
     </Box>
   );
 }
