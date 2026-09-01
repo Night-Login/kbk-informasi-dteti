@@ -130,6 +130,8 @@ model Lecturer {
   nip_or_staff_id             String
   email                       String?
   photo_url                   String?
+  media_id                    String?                   @db.Uuid
+  media                       MediaAsset?               @relation(fields: [media_id], references: [id], onDelete: SetNull)
   short_bio                   String?
   bio                         String?
   sinta_id                    String                    @unique
@@ -309,6 +311,7 @@ model MediaAsset {
   news              NewsArticle[]
   events            Event[]
   research_clusters ResearchCluster[]
+  lecturers         Lecturer[]
 
   @@map("media_assets")
 }

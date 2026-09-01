@@ -516,8 +516,7 @@ export async function uploadPhoto(req: Request, res: Response, next: NextFunctio
             return;
         }
 
-        const photoUrl = `/uploads/lecturers/${req.file.filename}`;
-        const updated = await lecturerService.updateLecturerPhoto(id, photoUrl);
+        const updated = await lecturerService.updateLecturerPhoto(id, req.file);
 
         res.status(200).json({
             success: true,

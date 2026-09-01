@@ -654,10 +654,7 @@ export const upsertLecturerMetric = async (
     });
 };
 
-/**
- * Update profile photo for a lecturer and clean up old photo file from disk if applicable
- */
-export const updateLecturerPhoto = async (id: string, photoUrl: string): Promise<Lecturer> => {
+export const updateLecturerPhoto = async (id: string, file: Express.Multer.File): Promise<Lecturer> => {
     const existing = await prisma.lecturer.findFirst({
         where: { id, deleted_at: null },
         include: includeClause
@@ -665,6 +662,8 @@ export const updateLecturerPhoto = async (id: string, photoUrl: string): Promise
     if (!existing) {
         throw new Error(`Lecturer with id ${id} not found or deleted.`);
     }
+
+    const photoUrl = `/uploads/lecturers/${file.filename}`;
 
     // Clean up old photo file from local disk if it starts with /uploads/
     if (existing.photo_url && existing.photo_url.startsWith("/uploads/")) {
@@ -678,9 +677,28 @@ export const updateLecturerPhoto = async (id: string, photoUrl: string): Promise
         }
     }
 
+    // Delete old media asset if exists
+    if (existing.media_id) {
+        await prisma.mediaAsset.delete({ where: { id: existing.media_id } }).catch(() => undefined);
+    }
+
+    const media = await prisma.mediaAsset.create({
+        data: {
+            title: `Lecturer Profile Photo - ${existing.full_name}`,
+            alt_text: existing.full_name,
+            file_url: photoUrl,
+            file_name: file.originalname,
+            mime_type: file.mimetype,
+            file_size: file.size
+        }
+    });
+
     const updated = await prisma.lecturer.update({
         where: { id },
-        data: { photo_url: photoUrl },
+        data: { 
+            photo_url: photoUrl,
+            media_id: media.id
+        },
         include: includeClause
     });
 
