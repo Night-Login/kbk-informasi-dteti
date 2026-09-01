@@ -185,6 +185,22 @@ function LecturerFormFields({ editing = false }: { editing?: boolean }) {
           </SimpleFormIterator>
         </ArrayInput>
       </Box>
+
+      <SectionTitle title="9. Teaching Assistants" />
+      <Box sx={{ gridColumn: "1 / -1" }}>
+        <ArrayInput source="teaching_assistants" label="">
+          <SimpleFormIterator>
+            <TextInput source="student_name" label="Student Name" required sx={{ width: '48%', mr: 2 }} />
+            <TextInput source="student_id_number" label="Student ID (NIM)" sx={{ width: '48%' }} />
+            <TextInput source="course_name" label="Course Name" sx={{ width: '48%', mr: 2 }} />
+            <TextInput source="academic_period" label="Academic Period (e.g. 2023/2024 Odd)" sx={{ width: '48%' }} />
+            <SelectInput source="status" label="Status" choices={[
+              { id: 'Active', name: 'Active' },
+              { id: 'Completed', name: 'Completed' },
+            ]} sx={{ width: '100%' }} />
+          </SimpleFormIterator>
+        </ArrayInput>
+      </Box>
     </Box>
   );
 }

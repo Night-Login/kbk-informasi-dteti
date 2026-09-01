@@ -226,9 +226,11 @@ export interface LecturerAward {
 
 export interface LecturerTeachingAssistant {
   id?: string;
-  full_name: string;
-  email?: string | null;
-  profile_href?: string | null;
+  student_name: string;
+  student_id_number?: string | null;
+  course_name?: string | null;
+  academic_period?: string | null;
+  status?: string | null;
 }
 
 export interface Lecturer {

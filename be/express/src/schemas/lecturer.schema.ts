@@ -43,6 +43,14 @@ export const lecturerSchemaBase = z.object({
     supervision_role: z.string().optional().nullable(),
     status: z.string().optional().nullable()
   })).optional(),
+  teaching_assistants: z.array(z.object({
+    id: z.string().optional(),
+    student_name: z.string().min(1, "Student name is required"),
+    student_id_number: z.string().optional().nullable(),
+    course_name: z.string().optional().nullable(),
+    academic_period: z.string().optional().nullable(),
+    status: z.string().optional().nullable()
+  })).optional(),
 });
 
 export const lecturerSchema = z.object({

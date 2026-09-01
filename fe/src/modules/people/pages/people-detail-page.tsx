@@ -45,6 +45,21 @@ const adviseeFilters: DataTableFilter[] = [
   { label: "Doctor (S3)", value: "S3" },
 ];
 
+const taColumns: DataTableColumn[] = [
+  { key: "no", label: "No", className: "w-16 text-center" },
+  { key: "name", label: "Student Name", className: "min-w-48" },
+  { key: "nim", label: "Student ID (NIM)", className: "min-w-32" },
+  { key: "course", label: "Course Name", className: "min-w-48" },
+  { key: "period", label: "Academic Period", className: "min-w-32 text-center" },
+  { key: "status", label: "Status", className: "min-w-24 text-center" },
+];
+
+const taFilters: DataTableFilter[] = [
+  { label: "Show All", value: "all" },
+  { label: "Active", value: "Active" },
+  { label: "Completed", value: "Completed" },
+];
+
 function publicationTimestamp(publication: Publication) {
   if (publication.publication_date) {
     const timestamp = Date.parse(publication.publication_date);
@@ -118,7 +133,7 @@ export default function PeopleDetailPage() {
   const adviseeRows = useMemo<DataTableRow[]>(
     () =>
       (lecturer?.supervised_students || []).map((student, index) => ({
-        id: student.id,
+        id: student.id || String(index),
         filterValue: student.program_level || "",
         cells: {
           no: index + 1,
@@ -126,6 +141,22 @@ export default function PeopleDetailPage() {
           level: student.program_level || "—",
           project: student.thesis_title || "—",
           researchArea: student.supervision_role || "—",
+        },
+      })),
+    [lecturer],
+  );
+  const taRows = useMemo<DataTableRow[]>(
+    () =>
+      (lecturer?.teaching_assistants || []).map((ta, index) => ({
+        id: ta.id || String(index),
+        filterValue: ta.status || "",
+        cells: {
+          no: index + 1,
+          name: ta.student_name,
+          nim: ta.student_id_number || "—",
+          course: ta.course_name || "—",
+          period: ta.academic_period || "—",
+          status: ta.status || "—",
         },
       })),
     [lecturer],
@@ -299,45 +330,6 @@ export default function PeopleDetailPage() {
                   )}
                 </div>
 
-                <div>
-                  <h2 className="text-base font-semibold text-white">
-                    Teaching Assistants
-                  </h2>
-                  {teachingAssistants.length > 0 ? (
-                    <ul className="mt-3 space-y-3 text-sm">
-                      {teachingAssistants.map((assistant) => (
-                        <li key={assistant.id || assistant.full_name}>
-                          {assistant.profile_href ? (
-                            <Link
-                              href={assistant.profile_href}
-                              className="font-semibold text-white hover:underline"
-                            >
-                              {assistant.full_name}
-                            </Link>
-                          ) : (
-                            <p className="font-semibold text-white">
-                              {assistant.full_name}
-                            </p>
-                          )}
-                          {assistant.email ? (
-                            <a
-                              href={`mailto:${assistant.email}`}
-                              className="mt-1 flex items-center gap-2 text-white/80 hover:text-white hover:underline"
-                            >
-                              <Mail size={14} aria-hidden="true" />
-                              {assistant.email}
-                            </a>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="mt-2 text-sm text-white/80">
-                      Teaching assistant data has not been added yet.
-                    </p>
-                  )}
-                </div>
-
                 {academicLinks.length > 0 ? (
                   <div>
                     <h2 className="text-base font-semibold text-white">Academic Profiles</h2>
@@ -441,6 +433,21 @@ export default function PeopleDetailPage() {
             searchPlaceholder="Search advisees"
             statusLabel="Supervisor status:"
             statusTone={isAvailable ? "available" : "unavailable"}
+          />
+        </section>
+
+        <section className="mt-14" aria-labelledby="teaching-assistants-heading">
+          <h2 id="teaching-assistants-heading" className="mb-5 text-2xl font-bold text-dteti-blue sm:text-3xl">
+            Teaching Assistants
+          </h2>
+          <DataTable
+            ariaLabel="Teaching assistants"
+            columns={taColumns}
+            rows={taRows}
+            filters={taFilters}
+            actionLabel="Action"
+            emptyMessage="Teaching assistant data has not been added yet."
+            searchPlaceholder="Search teaching assistants"
           />
         </section>
 

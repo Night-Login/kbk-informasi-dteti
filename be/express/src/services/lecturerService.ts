@@ -36,6 +36,10 @@ const includeClause = {
     supervised_students: {
         where: { deleted_at: null },
         orderBy: { start_date: "desc" as const }
+    },
+    teaching_assistants: {
+        where: { deleted_at: null },
+        orderBy: { created_at: "desc" as const }
     }
 };
 
@@ -74,6 +78,10 @@ const detailedIncludeClause = {
     supervised_students: {
         where: { deleted_at: null },
         orderBy: { start_date: "desc" as const }
+    },
+    teaching_assistants: {
+        where: { deleted_at: null },
+        orderBy: { created_at: "desc" as const }
     }
 };
 
@@ -285,7 +293,7 @@ export const getLecturerBySintaId = async (sintaId: string): Promise<Lecturer | 
  * Create a new lecturer along with optional metrics and tags
  */
 export const createLecturer = async (data: CreateLecturerDTO): Promise<Lecturer> => {
-    const { metrics, tag_ids, education, awards, supervised_students, ...lecturerData } = data;
+    const { metrics, tag_ids, education, awards, supervised_students, teaching_assistants, ...lecturerData } = data;
 
     const lecturer = await prisma.$transaction(async (tx) => {
         const created = await tx.lecturer.create({
@@ -377,6 +385,19 @@ export const createLecturer = async (data: CreateLecturerDTO): Promise<Lecturer>
             });
         }
 
+        if (teaching_assistants && teaching_assistants.length > 0) {
+            await tx.teachingAssistant.createMany({
+                data: teaching_assistants.map(ta => ({
+                    lecturer_id: created.id,
+                    student_name: ta.student_name,
+                    student_id_number: ta.student_id_number,
+                    course_name: ta.course_name,
+                    academic_period: ta.academic_period,
+                    status: ta.status
+                }))
+            });
+        }
+
         return tx.lecturer.findUnique({
             where: { id: created.id },
             include: includeClause
@@ -397,7 +418,7 @@ export const updateLecturer = async (id: string, data: UpdateLecturerDTO): Promi
         throw new Error(`Lecturer with id ${id} not found or deleted.`);
     }
 
-    const { metrics, tag_ids, education, awards, supervised_students, ...lecturerData } = data;
+    const { metrics, tag_ids, education, awards, supervised_students, teaching_assistants, ...lecturerData } = data;
 
     const lecturer = await prisma.$transaction(async (tx) => {
         await tx.lecturer.update({
@@ -498,6 +519,25 @@ export const updateLecturer = async (id: string, data: UpdateLecturerDTO): Promi
                         end_date: student.end_date ? new Date(student.end_date) : null,
                         supervision_role: student.supervision_role,
                         status: student.status
+                    }))
+                });
+            }
+        }
+
+        if (teaching_assistants !== undefined) {
+            await tx.teachingAssistant.deleteMany({
+                where: { lecturer_id: id }
+            });
+
+            if (teaching_assistants.length > 0) {
+                await tx.teachingAssistant.createMany({
+                    data: teaching_assistants.map(ta => ({
+                        lecturer_id: id,
+                        student_name: ta.student_name,
+                        student_id_number: ta.student_id_number,
+                        course_name: ta.course_name,
+                        academic_period: ta.academic_period,
+                        status: ta.status
                     }))
                 });
             }

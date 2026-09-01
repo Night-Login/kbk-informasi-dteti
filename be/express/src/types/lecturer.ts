@@ -48,6 +48,7 @@ export interface Lecturer {
     education?: LecturerEducation[];
     awards?: LecturerAward[];
     supervised_students?: SupervisedStudent[];
+    teaching_assistants?: TeachingAssistant[];
     [key: string]: any;
 }
 
@@ -99,6 +100,18 @@ export interface SupervisedStudent {
     updated_at?: Date | string;
 }
 
+export interface TeachingAssistant {
+    id?: string;
+    lecturer_id?: string;
+    student_name: string;
+    student_id_number?: string | null;
+    course_name?: string | null;
+    academic_period?: string | null;
+    status?: string | null;
+    created_at?: Date | string;
+    updated_at?: Date | string;
+}
+
 // Data Transfer Objects (DTOs) for creating/updating
 export interface CreateLecturerDTO {
     full_name: string;
@@ -124,6 +137,7 @@ export interface CreateLecturerDTO {
     education?: LecturerEducation[];
     awards?: LecturerAward[];
     supervised_students?: SupervisedStudent[];
+    teaching_assistants?: TeachingAssistant[];
 }
 
 export interface UpdateLecturerDTO extends Partial<CreateLecturerDTO> {}
