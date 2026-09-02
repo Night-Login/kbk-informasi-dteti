@@ -8,10 +8,15 @@ function CustomAppBar() {
     <AppBar
       sx={{
         bgcolor: "#255b88",
+        color: "#fff",
         borderBottom: "3px solid #e3b23c",
         "& .RaAppBar-title": {
           fontWeight: 750,
           letterSpacing: "-0.01em",
+          color: "#fff",
+        },
+        "& .MuiIconButton-root": {
+          color: "#fff",
         },
       }}
     />
