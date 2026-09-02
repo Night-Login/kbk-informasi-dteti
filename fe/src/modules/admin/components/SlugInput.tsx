@@ -27,36 +27,38 @@ export const SlugInput: React.FC<SlugInputProps> = ({
     }
   };
 
+  const textInputProps: any = {
+    source,
+    label,
+    required: true,
+    helperText,
+    InputProps: {
+      endAdornment: (
+        <InputAdornment position="end">
+          <Button
+            size="small"
+            onClick={handleGenerateSlug}
+            title="Generate slug from name/title"
+            startIcon={<AutoFixHighIcon fontSize="small" />}
+            sx={{
+              textTransform: "none",
+              fontSize: "0.75rem",
+              py: 0.2,
+              px: 1,
+              minWidth: "auto",
+            }}
+          >
+            Auto-Slug
+          </Button>
+        </InputAdornment>
+      ),
+    },
+    ...props,
+  };
+
   return (
     <Box sx={{ position: "relative", width: "100%" }}>
-      <TextInput
-        source={source}
-        label={label}
-        required
-        helperText={helperText}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <Button
-                size="small"
-                onClick={handleGenerateSlug}
-                title="Generate slug from name/title"
-                startIcon={<AutoFixHighIcon fontSize="small" />}
-                sx={{
-                  textTransform: "none",
-                  fontSize: "0.75rem",
-                  py: 0.2,
-                  px: 1,
-                  minWidth: "auto",
-                }}
-              >
-                Auto-Slug
-              </Button>
-            </InputAdornment>
-          ),
-        }}
-        {...props}
-      />
+      <TextInput {...textInputProps} />
     </Box>
   );
 };

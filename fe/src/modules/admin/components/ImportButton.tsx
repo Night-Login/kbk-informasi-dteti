@@ -20,7 +20,7 @@ import {
   Stack,
 } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import type { AdminDataProvider } from "../dataProvider";
 
@@ -227,7 +227,7 @@ export function ImportButton({ resource }: { resource: string }) {
 
       <MuiButton
         size="small"
-        startIcon={<HelpOutlineIcon />}
+        startIcon={<HelpOutlinedIcon />}
         onClick={() => setGuideOpen(true)}
         sx={{ textTransform: "none", fontSize: "0.8125rem", color: "text.secondary", ml: 0.5 }}
       >
@@ -242,7 +242,7 @@ export function ImportButton({ resource }: { resource: string }) {
           </IconButton>
         </DialogTitle>
         <DialogContent dividers>
-          <Typography variant="body2" color="text.secondary" paragraph>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             You can upload a <strong>.csv</strong> or <strong>.json</strong> file. Ensure column names match the expected format below:
           </Typography>
 

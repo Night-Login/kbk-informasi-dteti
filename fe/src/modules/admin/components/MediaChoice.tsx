@@ -54,7 +54,7 @@ export function MediaChoice() {
           {record.title || record.file_name || "Untitled image"}
         </Typography>
         {record.file_name && record.file_name !== record.title ? (
-          <Typography variant="caption" color="text.secondary" noWrap display="block">
+          <Typography variant="caption" color="text.secondary" noWrap sx={{ display: "block" }}>
             {record.file_name}
           </Typography>
         ) : null}

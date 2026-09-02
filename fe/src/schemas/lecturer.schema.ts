@@ -19,6 +19,12 @@ export const lecturerSchemaBase = z.object({
   semantic_scholar_id: z.string().optional().nullable(),
   supervision_status: z.string().optional().nullable(),
   is_active: z.boolean().optional().default(true),
+  metrics: z.object({
+    h_index: z.coerce.number().optional().nullable(),
+    total_citations: z.coerce.number().optional().nullable(),
+    sinta_score: z.coerce.number().optional().nullable(),
+    source: z.string().optional().nullable()
+  }).optional().nullable(),
   education: z.array(z.object({
     id: z.string().optional(),
     degree: z.string().min(1, "Degree is required"),
