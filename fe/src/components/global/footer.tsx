@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import { Mail, MapPin } from "lucide-react";
 import BrandMark from "@/components/global/brand-mark";
 import { useSiteSettings } from "@/hooks/use-site-settings";
+import { siteAboutInEnglish } from "@/config/site";
+import { DiscoveryFooter } from "@/modules/homepage/components/discovery-shell";
 
 type IconProps = { size?: number; className?: string };
 
@@ -96,9 +98,9 @@ export default function Footer() {
     return null;
   }
 
-  const about =
-    settings.footer_about ||
-    "Kelompok Keahlian Teknik Informasi DTETI UGM mengembangkan penelitian, pendidikan, dan kolaborasi di bidang sistem cerdas, data, jaringan, serta teknologi informasi.";
+  if (pathname === "/" || pathname === "/events") return <DiscoveryFooter settings={settings} />;
+
+  const about = siteAboutInEnglish(settings);
   const email = settings.contact_email || "teti@ugm.ac.id";
   const address =
     settings.contact_address ||
@@ -116,7 +118,7 @@ export default function Footer() {
           <h2 className="text-2xl font-bold text-white">Social Media</h2>
           <div
             className="mt-5 flex flex-wrap items-center gap-6"
-            aria-label="Media sosial"
+            aria-label="Social media"
           >
             {socialLinks.map(({ label, setting, href, icon: Icon }) => (
               <a

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import BrandMark from "@/components/global/brand-mark";
 import SearchModal from "@/components/global/search-modal";
+import { DiscoveryHeader } from "@/modules/homepage/components/discovery-shell";
 
 interface NavSubItem {
   label: string;
@@ -79,6 +80,7 @@ export default function Navbar() {
 
   // Register Ctrl+K / Cmd+K keyboard shortcut
   useEffect(() => {
+    if (pathname === "/" || pathname === "/events") return;
     const handleKeyDown = (e: globalThis.KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
@@ -88,11 +90,13 @@ export default function Navbar() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [pathname]);
 
   if (pathname?.startsWith("/admin")) {
     return null;
   }
+
+  if (pathname === "/" || pathname === "/events") return <DiscoveryHeader key={pathname} home={pathname === "/"} />;
 
   return (
     <>
@@ -103,7 +107,7 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <nav
             className="hidden items-center gap-4 xl:gap-6 lg:flex"
-            aria-label="Navigasi utama"
+            aria-label="Main navigation"
           >
             {navigation.map((item) => {
               const hasChildren = Boolean(item.children && item.children.length > 0);
@@ -210,8 +214,8 @@ export default function Navbar() {
             {/* Desktop Search Button */}
             <button
               type="button"
-              aria-label="Cari (Ctrl+K)"
-              title="Pencarian (Ctrl+K)"
+              aria-label="Search (Ctrl+K)"
+              title="Search (Ctrl+K)"
               onClick={() => setIsSearchOpen(true)}
               className="hidden size-10 place-items-center text-white/90 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow lg:grid cursor-pointer"
             >
@@ -221,7 +225,7 @@ export default function Navbar() {
             {/* Mobile Search Button */}
             <button
               type="button"
-              aria-label="Cari"
+              aria-label="Search"
               onClick={() => setIsSearchOpen(true)}
               className="grid size-10 place-items-center text-white/90 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow lg:hidden cursor-pointer"
             >
@@ -232,7 +236,7 @@ export default function Navbar() {
             <button
               type="button"
               className="grid size-10 place-items-center text-white/90 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow lg:hidden cursor-pointer"
-              aria-label={isOpen ? "Tutup menu" : "Buka menu"}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
               aria-expanded={isOpen}
               aria-controls="mobile-navigation"
               onClick={() => setIsOpen((current) => !current)}
@@ -248,7 +252,7 @@ export default function Navbar() {
           className={`${
             isOpen ? "block" : "hidden"
           } brand-gradient border-t border-white/15 px-4 py-4 lg:hidden`}
-          aria-label="Navigasi perangkat seluler"
+          aria-label="Mobile navigation"
         >
           <div className="page-container flex flex-col">
             {navigation.map((item) => {

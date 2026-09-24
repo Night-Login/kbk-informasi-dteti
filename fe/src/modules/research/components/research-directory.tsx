@@ -4,7 +4,7 @@ import Breadcrumbs from "@/components/global/breadcrumbs";
 import { FileText, Search, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type ResearchDirectoryItem = {
   slug: string;
@@ -25,7 +25,7 @@ type ResearchDirectoryProps = {
 
 function ResearchDirectoryCard({ item }: { item: ResearchDirectoryItem }) {
   return (
-    <article className="overflow-hidden rounded-xl border border-line bg-white">
+    <article id={`cluster-${item.slug}`} className="scroll-mt-28 overflow-hidden rounded-xl border border-line bg-white">
       <div className={item.imageUrl ? "grid lg:grid-cols-[minmax(250px,32%)_1fr]" : ""}>
         {item.imageUrl ? (
           <div className="relative min-h-52 bg-surface-strong sm:min-h-64 lg:min-h-full">
@@ -82,6 +82,16 @@ export default function ResearchDirectory({
   items,
 }: ResearchDirectoryProps) {
   const [query, setQuery] = useState("");
+  useEffect(() => {
+    const scrollToCluster = () => {
+      if (window.location.hash.startsWith("#cluster-")) {
+        try { document.getElementById(decodeURIComponent(window.location.hash.slice(1)))?.scrollIntoView(); } catch { /* Ignore malformed URL fragments. */ }
+      }
+    };
+    scrollToCluster();
+    window.addEventListener("hashchange", scrollToCluster);
+    return () => window.removeEventListener("hashchange", scrollToCluster);
+  }, [items]);
 
   const visibleItems = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase();
