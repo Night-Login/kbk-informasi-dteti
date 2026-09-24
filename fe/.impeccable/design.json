@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-17T16:15:00Z",
+  "title": "Design System: KBK Informasi discovery surfaces",
+  "extensions": {
+    "motion": [
+      { "name": "hero-cycle", "value": "16s", "purpose": "Rotating discovery prompts; pause and reduced-motion supported." },
+      { "name": "cluster-marquee", "value": "40s linear infinite", "purpose": "Continuous cluster exploration; pause on hover/focus." }
+    ],
+    "breakpoints": [
+      { "name": "single-grid", "value": "480px" },
+      { "name": "mobile-navigation", "value": "700px" },
+      { "name": "two-column-grid", "value": "1050px" }
+    ]
+  },
+  "components": [
+    { "name": "Explore button", "kind": "button", "html": "<button class=\"ds-explore\">Explore More</button>", "css": ".ds-explore{border:1px solid #414141;border-radius:6px;background:#fff;color:#202124;padding:8px 28px;min-height:42px;font:650 14px Arial,sans-serif;cursor:pointer}.ds-explore:hover{background:#eee}.ds-explore:focus-visible{outline:2px solid currentColor;outline-offset:5px}" }
+  ],
+  "narrative": {
+    "overview": "The supplied grayscale wireframes govern the landing and event surfaces. This is an intentional low-fidelity phase, not a replacement institutional palette for all routes. Other pages retain their existing blue/yellow system.",
+    "keyCharacteristics": ["Solid grayscale placeholders", "Discovery search", "Distinct editorial, event and news layouts"],
+    "dos": ["Keep database content and labeled preview fixtures distinct.", "Keep this system scoped to landing and events."],
+    "donts": ["Do not infer final brand colors or a new content model from the wireframe."]
+  }
+}
