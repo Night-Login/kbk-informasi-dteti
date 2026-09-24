@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { apiRequest, type ResearchSummary } from "@/lib/api";
 const initialClusters = [
@@ -11,7 +10,6 @@ const initialClusters = [
 export default function ResearchSection() {
   const [clusters, setClusters] = useState(initialClusters);
   const [loaded, setLoaded] = useState(false);
-  const [paused, setPaused] = useState(false);
   useEffect(() => {
     const controller = new AbortController();
     apiRequest<ResearchSummary>("research", { signal: controller.signal }).then((data) => {
@@ -19,12 +17,11 @@ export default function ResearchSection() {
     }).catch(() => {});
     return () => controller.abort();
   }, []);
-  return <section className={`discovery-clusters ${paused ? "is-paused" : ""}`} aria-label="Research clusters">
+  return <section className="discovery-clusters" aria-label="Research clusters">
     <div className="discovery-marquee-window"><div className="discovery-marquee-track">
       {[0, 1].map((copy) => <div key={copy} className="discovery-marquee-group" aria-hidden={copy === 1 ? true : undefined} inert={copy === 1 ? true : undefined}>
         {clusters.map((cluster) => <Link key={cluster.slug} href={loaded ? `/research-areas#cluster-${encodeURIComponent(cluster.slug)}` : "/research-areas"} className="discovery-cluster" tabIndex={copy === 1 ? -1 : undefined}>{cluster.name}</Link>)}
       </div>)}
     </div></div>
-    <button className="discovery-cluster-pause discovery-icon-button" onClick={() => setPaused(!paused)} aria-label={paused ? "Play cluster animation" : "Pause cluster animation"} aria-pressed={paused}>{paused ? <Play size={15} /> : <Pause size={15} />}</button>
   </section>;
 }

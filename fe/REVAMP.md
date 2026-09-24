@@ -44,3 +44,5 @@ All static interface copy, accessibility labels, preview fixtures, metadata desc
 Shared search is now a native dialog with one input, close control and a compact list of titles with plain content-type labels. No popular-topic chips, photos, badges or multi-panel result cards. It supports keyboard navigation, focus restoration, cancellation of outdated searches, and explicit loading/error/empty states. The hero topic rotation and cluster marquee remain adaptations of the supplied references, not frame-for-frame copies.
 
 Hero interaction correction: a dedicated HeroSearch input now searches inline and displays up to six results below the field. It does not dispatch the header modal event. Keyboard navigation, Escape, clear, loading, retry and no-results states are supported.
+
+Navigation/footer refinement: social links now render icons; visible pause/resume controls are removed. The navigation drawer opens and closes from the right, supports Escape, restores focus, and respects reduced motion.

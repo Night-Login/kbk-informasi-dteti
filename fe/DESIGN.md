@@ -39,10 +39,10 @@ Container width min(90%, 1440px). Article feed max-width 760px; event/news grids
 Flat tonal surfaces with no card shadows. Selected tabs use an underline; focus uses a 2px outline.
 
 ## Shapes
-Cards use 6–8px corners; media 3px. UGM mark comes from the user-supplied PNG. Round controls are reserved for motion pause and the editorial avatar placeholder.
+Cards use 6–8px corners; media 3px. UGM mark comes from the user-supplied PNG. The editorial avatar uses a circular placeholder.
 
 ## Components
-Hero uses a dedicated inline search component with results below its input. The header search opens the separate shared modal. Rotating search prompts run for 16 seconds; cluster marquee runs for 40 seconds, supports pause and stops on hover/focus. Reduced motion shows static text and wrapped cluster links. Tabs support arrows/Home/End. Events retain date, duration, location, description disclosure and calendar. Loading, error, retry and empty states use plain text. Explicit ?preview=1 fixtures carry a notice and never replace live API failures. Article and News currently share the existing news API model; no social counts are fabricated.
+Hero uses a dedicated inline search component with results below its input. The header search opens the separate shared modal. Rotating search prompts run for 16 seconds; cluster marquee runs for 40 seconds, stops on hover/focus. Reduced motion shows static text and wrapped cluster links. Tabs support arrows/Home/End. Events retain date, duration, location, description disclosure and calendar. Loading, error, retry and empty states use plain text. Explicit ?preview=1 fixtures carry a notice and never replace live API failures. Article and News currently share the existing news API model; no social counts are fabricated.
 
 ## Do's and Don'ts
 - Do preserve user-directed low-fidelity placeholder blocks.
@@ -51,3 +51,5 @@ Hero uses a dedicated inline search component with results below its input. The 
 - Do not infer final brand colors or a new content model from the wireframe.
 
 English is the interface language; official proper names remain unchanged. Shared search uses a plain white dialog, gray border, one input and compact text-only results. It has no popular-topic chips, imagery or badges. The native modal handles focus containment and Escape, and search requests discard aborted responses.
+
+Navigation uses a grayscale panel that slides in from the right over 360ms, with animated link underlines and a reduced-motion fallback. Footer social links use icons with accessible names. Hero and cluster pause/resume buttons are removed.
