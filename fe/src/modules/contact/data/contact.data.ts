@@ -34,7 +34,7 @@ export const contactSocialLinks = [
 
 export const contactAddress = {
   title:
-    "Departemen Teknik Elektro dan Teknologi Informasi, Fakultas Teknik Universitas Gadjah Mada",
+    "Department of Electrical and Information Engineering, Faculty of Engineering, Universitas Gadjah Mada",
   lines: [
     "Jl. Grafika No. 2, Sendowo, Sinduadi, Kec. Mlati, Kab. Sleman, Daerah Istimewa Yogyakarta 55281",
   ],

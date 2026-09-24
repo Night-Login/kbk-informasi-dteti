@@ -13,7 +13,7 @@ export default function BrandMark({ compact = false }: BrandMarkProps) {
   return (
     <Link
       href="/"
-      aria-label="Departemen Teknik Elektro dan Teknologi Informasi, kembali ke beranda"
+      aria-label="Department of Electrical and Information Engineering — back to home"
       className={`inline-flex shrink-0 items-center ${
         compact ? "h-12 w-32 sm:h-14 sm:w-40" : "h-28 w-64 sm:w-80"
       }`}

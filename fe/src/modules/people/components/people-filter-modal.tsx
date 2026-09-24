@@ -121,7 +121,7 @@ export default function PeopleFilterModal({
             <div className="flex flex-wrap gap-2">
               {[
                 { label: "All Status", value: "all" },
-                { label: "Available / Kuota Tersedia", value: "available" },
+                { label: "Available for supervision", value: "available" },
                 { label: "Unavailable / Penuh", value: "unavailable" },
               ].map((item) => {
                 const isSelected =

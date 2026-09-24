@@ -12,10 +12,10 @@ type AppLayoutProps = Readonly<{ children: React.ReactNode }>;
 
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
-    <html lang="id" className={publicSans.variable}>
+    <html lang="en" className={publicSans.variable}>
       <body>
         <a className="skip-link" href="#main-content">
-          Lewati ke konten utama
+          Skip to main content
         </a>
         <Navbar />
         {children}

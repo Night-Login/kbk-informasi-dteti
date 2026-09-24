@@ -1,6 +1,6 @@
 export const publicationData = [
   {
-    title: "Judul Publikasi (link) Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    title: "Judul Publications (link) Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     type: "Jurnal",
     date: "07 Juli 2026",
     authors: "Orang yang terlibat, Orang x, Orang y, Orang Z,",

@@ -118,7 +118,7 @@ export function TrashPage() {
                   <TableCell>{String(record.id)}</TableCell>
                   <TableCell>
                     {record.deleted_at || record.deletedAt
-                      ? new Date(record.deleted_at || record.deletedAt).toLocaleString("id-ID")
+                      ? new Date(record.deleted_at || record.deletedAt).toLocaleString("en-GB")
                       : "—"}
                   </TableCell>
                   <TableCell align="right">

@@ -9,7 +9,7 @@ const AdminApp = dynamic(() => import("@/modules/admin/AdminApp"), {
     <div className="flex h-screen w-full items-center justify-center bg-slate-50">
       <div className="flex flex-col items-center gap-3">
         <div className="size-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-        <span className="text-sm font-semibold text-slate-600">Memuat Portal Manajemen DTETI...</span>
+        <span className="text-sm font-semibold text-slate-600">Loading the DTETI management portal...</span>
       </div>
     </div>
   ),
