@@ -343,7 +343,7 @@ export async function getHomepageContent() {
     const [settings, news, events] = await Promise.all([
         getPublicSettings(),
         listContent("news", { limit: "6" }, true),
-        listContent("events", { limit: "6" }, true),
+        listContent("events", { limit: "8" }, true),
     ]);
 
     return { settings, news, events };
