@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Mail, MapPin, Menu, Search, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { InstagramIcon, FacebookIcon, YoutubeIcon } from '@/components/global/social-icons';
 import SearchModal from "@/components/global/search-modal";
 import { siteAboutInEnglish } from "@/config/site";
@@ -20,14 +20,13 @@ export const discoveryLinks = [
 export function DiscoveryHeader({ home }: { home: boolean }) {
   const [menu, setMenu] = useState(false);
   const [search, setSearch] = useState(false);
-  const drawer = useRef<HTMLDialogElement>(null);
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    if (!menu) { drawer.current?.close(); return; }
-    const previousOverflow = document.body.style.overflow;
-    drawer.current?.showModal();
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = previousOverflow; };
-  }, [menu]);
+    const update = () => setScrolled(window.scrollY > 80);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
@@ -39,7 +38,8 @@ export function DiscoveryHeader({ home }: { home: boolean }) {
     return () => { window.removeEventListener("keydown", onKey); };
   }, []);
   return <>
-    <header className={`discovery-header ${home ? "discovery-header-home" : ""}`}>
+    {!home && <div className="discovery-header-spacer" aria-hidden="true" />}
+    <header className={`discovery-header ${home ? "discovery-header-home" : ""} ${scrolled ? "discovery-header-scrolled" : ""}`}>
       <Link href="/" aria-label="UGM — Home" className="discovery-logo">
         <Image src="/images/ugm-mark-white.png" alt="Universitas Gadjah Mada" width={80} height={86} priority />
       </Link>
@@ -48,15 +48,10 @@ export function DiscoveryHeader({ home }: { home: boolean }) {
       </nav>
       <div className="discovery-header-actions">
         <button className="discovery-icon-button" onClick={() => setSearch(true)} aria-label="Search website"><Search size={22} /></button>
-        <button className="discovery-icon-button discovery-menu-toggle" onClick={() => setMenu(true)} aria-label="Open menu" aria-expanded={menu} aria-controls="discovery-menu"><Menu /></button>
+        <button className="discovery-icon-button discovery-menu-toggle" onClick={() => setMenu(!menu)} aria-label={menu ? "Close menu" : "Open menu"} aria-expanded={menu} aria-controls="discovery-menu">{menu ? <X /> : <Menu />}</button>
       </div>
+      {menu && <nav id="discovery-menu" className="discovery-mobile-nav" aria-label="Mobile navigation">{discoveryLinks.map((link) => <Link key={link.label} href={link.href} onClick={() => setMenu(false)}>{link.label}</Link>)}</nav>}
     </header>
-    <dialog ref={drawer} id="discovery-menu" className="discovery-nav-drawer" aria-label="Site navigation" onCancel={() => setMenu(false)} onClick={(event) => { if (event.target === event.currentTarget) setMenu(false); }}>
-      <div className="discovery-nav-panel">
-        <div className="discovery-nav-tools"><button className="discovery-icon-button" onClick={() => setMenu(false)} aria-label="Close menu"><X /></button></div>
-        <nav aria-label="Expanded navigation">{discoveryLinks.map((link) => <Link key={link.label} href={link.href} aria-current={(home && link.href === "/") || (!home && link.href === "/events") ? "page" : undefined} onClick={() => setMenu(false)}>{link.label}</Link>)}</nav>
-      </div>
-    </dialog>
     <SearchModal isOpen={search} onClose={() => setSearch(false)} />
   </>;
 }

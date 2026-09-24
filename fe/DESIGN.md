@@ -52,4 +52,4 @@ Hero uses a dedicated inline search component with results below its input. The 
 
 English is the interface language; official proper names remain unchanged. Shared search uses a plain white dialog, gray border, one input and compact text-only results. It has no popular-topic chips, imagery or badges. The native modal handles focus containment and Escape, and search requests discard aborted responses.
 
-Navigation uses a grayscale panel that slides in from the right over 360ms, with animated link underlines and a reduced-motion fallback. Footer social links use icons with accessible names. Hero and cluster pause/resume buttons are removed.
+Navigation stays fixed and transitions from a spacious transparent header to a compact white bar after 80px of scrolling, with dark text and logo. Returning to the top restores the initial state. Desktop uses text links; the original dropdown menu is mobile-only. Footer social links use icons. Hero and cluster pause/resume buttons are removed.

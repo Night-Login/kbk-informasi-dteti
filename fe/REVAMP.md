@@ -46,3 +46,5 @@ Shared search is now a native dialog with one input, close control and a compact
 Hero interaction correction: a dedicated HeroSearch input now searches inline and displays up to six results below the field. It does not dispatch the header modal event. Keyboard navigation, Escape, clear, loading, retry and no-results states are supported.
 
 Navigation/footer refinement: social links now render icons; visible pause/resume controls are removed. The navigation drawer opens and closes from the right, supports Escape, restores focus, and respects reduced motion.
+
+Scroll correction: removed the navigation drawer and desktop hamburger. The fixed header now transitions at 80px scroll from transparent/spacious to white/compact and back; original mobile navigation is retained.
