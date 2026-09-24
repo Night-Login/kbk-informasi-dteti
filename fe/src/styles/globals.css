@@ -351,3 +351,21 @@ a {
 .simple-search [role=option][aria-selected=true], .simple-search [role=option]:hover { background: #eee; }
 .simple-search-retry { margin-top: 12px; padding: 8px 12px; border: 1px solid #888; border-radius: 4px; font-size: 13px; cursor: pointer; }
 @media (max-width: 700px) { .simple-search { margin-top: 7vh; } .simple-search-input-row { padding-inline: 16px 10px; gap: 10px; } .simple-search-body { padding: 16px; } }
+
+/* Inline hero search, independent of the header dialog. */
+.hero-search { width: 96%; margin-inline: auto; text-align: left; }
+.hero-search-field { width: 100%; margin: 0; }
+.hero-search-field input { display: block; width: 100%; min-width: 0; padding-right: 48px; height: 1.3em; background: transparent; color: inherit; font: inherit; outline: none; }
+.hero-search-field:focus-within { border-bottom-width: 3px; }
+.hero-search-placeholder { position: absolute; inset: 0; pointer-events: none; }
+.hero-search-clear { position: absolute; right: 0; top: -4px; width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer; }
+.hero-search-results { margin-top: 12px; background: #f3f3f3; color: #202124; border-radius: 4px; padding: 8px 16px; max-height: 280px; overflow-y: auto; }
+.hero-search-results p:not(:empty) { padding: 12px 0; font-size: 14px; }
+.hero-search-results a { display: block; padding: 13px 8px; font-size: 15px; line-height: 1.4; overflow-wrap: anywhere; }
+.hero-search-results li + li { border-top: 1px solid #d7d7d7; }
+.hero-search-results a:hover, .hero-search-results [aria-selected=true] { background: #ddd; }
+.hero-search-results button { padding: 10px 0; text-decoration: underline; cursor: pointer; }
+@media (max-width: 700px) { .hero-search { width: 100%; } }
+.discovery-hero .hero-search-field input:focus-visible { outline: none; }
+.hero-search-placeholder { white-space: nowrap; overflow: hidden; }
+.hero-search-placeholder .discovery-search-static, .hero-search-placeholder .discovery-search-animation > span { overflow: hidden; text-overflow: ellipsis; }

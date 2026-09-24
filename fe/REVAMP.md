@@ -42,3 +42,5 @@ The documentation agent could not run due to its usage limit; the scoped design 
 All static interface copy, accessibility labels, preview fixtures, metadata descriptions and date locale use English. KBK Informasi and Universitas Gadjah Mada remain official proper names. Custom database-authored editorial content retains its source text; the known legacy footer default is translated at display time.
 
 Shared search is now a native dialog with one input, close control and a compact list of titles with plain content-type labels. No popular-topic chips, photos, badges or multi-panel result cards. It supports keyboard navigation, focus restoration, cancellation of outdated searches, and explicit loading/error/empty states. The hero topic rotation and cluster marquee remain adaptations of the supplied references, not frame-for-frame copies.
+
+Hero interaction correction: a dedicated HeroSearch input now searches inline and displays up to six results below the field. It does not dispatch the header modal event. Keyboard navigation, Escape, clear, loading, retry and no-results states are supported.

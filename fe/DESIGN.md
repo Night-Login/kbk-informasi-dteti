@@ -42,7 +42,7 @@ Flat tonal surfaces with no card shadows. Selected tabs use an underline; focus 
 Cards use 6–8px corners; media 3px. UGM mark comes from the user-supplied PNG. Round controls are reserved for motion pause and the editorial avatar placeholder.
 
 ## Components
-Hero opens the shared search modal. Rotating search prompts run for 16 seconds; cluster marquee runs for 40 seconds, supports pause and stops on hover/focus. Reduced motion shows static text and wrapped cluster links. Tabs support arrows/Home/End. Events retain date, duration, location, description disclosure and calendar. Loading, error, retry and empty states use plain text. Explicit ?preview=1 fixtures carry a notice and never replace live API failures. Article and News currently share the existing news API model; no social counts are fabricated.
+Hero uses a dedicated inline search component with results below its input. The header search opens the separate shared modal. Rotating search prompts run for 16 seconds; cluster marquee runs for 40 seconds, supports pause and stops on hover/focus. Reduced motion shows static text and wrapped cluster links. Tabs support arrows/Home/End. Events retain date, duration, location, description disclosure and calendar. Loading, error, retry and empty states use plain text. Explicit ?preview=1 fixtures carry a notice and never replace live API failures. Article and News currently share the existing news API model; no social counts are fabricated.
 
 ## Do's and Don'ts
 - Do preserve user-directed low-fidelity placeholder blocks.

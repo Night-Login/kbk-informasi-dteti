@@ -27,9 +27,7 @@ export function DiscoveryHeader({ home }: { home: boolean }) {
       if (event.key === "Escape") setMenu(false);
     };
     window.addEventListener("keydown", onKey);
-    const openSearch = () => setSearch(true);
-    window.addEventListener("discovery:open-search", openSearch);
-    return () => { window.removeEventListener("keydown", onKey); window.removeEventListener("discovery:open-search", openSearch); };
+    return () => { window.removeEventListener("keydown", onKey); };
   }, []);
   return <>
     <header className={`discovery-header ${home ? "discovery-header-home" : ""}`}>
