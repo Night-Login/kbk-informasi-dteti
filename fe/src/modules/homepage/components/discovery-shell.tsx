@@ -15,7 +15,7 @@ export const discoveryLinks = [
   { label: "People", href: "/people" },
   { label: "News", href: "/news" },
   { label: "Events", href: "/events" },
-  { label: "About", href: "/#about" },
+  { label: "About", href: "/about" },
 ];
 
 export function DiscoveryHeader({ home }: { home: boolean }) {
