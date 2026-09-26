@@ -96,7 +96,9 @@ export default function Navbar() {
     return null;
   }
 
-  if (pathname === "/" || pathname === "/events") return <DiscoveryHeader key={pathname} home={pathname === "/"} />;
+  if (pathname === "/" || pathname === "/events" || pathname?.startsWith("/people")) {
+    return <DiscoveryHeader key={pathname} home={pathname === "/" || pathname.startsWith("/people")} />;
+  }
 
   return (
     <>

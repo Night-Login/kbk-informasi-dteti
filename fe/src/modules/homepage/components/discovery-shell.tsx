@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Mail, MapPin, Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { InstagramIcon, FacebookIcon, YoutubeIcon } from '@/components/global/social-icons';
@@ -18,6 +19,7 @@ export const discoveryLinks = [
 ];
 
 export function DiscoveryHeader({ home }: { home: boolean }) {
+  const pathname = usePathname();
   const [menu, setMenu] = useState(false);
   const [search, setSearch] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -44,7 +46,10 @@ export function DiscoveryHeader({ home }: { home: boolean }) {
         <Image src="/images/ugm-mark-white.png" alt="Universitas Gadjah Mada" width={80} height={86} priority />
       </Link>
       <nav className="discovery-desktop-nav" aria-label="Main navigation">
-        {discoveryLinks.map((link) => <Link key={link.label} href={link.href} aria-current={(home && link.href === "/") || (!home && link.href === "/events") ? "page" : undefined}>{link.label}</Link>)}
+        {discoveryLinks.map((link) => {
+          const active = link.href === "/people" ? pathname?.startsWith("/people") : pathname === link.href;
+          return <Link key={link.label} href={link.href} aria-current={active ? "page" : undefined}>{link.label}</Link>;
+        })}
       </nav>
       <div className="discovery-header-actions">
         <button className="discovery-icon-button" onClick={() => setSearch(true)} aria-label="Search website"><Search size={22} /></button>

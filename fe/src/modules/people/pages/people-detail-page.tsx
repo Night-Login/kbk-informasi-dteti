@@ -1,72 +1,37 @@
 "use client";
 
-import Breadcrumbs from "@/components/global/breadcrumbs";
-import DataTable, {
-  type DataTableColumn,
-  type DataTableFilter,
-  type DataTableRow,
-} from "@/components/global/data-table";
-import TopicTag from "@/components/global/topic-tag";
+import PeopleHero from "@/modules/people/components/people-hero";
 import {
   ApiError,
   apiRequest,
   getApiAssetUrl,
-  lecturerIsAvailable,
   type Lecturer,
   type Publication,
 } from "@/lib/api";
-import {
-  ArrowRight,
-  BarChart3,
-  ExternalLink,
-  GraduationCap,
-  Link2,
-  LoaderCircle,
-  Mail,
-  Search,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-
-const adviseeColumns: DataTableColumn[] = [
-  { key: "no", label: "No", className: "w-16 text-center" },
-  { key: "name", label: "Student Name", className: "min-w-48" },
-  { key: "level", label: "Level", className: "w-24 text-center" },
-  { key: "project", label: "Project", className: "min-w-80" },
-  { key: "researchArea", label: "Research Areas", className: "min-w-40" },
-];
-
-const adviseeFilters: DataTableFilter[] = [
-  { label: "Show All", value: "all" },
-  { label: "Bachelor (S1)", value: "S1" },
-  { label: "Master (S2)", value: "S2" },
-  { label: "Doctor (S3)", value: "S3" },
-];
-
-const taColumns: DataTableColumn[] = [
-  { key: "no", label: "No", className: "w-16 text-center" },
-  { key: "name", label: "Student Name", className: "min-w-48" },
-  { key: "nim", label: "Student ID (NIM)", className: "min-w-32" },
-  { key: "course", label: "Course Name", className: "min-w-48" },
-  { key: "period", label: "Academic Period", className: "min-w-32 text-center" },
-  { key: "status", label: "Status", className: "min-w-24 text-center" },
-];
-
-const taFilters: DataTableFilter[] = [
-  { label: "Show All", value: "all" },
-  { label: "Active", value: "Active" },
-  { label: "Completed", value: "Completed" },
-];
 
 function publicationTimestamp(publication: Publication) {
   if (publication.publication_date) {
     const timestamp = Date.parse(publication.publication_date);
     if (Number.isFinite(timestamp)) return timestamp;
   }
-
   return Date.UTC(publication.year || 0, 0, 1);
+}
+
+function publicationDate(publication: Publication) {
+  if (!publication.publication_date) return publication.year ? String(publication.year) : "";
+  const date = new Date(publication.publication_date);
+  return Number.isNaN(date.getTime())
+    ? String(publication.year || "")
+    : new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }).format(date);
 }
 
 export default function PeopleDetailPage() {
@@ -115,62 +80,31 @@ export default function PeopleDetailPage() {
         .filter((tag): tag is NonNullable<typeof tag> => Boolean(tag)) || [],
     [lecturer],
   );
+
+  const interests = useMemo(
+    () => [...new Set(tags.map((tag) => tag.cluster?.name).filter(Boolean))] as string[],
+    [tags],
+  );
+
   const latestPublications = useMemo(
     () =>
       (lecturer?.publications || [])
         .map((relation) => relation.publication)
-        .filter(
-          (publication): publication is Publication => Boolean(publication),
-        )
-        .sort((first, second) => {
-          const dateDifference =
-            publicationTimestamp(second) - publicationTimestamp(first);
-          return dateDifference || first.title.localeCompare(second.title);
-        })
-        .slice(0, 5),
+        .filter((publication): publication is Publication => Boolean(publication))
+        .sort((first, second) => publicationTimestamp(second) - publicationTimestamp(first))
+        .slice(0, 2),
     [lecturer],
   );
-  const adviseeRows = useMemo<DataTableRow[]>(
-    () =>
-      (lecturer?.supervised_students || []).map((student, index) => ({
-        id: student.id || String(index),
-        filterValue: student.program_level || "",
-        cells: {
-          no: index + 1,
-          name: student.student_name,
-          level: student.program_level || "—",
-          project: student.thesis_title || "—",
-          researchArea: student.supervision_role || "—",
-        },
-      })),
-    [lecturer],
-  );
-  const taRows = useMemo<DataTableRow[]>(
-    () =>
-      (lecturer?.teaching_assistants || []).map((ta, index) => ({
-        id: ta.id || String(index),
-        filterValue: ta.status || "",
-        cells: {
-          no: index + 1,
-          name: ta.student_name,
-          nim: ta.student_id_number || "—",
-          course: ta.course_name || "—",
-          period: ta.academic_period || "—",
-          status: ta.status || "—",
-        },
-      })),
-    [lecturer],
-  );
-  const education = lecturer?.education || [];
-  const teachingAssistants = lecturer?.teaching_assistants || [];
-  const awards = lecturer?.awards || [];
 
   if (loading) {
     return (
-      <main id="main-content" className="grid min-h-screen place-items-center bg-white pt-20">
-        <div className="flex items-center gap-3 text-dteti-blue" role="status">
-          <LoaderCircle className="animate-spin" aria-hidden="true" />
-          <span className="font-semibold">Loading lecturer profile…</span>
+      <main id="main-content" className="min-h-screen bg-white text-[#151729]">
+        <PeopleHero />
+        <div className="grid min-h-80 place-items-center" role="status">
+          <div className="flex items-center gap-3">
+            <LoaderCircle className="animate-spin" aria-hidden="true" />
+            <span>Loading lecturer profile…</span>
+          </div>
         </div>
       </main>
     );
@@ -178,340 +112,168 @@ export default function PeopleDetailPage() {
 
   if (error || !lecturer) {
     return (
-      <main id="main-content" className="min-h-screen bg-white pb-20 pt-28">
-        <div className="page-container">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "People", href: "/people" },
-              { label: "Profile unavailable" },
-            ]}
-          />
-          <div className="mt-10 border border-line bg-surface px-6 py-16 text-center">
-            <h1 className="text-2xl font-bold text-dteti-blue">
-              Lecturer profile not found
-            </h1>
-            <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
-              {error || "The requested lecturer profile is unavailable."}
-            </p>
-            <Link
-              href="/people"
-              className="mt-6 inline-flex min-h-11 items-center bg-dteti-blue px-5 text-sm font-semibold text-white"
-            >
-              Back to People
-            </Link>
-          </div>
+      <main id="main-content" className="min-h-screen bg-white text-[#151729]">
+        <PeopleHero />
+        <div className="mx-auto max-w-4xl px-5 py-16 text-center">
+          <h2 className="text-2xl font-semibold">Lecturer profile not found</h2>
+          <p className="mt-3 text-sm text-[#7c8999]">{error || "The requested profile is unavailable."}</p>
+          <Link href="/people" className="mt-6 inline-flex min-h-12 items-center border border-[#808080] px-5 font-medium">
+            <ArrowLeft size={17} aria-hidden="true" />
+            <span className="ml-2">All people</span>
+          </Link>
         </div>
       </main>
     );
   }
 
   const photoUrl = getApiAssetUrl(lecturer.photo_url);
-  const isAvailable = lecturerIsAvailable(lecturer);
-  const academicLinks = [
-    lecturer.sinta_id
-      ? {
-          label: "SINTA",
-          href: `https://sinta.kemdikbud.go.id/authors/profile/${lecturer.sinta_id}`,
-          icon: GraduationCap,
-        }
-      : null,
-    lecturer.scopus_author_id
-      ? {
-          label: "Scopus",
-          href: `https://www.scopus.com/authid/detail.uri?authorId=${lecturer.scopus_author_id}`,
-          icon: Link2,
-        }
-      : null,
-    lecturer.google_scholar_url
-      ? {
-          label: "Google Scholar",
-          href: lecturer.google_scholar_url,
-          icon: Search,
-        }
-      : lecturer.google_scholar_id
-        ? {
-            label: "Google Scholar",
-            href: `https://scholar.google.com/citations?user=${lecturer.google_scholar_id}`,
-            icon: Search,
-          }
-        : null,
-    lecturer.orcid_id
-      ? {
-          label: "ORCID",
-          href: `https://orcid.org/${lecturer.orcid_id}`,
-          icon: ExternalLink,
-        }
-      : null,
-  ].filter((link): link is NonNullable<typeof link> => Boolean(link));
+  const education = lecturer.education || [];
+  const overview = lecturer.bio || lecturer.short_bio || "Biography has not been added yet.";
 
   return (
-    <main id="main-content" className="min-h-screen bg-white pb-20 pt-24 sm:pt-28">
-      <div className="page-container">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: "People", href: "/people" },
-            { label: lecturer.full_name },
-          ]}
-        />
+    <main id="main-content" className="min-h-screen bg-white text-[#1f1f1f]">
+      <PeopleHero />
 
-        <section className="mt-6 overflow-hidden" aria-labelledby="profile-name">
-          <div className="grid lg:grid-cols-[20rem_minmax(0,1fr)]">
-            <div className="relative min-h-72 bg-surface-strong lg:min-h-[26rem]">
-              {photoUrl ? (
-                <Image
-                  src={photoUrl}
-                  alt={`Portrait of ${lecturer.full_name}`}
-                  fill
-                  sizes="(min-width: 1024px) 20rem, 100vw"
-                  className="object-cover"
-                  unoptimized
-                  priority
-                />
-              ) : (
-                <div className="grid size-full place-items-center text-7xl font-bold text-muted">
-                  {lecturer.full_name.charAt(0)}
-                </div>
-              )}
-            </div>
+      <div className="mx-auto w-[90%] max-w-[1296px] py-12 sm:py-14">
+        <Link
+          href="/people"
+          className="inline-flex min-h-12 min-w-44 items-center justify-center gap-2 border border-[#808080] px-5 text-sm font-medium transition-colors hover:bg-[#f1f1f1]"
+        >
+          <ArrowLeft size={17} aria-hidden="true" />
+          All people
+        </Link>
 
-            <div className="brand-gradient grid gap-10 p-6 text-white sm:p-10 xl:grid-cols-[minmax(0,1fr)_18rem] xl:p-12">
-              <div>
-                <h1
-                  id="profile-name"
-                  className="text-3xl font-bold leading-tight text-dteti-yellow sm:text-4xl"
-                >
-                  {lecturer.full_name}
-                </h1>
-                <p className="mt-2 text-lg font-semibold text-white">
-                  {lecturer.academic_title || "Lecturer"}
-                </p>
-                <p className="mt-2 text-sm font-semibold text-white/90">
-                  Supervision: {isAvailable ? "Available" : lecturer.supervision_status || "Unavailable"}
-                </p>
-                {lecturer.short_bio ? (
-                  <p className="mt-6 max-w-3xl text-sm leading-6 text-white/90">
-                    {lecturer.short_bio}
-                  </p>
-                ) : null}
-
-                {lecturer.email ? (
-                  <a
-                    href={`mailto:${lecturer.email}`}
-                    className="mt-6 inline-flex min-h-11 items-center gap-3 border border-white/55 px-4 text-sm font-semibold text-white hover:bg-white hover:text-dteti-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow"
-                  >
-                    <Mail size={17} aria-hidden="true" />
-                    {lecturer.email}
-                  </a>
-                ) : null}
+        <section className="mt-3 grid overflow-hidden bg-[#d9d9d9] lg:grid-cols-[420px_minmax(0,1fr)]" aria-labelledby="profile-name">
+          <div className="relative min-h-[340px] bg-white lg:min-h-[381px]">
+            {photoUrl ? (
+              <Image
+                src={photoUrl}
+                alt={`Portrait of ${lecturer.full_name}`}
+                fill
+                priority
+                unoptimized
+                sizes="(min-width: 1024px) 420px, 90vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="grid size-full place-items-center bg-[linear-gradient(45deg,#f3f3f3_25%,transparent_25%),linear-gradient(-45deg,#f3f3f3_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f3f3f3_75%),linear-gradient(-45deg,transparent_75%,#f3f3f3_75%)] bg-[length:36px_36px] bg-[position:0_0,0_18px,18px_-18px,-18px_0] text-7xl font-bold text-[#7c8999]">
+                {lecturer.full_name.charAt(0)}
               </div>
-
-              <aside className="space-y-7">
-                <div>
-                  <h2 className="text-base font-semibold text-white">Research Areas</h2>
-                  {tags.length > 0 ? (
-                    <ul className="mt-3 flex flex-wrap gap-2">
-                      {tags.map((tag) => (
-                        <li key={tag.id}>
-                          <Link
-                            href={`/tag-research-areas/${tag.slug}`}
-                            className="inline-flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-dteti-blue"
-                          >
-                            <TopicTag>{tag.name}</TopicTag>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="mt-2 text-sm text-white/80">
-                      Research tags have not been assigned yet.
-                    </p>
-                  )}
-                </div>
-
-                {academicLinks.length > 0 ? (
-                  <div>
-                    <h2 className="text-base font-semibold text-white">Academic Profiles</h2>
-                    <ul className="mt-3 space-y-3 text-sm">
-                      {academicLinks.map(({ label, href, icon: Icon }) => (
-                        <li key={label}>
-                          <a
-                            href={href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-3 hover:underline"
-                          >
-                            <Icon size={16} aria-hidden="true" />
-                            {label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </aside>
-            </div>
+            )}
           </div>
-        </section>
 
-        <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
-          <section aria-labelledby="biography-heading">
-            <h2 id="biography-heading" className="text-2xl font-bold text-dteti-blue sm:text-3xl">
-              Biography
-            </h2>
-            <div className="mt-5 max-w-4xl space-y-5 text-base leading-8 text-ink">
-              {(lecturer.bio || lecturer.short_bio || "Biography has not been added yet.")
-                .split("\n\n")
-                .map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
+          <div className="grid gap-10 px-6 py-7 sm:px-10 lg:grid-cols-[minmax(0,1fr)_minmax(230px,0.75fr)] lg:px-11">
+            <div className="flex min-w-0 flex-col">
+              <h1 id="profile-name" className="text-3xl font-semibold leading-tight sm:text-4xl">
+                {lecturer.full_name}
+              </h1>
+              <p className="mt-1 text-lg">{lecturer.academic_title || "Lecturer"}</p>
+              {lecturer.email ? (
+                <a href={`mailto:${lecturer.email}`} className="mt-3 w-fit text-base hover:underline">
+                  {lecturer.email}
+                </a>
+              ) : null}
+
+              {tags.length ? (
+                <ul className="mt-auto flex flex-wrap gap-2 pt-8">
+                  {tags.slice(0, 3).map((tag) => (
+                    <li key={tag.id}>
+                      <Link
+                        href={`/tag-research-areas/${tag.slug}`}
+                        className="inline-flex min-h-9 items-center border border-[#808080] bg-white px-4 text-xs font-medium hover:bg-[#f1f1f1]"
+                      >
+                        {tag.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
-          </section>
 
-          <aside className="space-y-8">
-            <section aria-labelledby="metrics-heading">
-              <h2 id="metrics-heading" className="flex items-center gap-2 text-lg font-bold text-dteti-blue">
-                <BarChart3 size={20} aria-hidden="true" />
-                Research Metrics
-              </h2>
-              {lecturer.metrics ? (
-                <dl className="mt-4 divide-y divide-line border-y border-line text-sm">
-                  <div className="flex justify-between gap-4 py-3">
-                    <dt className="text-muted">H-index</dt>
-                    <dd className="font-semibold text-ink">{lecturer.metrics.h_index ?? "—"}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4 py-3">
-                    <dt className="text-muted">Citations</dt>
-                    <dd className="font-semibold text-ink">{lecturer.metrics.total_citations ?? "—"}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4 py-3">
-                    <dt className="text-muted">SINTA score</dt>
-                    <dd className="font-semibold text-ink">{lecturer.metrics.sinta_score ?? "—"}</dd>
-                  </div>
-                </dl>
-              ) : (
-                <p className="mt-3 text-sm leading-6 text-muted">
-                  Research metrics have not been added yet.
-                </p>
-              )}
-            </section>
-
-            <section aria-labelledby="education-heading">
-              <h2 id="education-heading" className="text-lg font-bold text-dteti-blue">
-                Education
-              </h2>
-              {education.length > 0 ? (
-                <ul className="mt-3 space-y-4 text-sm leading-6 text-ink">
-                  {education.map((edu) => (
-                    <li key={edu.id}>
-                      <p className="font-semibold">{edu.degree} in {edu.field || 'General'}</p>
-                      <p className="text-muted">{edu.institution}{edu.year ? ` (${edu.year})` : ''}</p>
+            <div>
+              <h2 className="text-xl font-semibold sm:text-2xl">Education History</h2>
+              {education.length ? (
+                <ul className="mt-3 space-y-3 text-sm leading-6 sm:text-base">
+                  {education.slice(0, 3).map((item) => (
+                    <li key={item.id}>
+                      <p>{item.degree}{item.field ? ` · ${item.field}` : ""}</p>
+                      <p>{item.institution}{item.year ? ` · ${item.year}` : ""}</p>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="mt-3 text-sm leading-6 text-muted">
-                  Education history has not been added yet.
-                </p>
+                <p className="mt-3 text-sm text-[#5f6268]">Education history has not been added yet.</p>
               )}
+            </div>
+          </div>
+        </section>
+
+        <div className="mt-5 grid gap-12 lg:grid-cols-[minmax(0,1fr)_456px] lg:gap-16">
+          <section aria-labelledby="overview-heading">
+            <h2 id="overview-heading" className="text-2xl font-semibold sm:text-3xl">Overview</h2>
+            <div className="mt-5 max-w-3xl space-y-5 text-base leading-7 sm:text-lg sm:leading-8">
+              {overview.split("\n\n").map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+            </div>
+          </section>
+
+          <aside className="space-y-7">
+            <section aria-labelledby="expertise-heading">
+              <h2 id="expertise-heading" className="text-xl font-semibold sm:text-2xl">Speciality &amp; expertise</h2>
+              <ul className="mt-3 space-y-1 text-base leading-7">
+                {tags.length ? tags.slice(0, 5).map((tag) => <li key={tag.id}>{tag.name}</li>) : <li>Not specified yet</li>}
+              </ul>
+            </section>
+            <section aria-labelledby="interests-heading">
+              <h2 id="interests-heading" className="text-xl font-semibold sm:text-2xl">Research interests</h2>
+              <ul className="mt-3 space-y-1 text-base leading-7">
+                {interests.length ? interests.map((interest) => <li key={interest}>{interest}</li>) : <li>Not specified yet</li>}
+              </ul>
             </section>
           </aside>
         </div>
 
-        <section className="mt-14" aria-labelledby="advisees-heading">
-          <h2 id="advisees-heading" className="mb-5 text-2xl font-bold text-dteti-blue sm:text-3xl">
-            Advisees
-          </h2>
-          <DataTable
-            ariaLabel="Lecturer advisees"
-            columns={adviseeColumns}
-            rows={adviseeRows}
-            filters={adviseeFilters}
-            actionLabel="Action"
-            emptyMessage="Advisee data has not been added yet."
-            searchPlaceholder="Search advisees"
-            statusLabel="Supervisor status:"
-            statusTone={isAvailable ? "available" : "unavailable"}
-          />
-        </section>
-
-        <section className="mt-14" aria-labelledby="teaching-assistants-heading">
-          <h2 id="teaching-assistants-heading" className="mb-5 text-2xl font-bold text-dteti-blue sm:text-3xl">
-            Teaching Assistants
-          </h2>
-          <DataTable
-            ariaLabel="Teaching assistants"
-            columns={taColumns}
-            rows={taRows}
-            filters={taFilters}
-            actionLabel="Action"
-            emptyMessage="Teaching assistant data has not been added yet."
-            searchPlaceholder="Search teaching assistants"
-          />
-        </section>
-
-        <section className="mt-14" aria-labelledby="publications-heading">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <h2 id="publications-heading" className="text-2xl font-bold text-dteti-blue sm:text-3xl">
-              Latest Publications
-            </h2>
-            <Link
-              href={`/publication?lecturer=${encodeURIComponent(lecturer.slug)}`}
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-dteti-yellow px-5 text-sm font-bold text-dteti-ink transition-colors hover:bg-dteti-yellow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-blue focus-visible:ring-offset-2"
-            >
-              View all publications
-              <ArrowRight size={17} aria-hidden="true" />
-            </Link>
-          </div>
-          {latestPublications.length > 0 ? (
-            <ul className="mt-6 divide-y divide-line border-t border-line">
+        <section className="mt-14 max-w-[942px]" aria-labelledby="publications-heading">
+          <h2 id="publications-heading" className="text-2xl font-semibold sm:text-3xl">Recent Publications</h2>
+          {latestPublications.length ? (
+            <ul className="mt-6 space-y-7">
               {latestPublications.map((publication) => (
-                <li key={publication.id} className="py-5">
+                <li key={publication.id}>
                   <a
                     href={publication.url || `/publication#${publication.slug}`}
                     target={publication.url ? "_blank" : undefined}
                     rel={publication.url ? "noopener noreferrer" : undefined}
-                    className="text-lg font-bold text-ink hover:text-dteti-blue hover:underline"
+                    className="text-lg font-semibold leading-snug hover:underline sm:text-xl"
                   >
                     {publication.title}
                   </a>
-                  <p className="mt-1 text-sm text-muted">
-                    {[publication.publication_type, publication.venue, publication.year]
+                  <p className="mt-1 text-sm text-[#5f6268]">
+                    {[publication.publication_type || publication.venue, publicationDate(publication), publication.authors_text]
                       .filter(Boolean)
                       .join(" · ")}
                   </p>
+                  {tags.length ? (
+                    <ul className="mt-2 flex flex-wrap gap-3">
+                      {tags.slice(0, 2).map((tag) => (
+                        <li key={tag.id} className="rounded border border-[#151729] bg-[#fbfbfb] px-2 py-1 text-xs">
+                          {tag.name}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-5 bg-surface px-6 py-10 text-sm text-muted">
-              No publications have been linked to this profile.
-            </p>
+            <p className="mt-5 text-[#5f6268]">No publications have been linked to this profile.</p>
           )}
-        </section>
 
-        <section className="mt-12" aria-labelledby="awards-heading">
-          <h2 id="awards-heading" className="text-2xl font-bold text-dteti-blue sm:text-3xl">
-            Awards &amp; Honours
-          </h2>
-          {awards.length > 0 ? (
-            <ul className="mt-6 space-y-4 text-base text-ink">
-              {awards.map((award) => (
-                <li key={award.id}>
-                  <p className="font-semibold">{award.name}</p>
-                  <p className="text-sm text-muted">
-                    {award.institution} {award.year ? `· ${award.year}` : ''}
-                  </p>
-                  {award.description && <p className="mt-1 text-sm">{award.description}</p>}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-5 bg-surface px-6 py-10 text-sm text-muted">
-              Awards and honours have not been added yet.
-            </p>
-          )}
+          <Link
+            href={`/publication?lecturer=${encodeURIComponent(lecturer.slug)}`}
+            className="mt-8 inline-flex min-h-11 items-center gap-3 rounded-lg border border-[#151729] px-8 text-sm font-semibold transition-colors hover:bg-[#151729] hover:text-white"
+          >
+            Explore More Publications
+            <ArrowRight size={17} aria-hidden="true" />
+          </Link>
         </section>
       </div>
     </main>

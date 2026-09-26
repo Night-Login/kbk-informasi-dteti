@@ -38,7 +38,9 @@ export default function Footer() {
     return null;
   }
 
-  if (pathname === "/" || pathname === "/events") return <DiscoveryFooter settings={settings} />;
+  if (pathname === "/" || pathname === "/events" || pathname?.startsWith("/people")) {
+    return <DiscoveryFooter settings={settings} />;
+  }
 
   const about = siteAboutInEnglish(settings);
   const email = settings.contact_email || "teti@ugm.ac.id";
