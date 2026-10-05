@@ -1,199 +1,74 @@
 "use client";
 
-import Breadcrumbs from "@/components/global/breadcrumbs";
-import { apiRequest, getApiAssetUrl, type ResearchCluster, type ResearchSummary } from "@/lib/api";
-import { researchLandingCards } from "@/modules/research/data/research.data";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import DiscoveryPageHero from "@/components/global/discovery-page-hero";
+import PeopleFilterPanel from "@/modules/people/components/people-filter-panel";
+import ResearchResultCard from "@/modules/research/components/research-result-card";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import { apiRequest, type ResearchSummary, type PaginatedResult, type Project, type Publication, type Lecturer } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 
-function ResearchLandingCard({
-  card,
-  featured = false,
-}: {
-  card: (typeof researchLandingCards)[number];
-  featured?: boolean;
-}) {
-  return (
-    <article
-      className={featured ? "w-full md:col-span-2 md:max-w-3xl md:justify-self-center" : ""}
-    >
-      <h2 className="text-2xl font-bold text-dteti-blue sm:text-3xl">
-        {card.title}
-      </h2>
-      <p className="mt-2 max-w-2xl text-base leading-7 text-ink">
-        {card.description}
-      </p>
-      <Link
-        href={card.href}
-        className="mt-6 flex min-h-16 items-center justify-between bg-dteti-yellow px-7 text-lg font-bold text-dteti-ink transition-colors hover:bg-dteti-yellow/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 sm:px-12 sm:text-xl"
-      >
-        <span>{card.actionLabel}</span>
-        <ArrowRight size={24} aria-hidden="true" />
-      </Link>
-    </article>
-  );
-}
+export type ResearchView = "Publication" | "Project" | "People";
+export type ResearchResult = Project | Publication | Lecturer;
+const endpoints = { Publication: "publications", Project: "projects", People: "lecturers" };
 
 export default function ResearchPage() {
-  const [clusters, setClusters] = useState<ResearchCluster[]>([]);
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [activeSlide, setActiveSlide] = useState(0);
+  const [view, setView] = useState<ResearchView>("Project");
+  const [query, setQuery] = useState("");
+  const [tag, setTag] = useState("");
+  const [page, setPage] = useState(1);
+  const [research, setResearch] = useState<ResearchSummary | null>(null);
+  const [filterError, setFilterError] = useState("");
+  const [result, setResult] = useState<PaginatedResult<ResearchResult> | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [retry, setRetry] = useState(0);
+  const search = useDebouncedValue(query, 300);
 
   useEffect(() => {
     const controller = new AbortController();
-
     apiRequest<ResearchSummary>("research", { signal: controller.signal })
-      .then((result) => {
-        setClusters(result.clusters || []);
-        setSettings(result.settings || {});
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setClusters([]);
-          setSettings({});
-        }
-      });
-
+      .then((data) => { setResearch(data); setFilterError(""); })
+      .catch(() => { if (!controller.signal.aborted) setFilterError("Research topics are temporarily unavailable."); });
     return () => controller.abort();
-  }, []);
-
-  const researchSlides = useMemo(() => clusters
-    .map((cluster) => ({
-      cluster,
-      image: getApiAssetUrl(cluster.media?.file_url || cluster.image_url),
-    }))
-    .filter((slide): slide is { cluster: ResearchCluster; image: string } => Boolean(slide.image)), [clusters]);
-  const selectedSlideIndex = researchSlides.length > 0
-    ? Math.min(activeSlide, researchSlides.length - 1)
-    : 0;
-  const selectedSlide = researchSlides[selectedSlideIndex];
-
-  const showPrevious = () => {
-    setActiveSlide((current) =>
-      researchSlides.length > 0 ? (current - 1 + researchSlides.length) % researchSlides.length : 0,
-    );
-  };
-
-  const showNext = () => {
-    setActiveSlide((current) =>
-      researchSlides.length > 0 ? (current + 1) % researchSlides.length : 0,
-    );
-  };
-
-  return (
-    <main id="main-content" className="bg-white pb-20 pt-24 text-ink sm:pt-28">
-      <div className="page-container">
-        <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Research" }]} />
-      </div>
-
-      <section className="page-container pb-12 pt-7 text-center">
-        <h1 className="text-4xl font-bold tracking-[-0.025em] text-dteti-blue sm:text-5xl">
-          Research
-        </h1>
-        <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-ink sm:text-lg">
-          Explore research expertise and ongoing work across the research group.
-        </p>
-      </section>
-
-      <section aria-label="Featured research" className="relative overflow-hidden bg-dteti-blue-deep">
-        {selectedSlide ? (
-          <>
-            <div className="relative h-[clamp(20rem,39vw,34rem)] w-full">
-              <Image
-                src={selectedSlide.image}
-                alt={selectedSlide.cluster.name}
-                fill
-                priority
-                sizes="100vw"
-                className="object-cover"
-                unoptimized={selectedSlide.image.startsWith("http") || selectedSlide.image.startsWith("/uploads/")}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-dteti-blue-deep/90 via-dteti-blue-deep/10 to-transparent" />
-              <div className="page-container absolute inset-x-0 bottom-0 pb-10 text-left text-white sm:pb-12">
-                <h2 className="max-w-3xl text-2xl font-extrabold text-white sm:text-4xl">
-                  {selectedSlide.cluster.name}
-                </h2>
-                {selectedSlide.cluster.description ? (
-                  <p className="mt-3 line-clamp-2 max-w-2xl text-sm leading-6 text-white/90 sm:text-base">
-                    {selectedSlide.cluster.description}
-                  </p>
-                ) : null}
-              </div>
-            </div>
-
-            {researchSlides.length > 1 ? (
-              <>
-                <button
-                  type="button"
-                  onClick={showPrevious}
-                  aria-label="Previous research image"
-                  className="absolute left-4 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-dteti-blue-deep transition-colors hover:bg-dteti-yellow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow sm:left-8"
-                >
-                  <ChevronLeft aria-hidden="true" />
-                </button>
-                <button
-                  type="button"
-                  onClick={showNext}
-                  aria-label="Next research image"
-                  className="absolute right-4 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-dteti-blue-deep transition-colors hover:bg-dteti-yellow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dteti-yellow sm:right-8"
-                >
-                  <ChevronRight aria-hidden="true" />
-                </button>
-                <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2" aria-label="Choose research image">
-                  {researchSlides.map((slide, index) => (
-                    <button
-                      type="button"
-                      key={slide.cluster.id}
-                      onClick={() => setActiveSlide(index)}
-                      aria-label={`Show ${slide.cluster.name}`}
-                      aria-current={index === selectedSlideIndex ? "true" : undefined}
-                      className={`size-3 rounded-full border-2 border-white transition-colors ${
-                        index === selectedSlideIndex ? "bg-dteti-yellow" : "bg-dteti-blue-deep/50 hover:bg-white"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </>
-            ) : null}
-          </>
-        ) : settings.research_featured_image ? (
-          <div className="relative h-[clamp(20rem,39vw,34rem)] w-full">
-            <Image
-              src={getApiAssetUrl(settings.research_featured_image) || settings.research_featured_image}
-              alt="Research at DTETI"
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-              unoptimized={settings.research_featured_image.startsWith("http") || settings.research_featured_image.startsWith("/uploads/")}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-dteti-blue-deep/90 via-dteti-blue-deep/10 to-transparent" />
-            <div className="page-container absolute inset-x-0 bottom-0 pb-10 text-center text-white sm:pb-12">
-              <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Research at DTETI</h2>
-              <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-white/90">
-                Explore research clusters, expertise, and active work across the Information Engineering Research Group.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="brand-gradient grid h-[clamp(20rem,39vw,34rem)] place-items-center px-6 text-center text-white">
-            <div className="max-w-2xl">
-              <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Research at DTETI</h2>
-              <p className="mt-4 text-base leading-7 text-white/90">
-                Explore research clusters, expertise, and active work across the Information Engineering Research Group.
-              </p>
-            </div>
-          </div>
-        )}
-      </section>
-
-      <section className="page-container grid gap-x-14 gap-y-12 pb-8 pt-12 md:grid-cols-2">
-        {researchLandingCards.map((card, index) => (
-          <ResearchLandingCard key={card.title} card={card} featured={index === 0} />
-        ))}
-      </section>
-    </main>
-  );
+  }, [retry]);
+  useEffect(() => {
+    const controller = new AbortController();
+    apiRequest<PaginatedResult<ResearchResult>>(`${endpoints[view]}/paginated`, {
+      signal: controller.signal,
+      query: { page, limit: 12, search, tag_slug: tag,
+        ...(view === "People" ? { is_active: true, sort_by: "full_name", sort_order: "asc" } :
+          view === "Publication" ? { sort_by: "year", sort_order: "desc" } : { visibility: "PUBLIC", sort_by: "start_year", sort_order: "desc" }),
+      },
+    }).then((data) => { setResult(data); setError(""); })
+      .catch((requestError: Error) => { if (!controller.signal.aborted) { setError(requestError.message); setResult(null); } })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [view, search, tag, page, retry]);
+  function clearFilters() { setLoading(true); setQuery(""); setTag(""); setPage(1); }
+  return <main id="main-content" className="min-h-screen bg-white text-[#151729]">
+    <DiscoveryPageHero title="Research" imageSrc="/images/research-hero.png" />
+    <div className="pt-10"><PeopleFilterPanel clusters={research?.clusters || []} query={query} selectedTag={tag}
+      onQueryChange={(value) => { setLoading(true); setQuery(value); setPage(1); }}
+      onTagChange={(value) => { setLoading(true); setTag(value); setPage(1); }} searchLabel={`Search ${view.toLowerCase()}`}
+      toolbar={<div className="order-last flex w-full justify-center gap-8 lg:order-none lg:w-auto lg:gap-12" aria-label="Research content">
+        {(["Publication", "Project", "People"] as const).map((tab) => <button key={tab} type="button" aria-pressed={view === tab} aria-controls="research-results"
+          onClick={() => { if (view !== tab) { setLoading(true); setView(tab); setPage(1); } }}
+          className={`min-h-11 border-b-2 px-1 text-base font-semibold transition-colors hover:bg-black/5 sm:text-xl ${view === tab ? "border-[#151729]" : "border-transparent"}`}>{tab}</button>)}
+      </div>} /></div>
+    {filterError && <p role="status" className="mx-auto mt-4 w-[90%] text-sm">{filterError} <button type="button" className="underline" onClick={() => setRetry((value) => value + 1)}>Retry topics</button></p>}
+    <section id="research-results" aria-label={`${view} results`} aria-busy={loading} className="mx-auto w-[90%] max-w-[1160px] py-10">
+      <p className="mb-5 text-sm text-[#7c8999]" aria-live="polite">{loading ? "Loading research…" : `${result?.total || 0} ${view.toLowerCase()} results`}</p>
+      {(query || tag) && <button type="button" onClick={clearFilters} className="mb-6 min-h-10 rounded border border-[#151729] px-4 text-sm hover:bg-black/5">Clear filters</button>}
+      {loading ? <div role="status" className="grid min-h-64 place-items-center"><LoaderCircle className="animate-spin" aria-label="Loading research" /></div> : error ?
+        <div className="bg-[#d9d9d9] p-8 text-center"><h2 className="text-xl font-semibold">Research is temporarily unavailable</h2><p className="mt-3">{error}</p><button type="button" className="mt-5 min-h-11 rounded border px-5" onClick={() => { setLoading(true); setRetry((value) => value + 1); }}>Try again</button></div> : result?.data.length ?
+        <div className="grid gap-8">{result.data.map((item) => <ResearchResultCard key={`${view}-${item.id}`} view={view} item={item} />)}</div> :
+        <div className="bg-[#d9d9d9] px-6 py-16 text-center"><h2 className="text-xl font-semibold">No {view.toLowerCase()} results found</h2><p className="mt-2">{query || tag ? "Try another search or clear your filters." : `No ${view.toLowerCase()} records have been published yet.`}</p></div>}
+      {!loading && !error && result && result.total_pages > 1 && <nav aria-label="Research pagination" className="mt-10 flex items-center justify-center gap-4">
+        <button type="button" disabled={page <= 1} onClick={() => { setLoading(true); setPage(page - 1); }} className="inline-flex min-h-11 items-center gap-1 border px-4 disabled:opacity-40"><ChevronLeft size={18} />Previous</button>
+        <span className="text-sm">Page {page} of {result.total_pages}</span>
+        <button type="button" disabled={page >= result.total_pages} onClick={() => { setLoading(true); setPage(page + 1); }} className="inline-flex min-h-11 items-center gap-1 border px-4 disabled:opacity-40">Next<ChevronRight size={18} /></button>
+      </nav>}
+    </section>
+  </main>;
 }

@@ -2,7 +2,7 @@
 
 import type { ResearchCluster } from "@/lib/api";
 import { ChevronDown, ChevronUp, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 type PeopleFilterPanelProps = {
   clusters: ResearchCluster[];
@@ -10,6 +10,8 @@ type PeopleFilterPanelProps = {
   selectedTag: string;
   onQueryChange: (value: string) => void;
   onTagChange: (value: string) => void;
+  toolbar?: ReactNode;
+  searchLabel?: string;
 };
 
 export default function PeopleFilterPanel({
@@ -18,12 +20,14 @@ export default function PeopleFilterPanel({
   selectedTag,
   onQueryChange,
   onTagChange,
+  toolbar,
+  searchLabel = "Search people",
 }: PeopleFilterPanelProps) {
   const [expanded, setExpanded] = useState(true);
 
   return (
-    <section className="border-b-2 border-[#151729] bg-white" aria-label="Filter people">
-      <div className="flex min-h-14 items-center justify-between gap-4 border-b border-[#e3e3e3] px-5 sm:px-[5%]">
+    <section className="border-b-2 border-[#151729] bg-white" aria-label="Filter research area">
+      <div className="flex min-h-14 flex-wrap items-center justify-between gap-4 border-b border-[#e3e3e3] px-5 py-2 sm:px-[5%]">
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}
@@ -35,14 +39,16 @@ export default function PeopleFilterPanel({
           <span>Filter research area</span>
         </button>
 
+        {toolbar}
+
         <label className="flex h-10 w-full max-w-80 items-center gap-2 rounded border border-[#7c8999] px-4 text-[#7c8999] focus-within:outline-2 focus-within:outline-offset-2 sm:h-8">
           <Search size={18} aria-hidden="true" />
-          <span className="sr-only">Search people</span>
+          <span className="sr-only">{searchLabel}</span>
           <input
             type="search"
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
-            placeholder="Search research people"
+            placeholder={toolbar ? searchLabel : "Search research people"}
             className="min-w-0 flex-1 bg-transparent text-sm text-[#151729] outline-none placeholder:text-[#7c8999]"
           />
         </label>

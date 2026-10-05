@@ -7,7 +7,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-kbk-backend}" ]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-kbk-backend}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 12
@@ -40,8 +44,8 @@ services:
     depends_on:
       database_init:
         condition: service_completed_successfully
-    expose:
-      - "5000"
+    ports:
+      - "5000:5000"
     environment:
       NODE_ENV: production
       PORT: 5000
