@@ -5,6 +5,7 @@ import * as path from 'path';
 import { parse } from 'csv-parse/sync';
 import * as crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import { seedMinimalDummyData } from './dummy_seed.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -314,6 +315,9 @@ async function main() {
     skipDuplicates: true
   });
   console.log(`✅ Linked ${tagLinkResult.count} Research Tags.`);
+
+  // Enrich data and ensure all pages have minimal dummy data populated
+  await seedMinimalDummyData(prisma);
 
   console.log('🎉 Seeding complete!');
 }
