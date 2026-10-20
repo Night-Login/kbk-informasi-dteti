@@ -18,7 +18,11 @@ const includeClause = {
     research_tags: {
         where: { tag: { deleted_at: null } },
         include: {
-            tag: true
+            tag: {
+                include: {
+                    cluster: true
+                }
+            }
         }
     },
     publications: {

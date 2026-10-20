@@ -14,57 +14,58 @@ const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
+import { seedMinimalDummyData } from "./dummy_seed.js";
+
 async function main() {
     const username = process.env.SUPERADMIN_USERNAME?.trim();
     const password = process.env.SUPERADMIN_PASSWORD;
 
     if (!username || !password) {
-        throw new Error(
-            "SUPERADMIN_USERNAME and SUPERADMIN_PASSWORD must both be configured before seeding.",
+        console.warn(
+            "⚠️ SUPERADMIN_USERNAME or SUPERADMIN_PASSWORD not set. Skipping superadmin provisioning.",
         );
-    }
+    } else {
+        const existingByUsername = await prisma.admin.findUnique({
+            where: { username },
+        });
 
-    const existingByUsername = await prisma.admin.findUnique({
-        where: { username },
-    });
+        if (existingByUsername) {
+            if (
+                existingByUsername.role !== Role.SUPERADMIN ||
+                existingByUsername.deletedAt !== null
+            ) {
+                throw new Error(
+                    `Admin username "${username}" already exists but is not an active superadmin.`,
+                );
+            }
+            console.log(`Superadmin account "${username}" already exists; verified.`);
+        } else {
+            const existingSuperAdmin = await prisma.admin.findFirst({
+                where: {
+                    role: Role.SUPERADMIN,
+                    deletedAt: null,
+                },
+            });
 
-    if (existingByUsername) {
-        if (
-            existingByUsername.role !== Role.SUPERADMIN ||
-            existingByUsername.deletedAt !== null
-        ) {
-            throw new Error(
-                `Admin username "${username}" already exists but is not an active superadmin.`,
-            );
+            if (existingSuperAdmin) {
+                throw new Error(
+                    `An active superadmin already exists with username "${existingSuperAdmin.username}".`,
+                );
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await prisma.admin.create({
+                data: {
+                    username,
+                    password: hashedPassword,
+                    role: Role.SUPERADMIN,
+                },
+            });
+            console.log(`Created superadmin account "${username}".`);
         }
-
-        console.log(`Superadmin account "${username}" already exists; no changes were made.`);
-        return;
     }
 
-    const existingSuperAdmin = await prisma.admin.findFirst({
-        where: {
-            role: Role.SUPERADMIN,
-            deletedAt: null,
-        },
-    });
-
-    if (existingSuperAdmin) {
-        throw new Error(
-            `An active superadmin already exists with username "${existingSuperAdmin.username}".`,
-        );
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await prisma.admin.create({
-        data: {
-            username,
-            password: hashedPassword,
-            role: Role.SUPERADMIN,
-        },
-    });
-
-    console.log(`Created superadmin account "${username}".`);
+    await seedMinimalDummyData(prisma);
 }
 
 main()
