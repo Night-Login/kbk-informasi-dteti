@@ -49,7 +49,7 @@ export default function AboutPage() {
 
   return (
     <main id="main-content" className="min-h-screen bg-white text-[#151729]">
-      <DiscoveryPageHero title="About" imageSrc="/images/about-hero.png" />
+      <DiscoveryPageHero title="About" />
 
       <div className="mx-auto grid w-[90%] max-w-[1296px] gap-12 py-12 sm:py-14">
         <SupervisorGuide headingId="supervisor-guide-primary" />

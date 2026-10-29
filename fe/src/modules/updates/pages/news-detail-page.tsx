@@ -78,7 +78,7 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
         id="main-content"
         className="discovery-page min-h-screen bg-white text-[#151729]"
       >
-        <DiscoveryPageHero title="News" imageSrc="/images/news-hero.png" />
+        <DiscoveryPageHero title="News" />
         <div className="grid min-h-80 place-items-center" role="status">
           <div className="flex items-center gap-3">
             <LoaderCircle className="animate-spin" aria-hidden="true" />
@@ -95,7 +95,7 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
         id="main-content"
         className="discovery-page min-h-screen bg-white text-[#151729]"
       >
-        <DiscoveryPageHero title="News" imageSrc="/images/news-hero.png" />
+        <DiscoveryPageHero title="News" />
         <div className="discovery-container py-14">
           <div className="mx-auto max-w-3xl bg-[#d9d9d9] px-6 py-14 text-center">
             <h2 className="text-2xl font-semibold">News article not found</h2>
@@ -119,7 +119,7 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
       id="main-content"
       className="discovery-page min-h-screen bg-white text-[#151729]"
     >
-      <DiscoveryPageHero title="News" imageSrc="/images/news-hero.png" />
+      <DiscoveryPageHero title="News" />
 
       <div className="discovery-container py-10 sm:py-14">
         <div className="mx-auto max-w-4xl">

@@ -5,5 +5,5 @@ type PeopleHeroProps = {
 };
 
 export default function PeopleHero({ title = "People" }: PeopleHeroProps) {
-  return <DiscoveryPageHero title={title} imageSrc="/images/people-hero.png" />;
+  return <DiscoveryPageHero title={title} />;
 }

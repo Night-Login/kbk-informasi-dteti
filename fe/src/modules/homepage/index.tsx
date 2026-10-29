@@ -4,7 +4,7 @@ import Link from "next/link";
 import HeroSection from "./sections/hero-section";
 import ResearchSection from "./sections/research-section";
 import { ArticleCard, EventCard, NewsCard } from "./components/content-cards";
-import { apiRequest, getApiAssetUrl, type HomepageContent } from "@/lib/api";
+import { apiRequest, type HomepageContent } from "@/lib/api";
 import { previewContent } from "./data/preview.data";
 const tabs = ["Article", "Events", "News"] as const;
 type Tab = typeof tabs[number];
@@ -30,7 +30,6 @@ export default function HomePage() {
   }, [attempt]);
   const news = content?.news || [];
   const events = content?.events || [];
-  const heroImage = getApiAssetUrl(content?.settings?.home_hero_image);
   const empty = tab === "Events" ? events.length === 0 : news.length === 0;
   function navigateTabs(event: KeyboardEvent, index: number) {
     let next = index;
@@ -42,7 +41,7 @@ export default function HomePage() {
     event.preventDefault(); setTab(tabs[next]); buttons.current[next]?.focus();
   }
   return <main id="main-content" className="discovery-page">
-    <HeroSection backgroundImage={heroImage} /><ResearchSection />
+    <HeroSection /><ResearchSection />
     {preview && <p className="discovery-preview-notice">Design preview · Sample content, not official event information. <button type="button" onClick={() => window.location.assign("/")}>Exit preview</button></p>}
     <div className="discovery-tabs" role="tablist" aria-label="Explore updates">{tabs.map((item, index) => <button key={item} ref={(element) => { buttons.current[index] = element; }} id={`tab-${item}`} role="tab" aria-controls={`panel-${item}`} aria-selected={tab === item} tabIndex={tab === item ? 0 : -1} onClick={() => setTab(item)} onKeyDown={(event) => navigateTabs(event, index)}>{item}</button>)}</div>
     <section id={`panel-${tab}`} role="tabpanel" aria-labelledby={`tab-${tab}`} tabIndex={0} className="discovery-content discovery-container" aria-busy={loading}>

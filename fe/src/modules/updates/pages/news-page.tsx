@@ -88,7 +88,7 @@ export default function NewsPage() {
       id="main-content"
       className="discovery-page min-h-screen bg-white text-[#151729]"
     >
-      <DiscoveryPageHero title="News" imageSrc="/images/news-hero.png" />
+      <DiscoveryPageHero title="News" />
 
       {preview && (
         <p className="discovery-preview-notice">

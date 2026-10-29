@@ -47,7 +47,7 @@ export default function ResearchPage() {
   }, [view, search, tag, page, retry]);
   function clearFilters() { setLoading(true); setQuery(""); setTag(""); setPage(1); }
   return <main id="main-content" className="min-h-screen bg-white text-[#151729]">
-    <DiscoveryPageHero title="Research" imageSrc="/images/research-hero.png" />
+    <DiscoveryPageHero title="Research" />
     <div className="pt-10"><PeopleFilterPanel clusters={research?.clusters || []} query={query} selectedTag={tag}
       onQueryChange={(value) => { setLoading(true); setQuery(value); setPage(1); }}
       onTagChange={(value) => { setLoading(true); setTag(value); setPage(1); }} searchLabel={`Search ${view.toLowerCase()}`}

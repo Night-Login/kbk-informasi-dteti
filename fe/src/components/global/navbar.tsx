@@ -97,7 +97,7 @@ export default function Navbar() {
   }
 
   if (pathname === "/" || pathname === "/events" || pathname === "/about" || pathname === "/research" || pathname?.startsWith("/people") || pathname?.startsWith("/news")) {
-    return <DiscoveryHeader key={pathname} home={pathname === "/" || pathname === "/about" || pathname === "/research" || pathname.startsWith("/people") || pathname.startsWith("/news")} />;
+    return <DiscoveryHeader key={pathname} home={pathname === "/" || pathname === "/events" || pathname === "/about" || pathname === "/research" || pathname.startsWith("/people") || pathname.startsWith("/news")} />;
   }
 
   return (

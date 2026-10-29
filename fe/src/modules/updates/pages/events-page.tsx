@@ -2,6 +2,7 @@
 import { ArrowLeft, ArrowRight, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Breadcrumbs from "@/components/global/breadcrumbs";
+import DiscoveryPageHero from "@/components/global/discovery-page-hero";
 import { apiRequest, type WebsiteEvent } from "@/lib/api";
 import { EventCard } from "@/modules/homepage/components/content-cards";
 import { previewContent } from "@/modules/homepage/data/preview.data";
@@ -130,9 +131,9 @@ export default function EventsPage() {
     return matchesQuery && (status === "all" || (status === "upcoming" && endTime >= referenceTime) || (status === "past" && endTime < referenceTime));
   }), [items, query, status, referenceTime]);
   return <main id="main-content" className="discovery-page discovery-events-page">
-    <div className="discovery-container">
+    <DiscoveryPageHero title="Events" />
+    <div className="discovery-container discovery-events-content">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Events" }]} />
-      <header className="discovery-events-heading"><h1>Events</h1></header>
       {preview && <p className="discovery-preview-notice">Design preview · Sample content, not an official schedule. <button type="button" onClick={() => window.location.assign("/events")}>Exit preview</button></p>}
       <div className="discovery-events-toolbar">
         <form className="discovery-events-search" role="search" onSubmit={(event) => event.preventDefault()}><Search size={20} aria-hidden="true" /><label htmlFor="event-search" className="sr-only">Search events or locations</label><input id="event-search" type="search" placeholder="Search events or locations" value={query} onChange={(event) => setQuery(event.target.value)} /></form>
