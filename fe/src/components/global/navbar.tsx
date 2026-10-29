@@ -80,7 +80,7 @@ export default function Navbar() {
 
   // Register Ctrl+K / Cmd+K keyboard shortcut
   useEffect(() => {
-    if (pathname === "/" || pathname === "/events") return;
+    if (pathname === "/" || pathname === "/events" || pathname === "/about" || pathname === "/research" || pathname?.startsWith("/people") || pathname?.startsWith("/news")) return;
     const handleKeyDown = (e: globalThis.KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
@@ -96,8 +96,8 @@ export default function Navbar() {
     return null;
   }
 
-  if (pathname === "/" || pathname === "/events" || pathname === "/about" || pathname === "/research" || pathname?.startsWith("/people")) {
-    return <DiscoveryHeader key={pathname} home={pathname === "/" || pathname === "/about" || pathname === "/research" || pathname.startsWith("/people")} />;
+  if (pathname === "/" || pathname === "/events" || pathname === "/about" || pathname === "/research" || pathname?.startsWith("/people") || pathname?.startsWith("/news")) {
+    return <DiscoveryHeader key={pathname} home={pathname === "/" || pathname === "/about" || pathname === "/research" || pathname.startsWith("/people") || pathname.startsWith("/news")} />;
   }
 
   return (

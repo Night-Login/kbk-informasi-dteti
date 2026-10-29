@@ -38,7 +38,7 @@ export default function Footer() {
     return null;
   }
 
-  if (pathname === "/" || pathname === "/events" || pathname === "/about" || pathname === "/research" || pathname?.startsWith("/people")) {
+  if (pathname === "/" || pathname === "/events" || pathname === "/about" || pathname === "/research" || pathname?.startsWith("/people") || pathname?.startsWith("/news")) {
     return <DiscoveryFooter settings={settings} />;
   }
 

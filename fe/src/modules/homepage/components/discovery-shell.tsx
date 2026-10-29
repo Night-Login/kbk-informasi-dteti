@@ -47,7 +47,7 @@ export function DiscoveryHeader({ home }: { home: boolean }) {
       </Link>
       <nav className="discovery-desktop-nav" aria-label="Main navigation">
         {discoveryLinks.map((link) => {
-          const active = link.href === "/people" ? pathname?.startsWith("/people") : pathname === link.href;
+          const active = link.href === "/people" ? pathname?.startsWith("/people") : link.href === "/news" ? pathname?.startsWith("/news") : pathname === link.href;
           return <Link key={link.label} href={link.href} aria-current={active ? "page" : undefined}>{link.label}</Link>;
         })}
       </nav>
