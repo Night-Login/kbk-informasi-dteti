@@ -86,7 +86,7 @@ export default function NewsPage() {
   return (
     <main
       id="main-content"
-      className="discovery-page min-h-screen bg-white text-[#151729]"
+      className="discovery-page min-h-screen bg-[#e6ecf2] text-[#151729]"
     >
       <DiscoveryPageHero title="News" />
 
@@ -104,7 +104,7 @@ export default function NewsPage() {
 
       <section
         aria-label="Filter and search news"
-        className="border-b-2 border-[#151729] bg-white"
+        className="border-b-[3px] border-[#1a4872] bg-[#fbfbfb]"
       >
         <div className="discovery-container flex min-h-16 flex-wrap items-center justify-between gap-4 py-3">
           <div
@@ -118,10 +118,10 @@ export default function NewsPage() {
                 type="button"
                 aria-pressed={sort === option.value}
                 onClick={() => setSort(option.value)}
-                className={`min-h-11 border-b-2 px-1 text-base font-semibold transition-colors hover:bg-black/5 ${
+                className={`min-h-11 border-b-2 px-1 text-base font-semibold transition-colors hover:bg-[#e6ecf2] ${
                   sort === option.value
-                    ? "border-[#151729] text-[#151729]"
-                    : "border-transparent text-[#4f5054]"
+                    ? "border-[#1a4872] text-[#1a4872]"
+                    : "border-transparent text-[#1a4872]/75"
                 }`}
               >
                 {option.label}
@@ -135,7 +135,7 @@ export default function NewsPage() {
               onSubmit={(event) => event.preventDefault()}
               className="w-full sm:w-72"
             >
-              <label className=" flex h-10 w-full items-center gap-2 rounded border border-[#7c8999] px-4 text-[#7c8999] focus-within:outline-2 focus-within:outline-offset-2">
+              <label className="flex h-10 w-full items-center gap-2 rounded border border-[#1a4872] bg-white px-4 text-[#1a4872] focus-within:outline-2 focus-within:outline-offset-2">
                 <Search size={18} aria-hidden="true" />
                 <span className="sr-only">Search latest news</span>
                 <input
@@ -151,7 +151,7 @@ export default function NewsPage() {
 
             <Link
               href={preview ? "/events?preview=1" : "/events"}
-              className="inline-flex min-h-10 items-center gap-2 rounded border border-[#151729] bg-white px-4 text-sm font-semibold text-[#151729] transition-colors hover:bg-[#151729] hover:text-white"
+              className="inline-flex min-h-10 items-center gap-2 rounded-[8px] border border-white bg-[#1a4872] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#133859]"
             >
               <CalendarDays size={16} aria-hidden="true" />
               <span>View Events</span>
@@ -165,7 +165,7 @@ export default function NewsPage() {
         aria-busy={loading}
         className="discovery-container py-10 sm:py-14"
       >
-        <p className="mb-5 text-sm text-[#7c8999]" aria-live="polite">
+        <p className="mb-5 text-sm text-[#4f5054]" aria-live="polite">
           {loading
             ? "Loading news…"
             : `${visibleItems.length} ${
@@ -177,22 +177,22 @@ export default function NewsPage() {
           <button
             type="button"
             onClick={clearFilters}
-            className="mb-6 min-h-10 rounded border border-[#151729] px-4 text-sm font-medium hover:bg-black/5"
+            className="mb-6 min-h-10 rounded-[8px] border border-[#1a4872] bg-white px-4 text-sm font-semibold text-[#1a4872] transition-colors hover:bg-[#1a4872] hover:text-white"
           >
             Clear filters
           </button>
         )}
 
         {loading ? (
-          <div className="grid min-h-64 place-items-center" role="status">
+          <div className="grid min-h-64 place-items-center text-[#1a4872]" role="status">
             <div className="flex items-center gap-3">
               <LoaderCircle className="animate-spin" aria-hidden="true" />
               <span>Loading news…</span>
             </div>
           </div>
         ) : error ? (
-          <div role="alert" className="bg-[#d9d9d9] p-8 text-center">
-            <h2 className="text-xl font-semibold">
+          <div role="alert" className="rounded-[8px] bg-white p-8 text-center">
+            <h2 className="text-xl font-bold text-[#1a4872]">
               News is temporarily unavailable
             </h2>
             <p className="mt-3 text-sm text-[#4f5054]">{error}</p>
@@ -203,7 +203,7 @@ export default function NewsPage() {
                 setError("");
                 setAttempt((value) => value + 1);
               }}
-              className="mt-5 min-h-11 rounded border border-[#151729] bg-white px-5 text-sm font-semibold transition-colors hover:bg-[#151729] hover:text-white"
+              className="mt-5 min-h-10 rounded-[8px] bg-[#1a4872] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#133859]"
             >
               Try again
             </button>
@@ -235,8 +235,8 @@ export default function NewsPage() {
             )}
           </div>
         ) : (
-          <div className="bg-[#d9d9d9] px-6 py-16 text-center">
-            <h2 className="text-xl font-semibold">No news found</h2>
+          <div className="rounded-[8px] bg-white px-6 py-16 text-center">
+            <h2 className="text-xl font-bold text-[#1a4872]">No news found</h2>
             <p className="mt-2 text-sm text-[#4f5054]">
               {items.length > 0
                 ? "Try another keyword or clear your filters."
@@ -246,7 +246,7 @@ export default function NewsPage() {
               <button
                 type="button"
                 onClick={clearFilters}
-                className="mt-5 min-h-11 rounded border border-[#151729] bg-white px-5 text-sm font-semibold transition-colors hover:bg-[#151729] hover:text-white"
+                className="mt-5 min-h-10 rounded-[8px] bg-[#1a4872] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#133859]"
               >
                 Clear filters
               </button>

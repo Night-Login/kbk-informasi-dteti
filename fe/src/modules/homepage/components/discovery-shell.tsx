@@ -43,16 +43,16 @@ export function DiscoveryHeader({ home }: { home: boolean }) {
     {!home && <div className="discovery-header-spacer" aria-hidden="true" />}
     <header className={`discovery-header ${home ? "discovery-header-home" : ""} ${scrolled ? "discovery-header-scrolled" : ""}`}>
       <Link href="/" aria-label="UGM — Home" className="discovery-logo">
-        <Image src="/images/ugm-mark-white.png" alt="Universitas Gadjah Mada" width={80} height={86} priority />
+        <Image src="/images/ugm-mark-white.png" alt="Universitas Gadjah Mada" width={78} height={83} priority />
       </Link>
       <nav className="discovery-desktop-nav" aria-label="Main navigation">
         {discoveryLinks.map((link) => {
-          const active = link.href === "/people" ? pathname?.startsWith("/people") : link.href === "/news" ? pathname?.startsWith("/news") : pathname === link.href;
+          const active = link.href === "/people" ? pathname?.startsWith("/people") : link.href === "/news" ? pathname?.startsWith("/news") : link.href === "/research" ? (pathname === "/research" || pathname === "/research-areas" || pathname?.startsWith("/tag-research-areas") || pathname === "/projects" || pathname === "/publication") : pathname === link.href;
           return <Link key={link.label} href={link.href} aria-current={active ? "page" : undefined}>{link.label}</Link>;
         })}
       </nav>
       <div className="discovery-header-actions">
-        <button className="discovery-icon-button" onClick={() => setSearch(true)} aria-label="Search website"><Search size={22} /></button>
+        <button className="discovery-icon-button" onClick={() => setSearch(true)} aria-label="Search website"><Search size={24} /></button>
         <button className="discovery-icon-button discovery-menu-toggle" onClick={() => setMenu(!menu)} aria-label={menu ? "Close menu" : "Open menu"} aria-expanded={menu} aria-controls="discovery-menu">{menu ? <X /> : <Menu />}</button>
       </div>
       {menu && <nav id="discovery-menu" className="discovery-mobile-nav" aria-label="Mobile navigation">{discoveryLinks.map((link) => <Link key={link.label} href={link.href} onClick={() => setMenu(false)}>{link.label}</Link>)}</nav>}
@@ -72,7 +72,7 @@ export function DiscoveryFooter({ settings }: { settings: Record<string, string>
     <div className="discovery-container discovery-footer-grid">
       <div><h2>{settings.site_name || "Information Engineering Research Group UGM"}</h2><p>{siteAboutInEnglish(settings)}</p></div>
       <nav aria-label="Footer pages"><h2>Pages</h2>{discoveryLinks.map((link) => <Link key={link.label} href={link.href}>{link.label}</Link>)}</nav>
-      <div><h2>Social Media</h2><div className="discovery-social">{social.map(({ name, href, Icon }) => <a key={name} href={href} aria-label={name} title={name} target="_blank" rel="noopener noreferrer"><Icon size={22} aria-hidden="true" /></a>)}</div><h2 className="discovery-contact-title">Contact Us</h2><a className="discovery-contact" href={`mailto:${email}`}><Mail size={18} aria-hidden="true" />{email}</a><p className="discovery-contact"><MapPin size={20} aria-hidden="true" />{settings.contact_address || "Jl. Grafika No. 2, Kampus UGM, Yogyakarta 55281"}</p></div>
+      <div><h2>Social Media</h2><div className="discovery-social">{social.map(({ name, href, Icon }) => <a key={name} href={href} aria-label={name} title={name} target="_blank" rel="noopener noreferrer"><Icon size={28} aria-hidden="true" /></a>)}</div><h2 className="discovery-contact-title">Contact Us</h2><a className="discovery-contact" href={`mailto:${email}`}><Mail size={22} aria-hidden="true" />{email}</a><p className="discovery-contact"><MapPin size={22} aria-hidden="true" />{settings.contact_address || "Jl. Grafika No. 2, Kampus UGM, Yogyakarta 55281"}</p></div>
     </div>
   </footer>;
 }

@@ -31,19 +31,19 @@ const steps: SupervisorStep[] = [
 export default function SupervisorGuide({ headingId }: { headingId: string }) {
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId} className="text-2xl font-bold sm:text-[32px]">
+      <h2 id={headingId} className="text-2xl font-bold text-[#1a4872] sm:text-[32px]">
         Frequently Asked Questions (FAQs)
       </h2>
-      <h3 className="mt-5 text-xl font-bold sm:text-2xl">How to contact a potential supervisor?</h3>
+      <h3 className="mt-5 text-xl font-bold text-[#1a4872] sm:text-2xl">How to contact a potential supervisor?</h3>
       <ol className="mt-6 space-y-4 pl-6">
         {steps.map((step) => (
-          <li key={step.title} className="list-decimal pl-1">
-            <h4 className="text-base font-semibold sm:text-xl">{step.title}</h4>
-            <p className="mt-1 text-sm leading-6 sm:text-base">{step.description}</p>
+          <li key={step.title} className="list-decimal pl-1 marker:font-bold marker:text-[#1a4872]">
+            <h4 className="text-base font-bold text-[#1a4872] sm:text-xl">{step.title}</h4>
+            <p className="mt-1 text-sm leading-6 text-[#151729] sm:text-base">{step.description}</p>
             {step.action ? (
               <Link
                 href={step.action.href}
-                className="mt-2 inline-flex min-h-9 items-center gap-1 rounded-lg border border-[#151729] px-4 text-sm font-medium transition-colors hover:bg-[#151729] hover:text-white"
+                className="mt-2 inline-flex min-h-9 items-center gap-1 rounded-[8px] border border-white bg-[#1a4872] px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-[#133859]"
               >
                 {step.action.label}
                 <ArrowRight size={17} aria-hidden="true" />

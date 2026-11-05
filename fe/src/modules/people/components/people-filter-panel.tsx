@@ -26,12 +26,12 @@ export default function PeopleFilterPanel({
   const [expanded, setExpanded] = useState(true);
 
   return (
-    <section className="border-b-2 border-[#151729] bg-white" aria-label="Filter research area">
-      <div className="flex min-h-14 flex-wrap items-center justify-between gap-4 border-b border-[#e3e3e3] px-5 py-2 sm:px-[5%]">
+    <section className="border-b-[3px] border-[#1a4872] bg-[#fbfbfb]" aria-label="Filter research area">
+      <div className="relative flex min-h-14 flex-wrap items-center justify-between gap-4 border-b border-[#e3e3e3] px-5 py-2 sm:px-[5%]">
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}
-          className="inline-flex min-h-11 items-center gap-3 px-2 text-sm font-semibold text-[#151729] transition-colors hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="inline-flex min-h-11 items-center gap-3 px-2 text-sm font-semibold text-[#1a4872] transition-colors hover:bg-[#e6ecf2] focus-visible:outline-2 focus-visible:outline-offset-2"
           aria-expanded={expanded}
           aria-controls="people-topic-filters"
         >
@@ -41,7 +41,7 @@ export default function PeopleFilterPanel({
 
         {toolbar}
 
-        <label className="flex h-10 w-full max-w-80 items-center gap-2 rounded border border-[#7c8999] px-4 text-[#7c8999] focus-within:outline-2 focus-within:outline-offset-2 sm:h-8">
+        <label className="flex h-10 w-full max-w-80 items-center gap-2 rounded border border-[#1a4872] bg-white px-4 text-[#1a4872] focus-within:outline-2 focus-within:outline-offset-2 sm:h-8">
           <Search size={18} aria-hidden="true" />
           <span className="sr-only">{searchLabel}</span>
           <input
@@ -57,14 +57,14 @@ export default function PeopleFilterPanel({
       <div
         id="people-topic-filters"
         hidden={!expanded}
-        className="grid gap-0 border-t border-[#151729] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+        className="grid gap-0 border-t border-[#1a4872] bg-[#fbfbfb] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
       >
         {clusters.map((cluster) => (
           <div
             key={cluster.id}
-            className="border-b border-[#aeb5bd] px-6 py-6 sm:border-r xl:border-b-0 last:border-r-0"
+            className="border-b border-[#d5e0eb] px-6 py-6 sm:border-r xl:border-b-0 last:border-r-0"
           >
-            <h2 className="mb-4 text-sm font-semibold text-[#151729]">
+            <h2 className="mb-4 text-sm font-bold text-[#1a4872]">
               {cluster.name}
             </h2>
             <div className="grid gap-2">
@@ -76,7 +76,7 @@ export default function PeopleFilterPanel({
                       type="checkbox"
                       checked={checked}
                       onChange={() => onTagChange(checked ? "" : tag.slug)}
-                      className="mt-1 size-3 rounded-sm border-[#151729] accent-[#151729]"
+                      className="mt-1 size-3 rounded-sm border-[#1a4872] accent-[#1a4872]"
                     />
                     <span>{tag.name}</span>
                   </label>

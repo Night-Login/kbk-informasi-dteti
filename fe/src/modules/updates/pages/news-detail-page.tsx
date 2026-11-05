@@ -19,7 +19,7 @@ function formatPublishedDate(value: string) {
 }
 
 const actionButtonClass =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded border border-[#151729] bg-white px-5 text-sm font-semibold text-[#151729] transition-colors hover:bg-[#151729] hover:text-white";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border border-[#1a4872] bg-white px-5 text-sm font-semibold text-[#1a4872] transition-colors hover:bg-[#1a4872] hover:text-white";
 
 export default function NewsDetailPage({ slug }: { slug: string }) {
   const [article, setArticle] = useState<NewsArticle | null>(null);
@@ -76,10 +76,10 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
     return (
       <main
         id="main-content"
-        className="discovery-page min-h-screen bg-white text-[#151729]"
+        className="discovery-page min-h-screen bg-[#e6ecf2] text-[#151729]"
       >
         <DiscoveryPageHero title="News" />
-        <div className="grid min-h-80 place-items-center" role="status">
+        <div className="grid min-h-80 place-items-center text-[#1a4872]" role="status">
           <div className="flex items-center gap-3">
             <LoaderCircle className="animate-spin" aria-hidden="true" />
             <span>Loading article…</span>
@@ -93,12 +93,12 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
     return (
       <main
         id="main-content"
-        className="discovery-page min-h-screen bg-white text-[#151729]"
+        className="discovery-page min-h-screen bg-[#e6ecf2] text-[#151729]"
       >
         <DiscoveryPageHero title="News" />
         <div className="discovery-container py-14">
-          <div className="mx-auto max-w-3xl bg-[#d9d9d9] px-6 py-14 text-center">
-            <h2 className="text-2xl font-semibold">News article not found</h2>
+          <div className="mx-auto max-w-3xl rounded-[8px] bg-white px-6 py-14 text-center">
+            <h2 className="text-2xl font-bold text-[#1a4872]">News article not found</h2>
             <p className="mt-3 text-sm text-[#4f5054]">
               {error || "This article is no longer available."}
             </p>
@@ -117,7 +117,7 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
   return (
     <main
       id="main-content"
-      className="discovery-page min-h-screen bg-white text-[#151729]"
+      className="discovery-page min-h-screen bg-[#e6ecf2] text-[#151729]"
     >
       <DiscoveryPageHero title="News" />
 
@@ -128,14 +128,14 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
             <span>Back to News</span>
           </Link>
 
-          <article className="mt-6">
-            <header className="rounded-lg bg-[#d9d9d9] p-6 sm:p-10">
+          <article className="mt-6 rounded-[8px] bg-white p-6 sm:p-10">
+            <header>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="discovery-tag">DTETI UGM</span>
                   <time
                     dateTime={article.published_at}
-                    className="text-xs font-medium text-[#44454b]"
+                    className="text-xs font-medium text-[#1a4872]"
                   >
                     {formatPublishedDate(article.published_at)}
                   </time>
@@ -144,7 +144,7 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
                 <button
                   type="button"
                   onClick={handleShare}
-                  className="discovery-icon-button"
+                  className="discovery-icon-button text-[#1a4872]"
                   aria-label={`Share ${article.title}`}
                   title="Share article"
                 >
@@ -153,21 +153,21 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
               </div>
 
               {shareMessage && (
-                <p role="status" className="mt-2 text-xs text-[#44454b]">
+                <p role="status" className="mt-2 text-xs text-[#1a4872]">
                   {shareMessage}
                 </p>
               )}
 
-              <h2 className="mt-4 text-2xl font-bold leading-tight text-[#151729] sm:text-4xl">
+              <h2 className="mt-4 text-2xl font-bold leading-tight text-[#1a4872] sm:text-4xl">
                 {article.title}
               </h2>
 
-              <p className="mt-4 max-w-3xl text-base leading-7 text-[#3f4045] sm:text-lg">
+              <p className="mt-4 max-w-3xl text-base leading-7 text-[#151729] sm:text-lg">
                 {article.excerpt}
               </p>
 
               {image && (
-                <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded bg-[#ececec]">
+                <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-[4px] bg-[#e6ecf2]">
                   <Image
                     src={image}
                     alt={article.media?.alt_text || article.title}
@@ -183,7 +183,7 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
               )}
             </header>
 
-            <div className="mt-8 space-y-6 text-base leading-8 text-[#202124] sm:text-lg">
+            <div className="mt-8 space-y-6 text-base leading-8 text-[#151729] sm:text-lg">
               {article.body ? (
                 <div className="whitespace-pre-line">{article.body}</div>
               ) : (
@@ -191,7 +191,7 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
               )}
             </div>
 
-            <footer className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-[#d9d9d9] pt-6">
+            <footer className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-[#e6ecf2] pt-6">
               <Link href="/news" className={actionButtonClass}>
                 <ArrowLeft size={17} aria-hidden="true" />
                 <span>Back to News</span>
@@ -208,7 +208,7 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
                       ? "noopener noreferrer"
                       : undefined
                   }
-                  className={actionButtonClass}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] border border-white bg-[#1a4872] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#133859]"
                 >
                   <span>Open original source</span>
                   <ArrowUpRight size={17} aria-hidden="true" />

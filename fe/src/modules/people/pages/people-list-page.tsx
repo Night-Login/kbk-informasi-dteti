@@ -105,7 +105,7 @@ export default function PeopleListPage() {
   }
 
   return (
-    <main id="main-content" className="min-h-screen bg-white text-[#151729]">
+    <main id="main-content" className="min-h-screen bg-[#e6ecf2] text-[#151729]">
       <PeopleHero />
 
       <PeopleFilterPanel
@@ -116,29 +116,29 @@ export default function PeopleListPage() {
         onTagChange={updateTag}
       />
 
-      <section className="px-5 py-10 sm:px-[3%] sm:py-14" aria-label="People directory">
-        <p className="mb-6 text-sm text-[#7c8999]" aria-live="polite">
+      <section className="mx-auto w-[90%] max-w-[1296px] py-10 sm:py-14" aria-label="People directory">
+        <p className="mb-6 text-sm text-[#4f5054]" aria-live="polite">
           {loading ? "Loading people…" : `Showing ${result?.total ?? lecturers.length} people`}
         </p>
 
         {loading ? (
-          <div className="grid min-h-64 place-items-center" role="status">
+          <div className="grid min-h-64 place-items-center text-[#1a4872]" role="status">
             <div className="flex items-center gap-3">
               <LoaderCircle className="animate-spin" aria-hidden="true" />
               <span>Loading people…</span>
             </div>
           </div>
         ) : error ? (
-          <div className="border border-[#aeb5bd] px-6 py-14 text-center">
-            <h2 className="text-xl font-semibold">People are temporarily unavailable</h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-[#7c8999]">{error}</p>
+          <div className="rounded-[8px] bg-white px-6 py-14 text-center">
+            <h2 className="text-xl font-bold text-[#1a4872]">People are temporarily unavailable</h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm text-[#4f5054]">{error}</p>
             <button
               type="button"
               onClick={() => {
                 setLoading(true);
                 setReloadKey((value) => value + 1);
               }}
-              className="mt-5 min-h-11 border border-[#151729] px-6 text-sm font-semibold transition-colors hover:bg-[#151729] hover:text-white"
+              className="mt-5 min-h-10 rounded-[8px] bg-[#1a4872] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#133859]"
             >
               Try again
             </button>
@@ -164,11 +164,11 @@ export default function PeopleListPage() {
                     setLoading(true);
                     setPage((value) => Math.max(1, value - 1));
                   }}
-                  className="inline-flex min-h-11 items-center gap-2 border border-[#151729] px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-[8px] border border-[#1a4872] bg-white px-4 text-sm font-semibold text-[#1a4872] transition-colors hover:bg-[#1a4872] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ChevronLeft size={17} aria-hidden="true" /> Previous
                 </button>
-                <span className="text-sm">Page {page} of {result?.total_pages || 1}</span>
+                <span className="text-sm font-medium">Page {page} of {result?.total_pages || 1}</span>
                 <button
                   type="button"
                   disabled={page >= (result?.total_pages || 1)}
@@ -176,7 +176,7 @@ export default function PeopleListPage() {
                     setLoading(true);
                     setPage((value) => value + 1);
                   }}
-                  className="inline-flex min-h-11 items-center gap-2 border border-[#151729] px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex min-h-11 items-center gap-2 rounded-[8px] border border-[#1a4872] bg-white px-4 text-sm font-semibold text-[#1a4872] transition-colors hover:bg-[#1a4872] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Next <ChevronRight size={17} aria-hidden="true" />
                 </button>
@@ -184,9 +184,9 @@ export default function PeopleListPage() {
             ) : null}
           </>
         ) : (
-          <div className="border border-[#aeb5bd] px-6 py-16 text-center">
-            <h2 className="text-xl font-semibold">No people found</h2>
-            <p className="mt-2 text-sm text-[#7c8999]">Try a different name or research topic.</p>
+          <div className="rounded-[8px] bg-white px-6 py-16 text-center">
+            <h2 className="text-xl font-bold text-[#1a4872]">No people found</h2>
+            <p className="mt-2 text-sm text-[#4f5054]">Try a different name or research topic.</p>
             {(query || selectedTag) ? (
               <button
                 type="button"
@@ -196,7 +196,7 @@ export default function PeopleListPage() {
                   setSelectedTag("");
                   setPage(1);
                 }}
-                className="mt-5 min-h-11 border border-[#151729] px-6 text-sm font-semibold"
+                className="mt-5 min-h-10 rounded-[8px] bg-[#1a4872] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#133859]"
               >
                 Clear filters
               </button>

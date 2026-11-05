@@ -18,7 +18,7 @@ function FormField({
   type?: string;
 }) {
   return (
-    <label htmlFor={id} className="grid gap-2 text-sm">
+    <label htmlFor={id} className="grid gap-2 text-sm font-medium text-[#151729]">
       {label}
       <input
         id={id}
@@ -26,7 +26,7 @@ function FormField({
         type={type}
         placeholder={placeholder}
         required
-        className="min-h-10 bg-white/65 px-3 text-[#151729] outline-none placeholder:text-[#595959] focus-visible:ring-2 focus-visible:ring-[#595959]"
+        className="min-h-10 rounded-[4px] border border-[#1a4872]/25 bg-[#e6ecf2]/65 px-3 text-[#151729] outline-none placeholder:text-[#7c8999] focus-visible:ring-2 focus-visible:ring-[#1a4872]"
       />
     </label>
   );
@@ -48,21 +48,25 @@ export default function AboutPage() {
   }
 
   return (
-    <main id="main-content" className="min-h-screen bg-white text-[#151729]">
+    <main id="main-content" className="min-h-screen bg-[#e6ecf2] text-[#151729]">
       <DiscoveryPageHero title="About" />
 
       <div className="mx-auto grid w-[90%] max-w-[1296px] gap-12 py-12 sm:py-14">
-        <SupervisorGuide headingId="supervisor-guide-primary" />
+        <div className="rounded-[8px] bg-white p-6 sm:p-10">
+          <SupervisorGuide headingId="supervisor-guide-primary" />
+        </div>
 
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,669px)] lg:items-start">
-          <SupervisorGuide headingId="supervisor-guide-contact" />
+          <div className="rounded-[8px] bg-white p-6 sm:p-10">
+            <SupervisorGuide headingId="supervisor-guide-contact" />
+          </div>
 
           <form
             onSubmit={handleSubmit}
-            className="rounded-lg bg-[#d9d9d9] p-5"
+            className="rounded-[8px] bg-white p-6 sm:p-8"
             aria-labelledby="about-message-heading"
           >
-            <h2 id="about-message-heading" className="text-2xl font-semibold">Send us a message</h2>
+            <h2 id="about-message-heading" className="text-2xl font-bold text-[#1a4872]">Send us a message</h2>
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
               <FormField id="name" label="Full name" placeholder="Name" />
               <FormField id="email" label="Email" placeholder="Email" type="email" />
@@ -70,7 +74,7 @@ export default function AboutPage() {
             <div className="mt-5">
               <FormField id="subject" label="Subject" placeholder="Subject" />
             </div>
-            <label htmlFor="message" className="mt-5 grid gap-2 text-sm">
+            <label htmlFor="message" className="mt-5 grid gap-2 text-sm font-medium text-[#151729]">
               Message
               <textarea
                 id="message"
@@ -78,13 +82,13 @@ export default function AboutPage() {
                 placeholder="Message"
                 rows={5}
                 required
-                className="resize-y bg-white/65 px-3 py-3 text-[#151729] outline-none placeholder:text-[#595959] focus-visible:ring-2 focus-visible:ring-[#595959]"
+                className="resize-y rounded-[4px] border border-[#1a4872]/25 bg-[#e6ecf2]/65 px-3 py-3 text-[#151729] outline-none placeholder:text-[#7c8999] focus-visible:ring-2 focus-visible:ring-[#1a4872]"
               />
             </label>
-            <div className="mt-5 flex justify-center">
+            <div className="mt-6 flex justify-center">
               <button
                 type="submit"
-                className="min-h-10 rounded-lg bg-[#595959] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#151729] focus-visible:outline-2 focus-visible:outline-offset-2"
+                className="min-h-10 rounded-[8px] border border-white bg-[#1a4872] px-8 py-2 text-base font-semibold text-white transition-colors hover:bg-[#133859] focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 Submit
               </button>

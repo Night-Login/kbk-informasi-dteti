@@ -25,7 +25,7 @@ type ResearchDirectoryProps = {
 
 function ResearchDirectoryCard({ item }: { item: ResearchDirectoryItem }) {
   return (
-    <article id={`cluster-${item.slug}`} className="scroll-mt-28 overflow-hidden rounded-xl border border-line bg-white">
+    <article id={`cluster-${item.slug}`} className="scroll-mt-28 overflow-hidden rounded-[8px] bg-white">
       <div className={item.imageUrl ? "grid lg:grid-cols-[minmax(250px,32%)_1fr]" : ""}>
         {item.imageUrl ? (
           <div className="relative min-h-52 bg-surface-strong sm:min-h-64 lg:min-h-full">
@@ -40,11 +40,11 @@ function ResearchDirectoryCard({ item }: { item: ResearchDirectoryItem }) {
           </div>
         ) : null}
         <div className="px-6 py-8 sm:px-10 sm:py-9">
-          <h2 className="text-2xl font-bold text-dteti-blue sm:text-3xl">
+          <h2 className="text-2xl font-bold text-[#1a4872] sm:text-3xl">
             {item.title}
           </h2>
           {item.description ? (
-            <p className="mt-3 max-w-4xl text-sm leading-6 text-muted">
+            <p className="mt-3 max-w-4xl text-sm leading-6 text-[#151729]">
               {item.description}
             </p>
           ) : null}
@@ -53,19 +53,19 @@ function ResearchDirectoryCard({ item }: { item: ResearchDirectoryItem }) {
               <Link
                 key={tag.slug}
                 href={`/tag-research-areas/${tag.slug}`}
-                className="inline-flex min-h-9 items-center border border-dteti-ink/70 bg-dteti-yellow px-3.5 text-sm font-semibold text-dteti-ink transition-colors hover:bg-dteti-yellow/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
+                className="inline-flex min-h-9 items-center rounded-[4px] border border-[#1a4872]/30 bg-[#e6ecf2] px-3.5 text-sm font-medium text-[#151729] transition-colors hover:bg-[#1a4872] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2"
               >
                 {tag.name}
               </Link>
             ))}
           </div>
           <div className="mt-7 flex flex-wrap items-center gap-6 border-t border-line pt-5 text-sm font-semibold text-ink sm:gap-8">
-            <span className="inline-flex items-center gap-2 text-dteti-ink" title="Lecturers">
-              <UserRound size={19} className="text-dteti-blue" aria-hidden="true" />
+            <span className="inline-flex items-center gap-2 text-[#151729]" title="Lecturers">
+              <UserRound size={19} className="text-[#1a4872]" aria-hidden="true" />
               <span>{item.lecturers} Lecturers</span>
             </span>
-            <span className="inline-flex items-center gap-2 text-dteti-ink" title="Publications">
-              <FileText size={19} className="text-dteti-blue" aria-hidden="true" />
+            <span className="inline-flex items-center gap-2 text-[#151729]" title="Publications">
+              <FileText size={19} className="text-[#1a4872]" aria-hidden="true" />
               <span>{item.publications} Publications</span>
             </span>
           </div>
@@ -105,7 +105,7 @@ export default function ResearchDirectory({
   }, [items, query]);
 
   return (
-    <main id="main-content" className="bg-white pb-20 pt-24 text-ink sm:pt-28">
+    <main id="main-content" className="min-h-screen bg-[#e6ecf2] pb-20 pt-24 text-ink sm:pt-28">
       <div className="page-container">
         <Breadcrumbs
           items={[
@@ -116,7 +116,7 @@ export default function ResearchDirectory({
         />
 
         <section className="pb-4 pt-7">
-          <h1 className="text-center text-4xl font-bold tracking-[-0.025em] text-dteti-blue sm:text-5xl">
+          <h1 className="text-center text-4xl font-bold tracking-[-0.025em] text-[#1a4872] sm:text-5xl">
             {title}
           </h1>
 
@@ -128,8 +128,8 @@ export default function ResearchDirectory({
             <label className="sr-only" htmlFor="research-search">
               {searchPlaceholder}
             </label>
-            <div className="flex min-h-16 items-center gap-4 rounded-xl border border-line bg-white px-6 focus-within:border-dteti-blue focus-within:ring-2 focus-within:ring-focus sm:px-8">
-              <Search className="text-muted" size={21} aria-hidden="true" />
+            <div className="flex min-h-14 items-center gap-4 rounded-[8px] border border-[#1a4872] bg-white px-6 focus-within:ring-2 focus-within:ring-focus sm:px-8">
+              <Search className="text-[#1a4872]" size={21} aria-hidden="true" />
               <input
                 id="research-search"
                 type="search"
@@ -147,14 +147,14 @@ export default function ResearchDirectory({
           </p>
 
           {visibleItems.length > 0 ? (
-            <div className="mt-10 grid gap-10">
+            <div className="mt-10 grid gap-8">
               {visibleItems.map((item) => (
                 <ResearchDirectoryCard key={item.title} item={item} />
               ))}
             </div>
           ) : (
-            <div className="mt-10 bg-surface px-6 py-16 text-center">
-              <h2 className="text-xl font-bold text-dteti-blue">
+            <div className="mt-10 rounded-[8px] bg-white px-6 py-16 text-center">
+              <h2 className="text-xl font-bold text-[#1a4872]">
                 No research areas found
               </h2>
               <p className="mt-2 text-sm text-muted">
