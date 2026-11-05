@@ -27,7 +27,7 @@ export default function LecturerCard({ lecturer, priority = false }: LecturerCar
             priority={priority}
           />
         ) : (
-          <span className="grid size-full place-items-center bg-[#e6ecf2] text-5xl font-bold text-[#1a4872]">
+          <span className="grid size-full place-items-center rounded-t-[8px] border-2 border-[#1a4872] bg-[#fbfbfb] text-5xl font-bold text-[#1a4872]">
             {lecturer.fullName.charAt(0)}
           </span>
         )}

@@ -158,7 +158,7 @@ export default function PeopleDetailPage() {
                 className="object-cover"
               />
             ) : (
-              <div className="grid size-full place-items-center bg-[#e6ecf2] text-7xl font-bold text-[#1a4872]">
+              <div className="grid size-full place-items-center rounded-t-[8px] border-2 border-[#1a4872] bg-[#fbfbfb] text-7xl font-bold text-[#1a4872] lg:rounded-l-[8px] lg:rounded-tr-none">
                 {lecturer.full_name.charAt(0)}
               </div>
             )}
