@@ -1,12 +1,6 @@
-import { PublicationPage } from "@/modules/publication";
+import { redirect } from "next/navigation";
 
-export default async function Page({
-    searchParams,
-}: {
-    searchParams: Promise<{ lecturer?: string | string[] }>;
-}) {
-    const params = await searchParams;
-    const lecturer = Array.isArray(params.lecturer) ? params.lecturer[0] : params.lecturer;
-
-    return <PublicationPage initialLecturer={lecturer || ""} />;
+export default function Page() {
+  redirect("/research?view=Publication");
 }
+

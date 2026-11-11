@@ -30,7 +30,7 @@ export default function HeroSearch() {
           ...data.lecturers.map((item) => ({ id: `person-${item.id}`, title: item.full_name, href: `/people/${item.slug || item.id}` })),
           ...data.research_tags.map((item) => ({ id: `research-${item.id}`, title: item.name, href: `/tag-research-areas/${item.slug || item.id}` })),
           ...data.projects.map((item) => ({ id: `project-${item.id}`, title: item.title, href: "/projects" })),
-          ...data.publications.map((item) => ({ id: `publication-${item.id}`, title: item.title, href: "/publication" })),
+          ...data.publications.map((item) => ({ id: `publication-${item.id}`, title: item.title, href: "/research?view=Publication" })),
           ...data.content.map((item) => ({ id: `content-${item.id}`, title: item.title, href: item.type === "EVENT" ? `/events#${item.slug || item.id}` : `/news/${item.slug || item.id}` })),
         ];
         setResponse({ query: term, items: results.slice(0, 6), error: false });
@@ -75,3 +75,4 @@ export default function HeroSearch() {
     </div>}
   </div>;
 }
+

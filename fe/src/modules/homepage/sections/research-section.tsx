@@ -9,13 +9,12 @@ const initialClusters = [
 ];
 export default function ResearchSection() {
   const [clusters, setClusters] = useState(initialClusters);
-  const [loaded, setLoaded] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const controller = new AbortController();
     apiRequest<ResearchSummary>("research", { signal: controller.signal }).then((data) => {
-      if (data.clusters.length) { setClusters(data.clusters); setLoaded(true); }
+      if (data.clusters.length) { setClusters(data.clusters); }
     }).catch(() => {});
     return () => controller.abort();
   }, []);
@@ -77,7 +76,7 @@ export default function ResearchSection() {
   return <section className="discovery-clusters" aria-label="Research clusters">
     <div ref={viewport} className="discovery-marquee-window" tabIndex={0} role="region" aria-label="Research clusters, scroll horizontally to explore"><div ref={track} className="discovery-marquee-track">
       {[0, 1].map((copy) => <div key={copy} className="discovery-marquee-group" aria-hidden={copy === 1 ? true : undefined}>
-        {clusters.map((cluster) => <Link key={cluster.slug} href={loaded ? `/research-areas#cluster-${encodeURIComponent(cluster.slug)}` : "/research-areas"} className="discovery-cluster" tabIndex={copy === 1 ? -1 : undefined}>{cluster.name}</Link>)}
+        {clusters.map((cluster) => <Link key={cluster.slug} href={`/research?cluster=${encodeURIComponent(cluster.slug)}`} className="discovery-cluster" tabIndex={copy === 1 ? -1 : undefined}>{cluster.name}</Link>)}
       </div>)}
     </div></div>
   </section>;

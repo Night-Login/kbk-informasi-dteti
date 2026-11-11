@@ -15,7 +15,7 @@ export const researchLandingCards = [
     title: "Publication",
     description: "Browse research outputs from lecturers and research teams.",
     actionLabel: "View Publication",
-    href: "/publication",
+    href: "/research?view=Publication",
   },
 ] as const;
 
@@ -167,3 +167,4 @@ export const projectData = [
     status: "Planned",
   },
 ] as const;
+

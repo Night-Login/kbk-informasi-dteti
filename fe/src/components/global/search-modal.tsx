@@ -10,7 +10,7 @@ function toResults(data: UniversalSearchResult): Result[] {
   return [
     ...data.lecturers.map((item) => ({ id: `person-${item.id}`, title: item.full_name, kind: "People", href: `/people/${item.slug || item.id}` })),
     ...data.research_tags.map((item) => ({ id: `topic-${item.id}`, title: item.name, kind: "Research", href: `/tag-research-areas/${item.slug || item.id}` })),
-    ...data.publications.map((item) => ({ id: `publication-${item.id}`, title: item.title, kind: "Publication", href: "/publication" })),
+    ...data.publications.map((item) => ({ id: `publication-${item.id}`, title: item.title, kind: "Publication", href: "/research?view=Publication" })),
     ...data.projects.map((item) => ({ id: `project-${item.id}`, title: item.title, kind: "Project", href: "/projects" })),
     ...data.content.map((item) => ({ id: `content-${item.id}`, title: item.title, kind: item.type === "EVENT" ? "Event" : "News", href: item.type === "EVENT" ? `/events#${item.slug || item.id}` : `/news/${item.slug || item.id}` })),
   ];
@@ -85,3 +85,4 @@ function SearchContent({ onClose }: { onClose: () => void }) {
     </div>
   </dialog>;
 }
+

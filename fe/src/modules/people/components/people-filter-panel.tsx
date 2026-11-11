@@ -8,6 +8,7 @@ type PeopleFilterPanelProps = {
   clusters: ResearchCluster[];
   query: string;
   selectedTag: string;
+  selectedCluster?: string;
   onQueryChange: (value: string) => void;
   onTagChange: (value: string) => void;
   toolbar?: ReactNode;
@@ -18,6 +19,7 @@ export default function PeopleFilterPanel({
   clusters,
   query,
   selectedTag,
+  selectedCluster,
   onQueryChange,
   onTagChange,
   toolbar,
@@ -69,7 +71,7 @@ export default function PeopleFilterPanel({
             </h2>
             <div className="grid gap-2">
               {(cluster.tags || []).map((tag) => {
-                const checked = selectedTag === tag.slug;
+                const checked = selectedTag === tag.slug || selectedCluster === cluster.slug;
                 return (
                   <label key={tag.id} className="flex cursor-pointer items-start gap-2 text-sm leading-5 text-[#151729]">
                     <input
