@@ -410,3 +410,11 @@ a {
 }
 @media (min-width: 701px) { .discovery-mobile-nav { display: none; } }
 @media (prefers-reduced-motion: reduce) { .discovery-header, .discovery-logo, .discovery-logo img, .discovery-desktop-nav a::after { transition: none; } }
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  html:has(.discovery-hero) { overflow-anchor: none; }
+
+  .discovery-hero {
+    min-height: var(--hero-height, max(100svh, clamp(500px, 44.5vw, 640px)));
+  }
+}
