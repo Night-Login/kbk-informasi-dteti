@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight, CalendarDays, Clock3, MapPin, Share2 } from "lucide-react";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 import type { NewsArticle, WebsiteEvent } from "@/lib/api";
 import { getApiAssetUrl } from "@/lib/api";
 
@@ -10,13 +10,13 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "sh
 const timeFormat = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Jakarta" });
 export function displayDate(value: string) { const date = new Date(value); return Number.isNaN(date.getTime()) ? "Date to be announced" : dateFormat.format(date); }
 
-export function EventCard({ event }: { event: WebsiteEvent }) {
+export function EventCard({ event, style }: { event: WebsiteEvent; style?: CSSProperties }) {
   const start = new Date(event.starts_at);
   const end = event.ends_at ? new Date(event.ends_at) : null;
   const endLabel = end && !Number.isNaN(end.getTime()) ? `${displayDate(event.starts_at) !== displayDate(event.ends_at!) ? `${displayDate(event.ends_at!)} · ` : ""}${timeFormat.format(end)} WIB` : null;
   const image = getApiAssetUrl(event.media?.file_url || event.image_url);
 
-  return <article id={event.slug} className="discovery-event-card">
+  return <article id={event.slug} className="discovery-event-card discovery-stagger-card" style={style}>
     <div className="discovery-media" aria-hidden="true" style={image ? { overflow: "hidden" } : undefined}>
       {image && <img src={image} alt={event.media?.alt_text || event.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
     </div>
@@ -30,11 +30,11 @@ export function EventCard({ event }: { event: WebsiteEvent }) {
   </article>;
 }
 
-export function NewsCard({ article, featured = false, preview = false }: { article: NewsArticle; featured?: boolean; preview?: boolean }) {
+export function NewsCard({ article, featured = false, preview = false, style }: { article: NewsArticle; featured?: boolean; preview?: boolean; style?: CSSProperties }) {
   const image = getApiAssetUrl(article.media?.file_url || article.image_url);
   const mediaContent = image ? <img src={image} alt={article.media?.alt_text || article.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null;
 
-  return <article className={`discovery-news-card ${featured ? "discovery-news-featured" : ""}`}>
+  return <article className={`discovery-news-card discovery-stagger-card ${featured ? "discovery-news-featured" : ""}`} style={style}>
     {preview ? (
       <div className="discovery-media" aria-hidden="true" style={image ? { overflow: "hidden" } : undefined}>
         {mediaContent}
@@ -48,7 +48,7 @@ export function NewsCard({ article, featured = false, preview = false }: { artic
   </article>;
 }
 
-export function ArticleCard({ article, preview = false }: { article: NewsArticle; preview?: boolean }) {
+export function ArticleCard({ article, preview = false, style }: { article: NewsArticle; preview?: boolean; style?: CSSProperties }) {
   const [message, setMessage] = useState("");
   const image = getApiAssetUrl(article.media?.file_url || article.image_url);
   const mediaContent = image ? <img src={image} alt={article.media?.alt_text || article.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : null;
@@ -60,7 +60,7 @@ export function ArticleCard({ article, preview = false }: { article: NewsArticle
       else { await navigator.clipboard.writeText(url); setMessage("Link copied"); }
     } catch (error) { if (!(error instanceof DOMException && error.name === "AbortError")) setMessage("Could not share. Open the article to copy its URL."); }
   }
-  return <article className="discovery-article-card">
+  return <article className="discovery-article-card discovery-stagger-card" style={style}>
     <div className="discovery-author"><span className="discovery-avatar" aria-hidden="true" /><div><strong>DTETI UGM</strong><time dateTime={article.published_at}>{displayDate(article.published_at)}</time></div></div>
     <h3>{preview ? article.title : <Link href={`/news/${article.slug}`}>{article.title}</Link>}</h3><p>{article.excerpt}</p>
     {preview ? (
