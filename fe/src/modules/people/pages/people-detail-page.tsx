@@ -145,7 +145,7 @@ export default function PeopleDetailPage() {
           All people
         </Link>
 
-        <section className="mt-4 grid overflow-hidden rounded-[8px] bg-white lg:grid-cols-[420px_minmax(0,1fr)]" aria-labelledby="profile-name">
+        <section className="discovery-stagger-card mt-4 grid overflow-hidden rounded-[8px] bg-white lg:grid-cols-[420px_minmax(0,1fr)]" aria-labelledby="profile-name">
           <div className="relative min-h-[340px] bg-[#e6ecf2] lg:min-h-[381px]">
             {photoUrl ? (
               <Image
@@ -210,7 +210,7 @@ export default function PeopleDetailPage() {
           </div>
         </section>
 
-        <div className="mt-6 grid gap-8 rounded-[8px] bg-white p-6 sm:p-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-16">
+        <div className="discovery-stagger-card mt-6 grid gap-8 rounded-[8px] bg-white p-6 sm:p-10 lg:grid-cols-[minmax(0,1fr)_420px] lg:gap-16">
           <section aria-labelledby="overview-heading">
             <h2 id="overview-heading" className="text-2xl font-bold text-[#1a4872] sm:text-3xl">Overview</h2>
             <div className="mt-5 max-w-3xl space-y-5 text-base leading-7 text-[#151729] sm:text-lg sm:leading-8">
@@ -234,7 +234,7 @@ export default function PeopleDetailPage() {
           </aside>
         </div>
 
-        <section className="mt-6 rounded-[8px] bg-white p-6 sm:p-10" aria-labelledby="publications-heading">
+        <section className="discovery-stagger-card mt-6 rounded-[8px] bg-white p-6 sm:p-10" aria-labelledby="publications-heading">
           <h2 id="publications-heading" className="text-2xl font-bold text-[#1a4872] sm:text-3xl">Recent Publications</h2>
           {latestPublications.length ? (
             <ul className="mt-6 space-y-7">

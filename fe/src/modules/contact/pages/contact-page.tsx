@@ -67,7 +67,7 @@ export default function ContactPage() {
         <div className="mx-auto mt-10 grid max-w-6xl gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
           <form
             onSubmit={handleSubmit}
-            className="brand-gradient rounded-xl px-6 py-8 text-white sm:px-12"
+            className="discovery-stagger-card brand-gradient rounded-xl px-6 py-8 text-white sm:px-12"
           >
             <h2 className="text-2xl font-bold">Send us a message</h2>
 
@@ -109,7 +109,7 @@ export default function ContactPage() {
             </div>
           </form>
 
-          <aside className="flex flex-col justify-between rounded-xl border border-line bg-surface p-7 sm:p-10">
+          <aside className="discovery-stagger-card flex flex-col justify-between rounded-xl border border-line bg-surface p-7 sm:p-10">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-dteti-blue/70">
                 Direct contact

@@ -247,6 +247,7 @@ export default function TagResearchAreasPage() {
                   key={lecturer.sourceId || lecturer.id}
                   lecturer={lecturer}
                   priority={index < 4}
+                  index={index}
                 />
               ))}
             </div>

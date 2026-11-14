@@ -151,6 +151,7 @@ export default function PeopleListPage() {
                   key={lecturer.sourceId || lecturer.id}
                   lecturer={lecturer}
                   priority={index < 4}
+                  index={index}
                 />
               ))}
             </div>

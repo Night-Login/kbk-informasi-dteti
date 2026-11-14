@@ -4,7 +4,7 @@ import Breadcrumbs from "@/components/global/breadcrumbs";
 import { FileText, Search, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useState } from "react";
 
 type ResearchDirectoryItem = {
   slug: string;
@@ -23,9 +23,19 @@ type ResearchDirectoryProps = {
   items: readonly ResearchDirectoryItem[];
 };
 
-function ResearchDirectoryCard({ item }: { item: ResearchDirectoryItem }) {
+function ResearchDirectoryCard({
+  item,
+  index = 0,
+}: {
+  item: ResearchDirectoryItem;
+  index?: number;
+}) {
   return (
-    <article id={`cluster-${item.slug}`} className="scroll-mt-28 overflow-hidden rounded-[8px] bg-white">
+    <article
+      id={`cluster-${item.slug}`}
+      style={{ "--card-index": index } as CSSProperties}
+      className="discovery-stagger-card discovery-card-lift scroll-mt-28 overflow-hidden rounded-[8px] bg-white"
+    >
       <div className={item.imageUrl ? "grid lg:grid-cols-[minmax(250px,32%)_1fr]" : ""}>
         {item.imageUrl ? (
           <div className="relative min-h-52 bg-surface-strong sm:min-h-64 lg:min-h-full">
@@ -148,8 +158,8 @@ export default function ResearchDirectory({
 
           {visibleItems.length > 0 ? (
             <div className="mt-10 grid gap-8">
-              {visibleItems.map((item) => (
-                <ResearchDirectoryCard key={item.title} item={item} />
+              {visibleItems.map((item, index) => (
+                <ResearchDirectoryCard key={item.title} item={item} index={index} />
               ))}
             </div>
           ) : (

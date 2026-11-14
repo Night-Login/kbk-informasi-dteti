@@ -125,7 +125,7 @@ function EventCalendar({
   return (
     <aside
       aria-label="Event calendar"
-      className="w-full max-w-[408px] border border-[#bfbfbf] bg-[#f5f5f5] p-[32px]"
+      className="discovery-stagger-card w-full max-w-[408px] border border-[#bfbfbf] bg-[#f5f5f5] p-[32px]"
     >
       <h2 className="text-[25px] font-semibold leading-[36px] text-[#1a4872]">
         {monthFormatter.format(month)}
@@ -226,7 +226,13 @@ function EventCalendar({
   );
 }
 
-function EventGridCard({ event }: { event: WebsiteEvent }) {
+function EventGridCard({
+  event,
+  index = 0,
+}: {
+  event: WebsiteEvent;
+  index?: number;
+}) {
   const [expanded, setExpanded] = useState(false);
   const image = getApiAssetUrl(event.media?.file_url || event.image_url);
   const tags = getEventTags(event);
@@ -234,7 +240,8 @@ function EventGridCard({ event }: { event: WebsiteEvent }) {
   return (
     <article
       id={event.slug}
-      className="flex min-h-[435px] flex-col justify-between rounded-[8px] bg-[#e6ecf2] p-[16px] pt-[17px] pb-[18px] scroll-mt-24"
+      style={{ "--card-index": index } as React.CSSProperties}
+      className="discovery-stagger-card discovery-card-lift flex min-h-[435px] flex-col justify-between rounded-[8px] bg-[#e6ecf2] p-[16px] pt-[17px] pb-[18px] scroll-mt-24"
     >
       <div>
         <div className="h-[216px] w-full overflow-hidden rounded-[4px] bg-white">
@@ -592,8 +599,8 @@ export default function EventsPage() {
                       </div>
 
                       <div className="grid grid-cols-1 gap-[24px] md:grid-cols-2">
-                        {group.events.map((event) => (
-                          <EventGridCard key={event.id} event={event} />
+                        {group.events.map((event, index) => (
+                          <EventGridCard key={event.id} event={event} index={index} />
                         ))}
                       </div>
                     </section>

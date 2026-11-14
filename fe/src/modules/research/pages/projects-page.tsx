@@ -216,7 +216,7 @@ export default function ProjectsPage() {
         ) : result && result.data.length > 0 ? (
           <>
             <section className="mt-10 space-y-6" aria-label="Project results">
-              {result.data.map((project) => {
+              {result.data.map((project, index) => {
                 const projectTags = (project.research_tags || [])
                   .map((relation) => relation.tag)
                   .filter((item): item is ResearchTag => Boolean(item));
@@ -226,7 +226,8 @@ export default function ProjectsPage() {
                   <article
                     id={project.slug}
                     key={project.id}
-                    className="brand-gradient px-6 py-7 text-white sm:px-12 sm:py-9"
+                    style={{ "--card-index": index } as React.CSSProperties}
+                    className="discovery-stagger-card brand-gradient px-6 py-7 text-white sm:px-12 sm:py-9"
                   >
                     <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
                       <span className="font-bold text-dteti-yellow">

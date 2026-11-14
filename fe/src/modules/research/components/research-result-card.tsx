@@ -4,11 +4,11 @@ import { getProjectPeople, getPublicationTags, type Project, type Publication, t
 import type { ResearchResult, ResearchView } from "@/modules/research/pages/research-page";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useRef } from "react";
+import { type CSSProperties, useRef } from "react";
 
 const actionClass = "inline-flex min-h-11 w-fit min-w-44 items-center justify-center gap-2 rounded-[8px] border border-white bg-[#1a4872] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#133859]";
 
-export default function ResearchResultCard({ view, item }: { view: ResearchView; item: ResearchResult }) {
+export default function ResearchResultCard({ view, item, index = 0 }: { view: ResearchView; item: ResearchResult; index?: number }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const project = view === "Project" ? item as Project : null;
   const publication = view === "Publication" ? item as Publication : null;
@@ -19,7 +19,7 @@ export default function ResearchResultCard({ view, item }: { view: ResearchView;
   const people = project ? getProjectPeople(project) : [];
   const period = project ? [project.start_year, project.end_year || (project.status === "ONGOING" ? "Present" : null)].filter(Boolean).join(" – ") : publication?.year;
   const url = publication?.url || (publication?.doi ? `https://doi.org/${publication.doi}` : "");
-  return <article className="grid gap-6 rounded-[8px] bg-white px-6 py-6 sm:px-12 lg:px-16">
+  return <article style={{ "--card-index": index } as CSSProperties} className="discovery-stagger-card discovery-card-lift grid gap-6 rounded-[8px] bg-white px-6 py-6 sm:px-12 lg:px-16">
     <div><h2 className="text-xl font-bold text-[#1a4872] sm:text-2xl">{title}</h2>{description && <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#151729] sm:text-base">{description}</p>}</div>
     {tags.length > 0 && <ul className="flex flex-wrap gap-3">{tags.map((tag) => <li key={tag.id}><Link className="inline-flex rounded border border-[#1a4872]/30 bg-[#e6ecf2] px-2.5 py-1 text-sm text-[#151729] hover:underline" href={`/tag-research-areas/${tag.slug}`}>{tag.name}</Link></li>)}</ul>}
     <div className="grid gap-2 text-sm text-[#151729] sm:text-base">

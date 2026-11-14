@@ -52,18 +52,18 @@ export default function AboutPage() {
       <DiscoveryPageHero title="About" />
 
       <div className="mx-auto grid w-[90%] max-w-[1296px] gap-12 py-12 sm:py-14">
-        <div className="rounded-[8px] bg-white p-6 sm:p-10">
+        <div className="discovery-stagger-card rounded-[8px] bg-white p-6 sm:p-10">
           <SupervisorGuide headingId="supervisor-guide-primary" />
         </div>
 
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,669px)] lg:items-start">
-          <div className="rounded-[8px] bg-white p-6 sm:p-10">
+          <div className="discovery-stagger-card rounded-[8px] bg-white p-6 sm:p-10">
             <SupervisorGuide headingId="supervisor-guide-contact" />
           </div>
 
           <form
             onSubmit={handleSubmit}
-            className="rounded-[8px] bg-white p-6 sm:p-8"
+            className="discovery-stagger-card rounded-[8px] bg-white p-6 sm:p-8"
             aria-labelledby="about-message-heading"
           >
             <h2 id="about-message-heading" className="text-2xl font-bold text-[#1a4872]">Send us a message</h2>

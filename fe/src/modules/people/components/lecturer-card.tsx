@@ -1,16 +1,21 @@
 import { BadgeCheck, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import type { PersonLite } from "@/types/person";
 
 type LecturerCardProps = {
   lecturer: PersonLite;
   priority?: boolean;
+  index?: number;
 };
 
-export default function LecturerCard({ lecturer, priority = false }: LecturerCardProps) {
+export default function LecturerCard({ lecturer, priority = false, index = 0 }: LecturerCardProps) {
   return (
-    <article className="group mx-auto flex h-full w-full max-w-[321px] flex-col overflow-hidden rounded-[8px] bg-white text-[#151729]">
+    <article
+      style={{ "--card-index": index } as CSSProperties}
+      className="discovery-stagger-card discovery-card-lift group mx-auto flex h-full w-full max-w-[321px] flex-col overflow-hidden rounded-[8px] bg-white text-[#151729]"
+    >
       <Link
         href={`/people/${lecturer.id}`}
         className="relative aspect-[321/294] w-full overflow-hidden bg-[#e6ecf2]"

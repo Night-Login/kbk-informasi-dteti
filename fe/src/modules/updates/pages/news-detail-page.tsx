@@ -128,7 +128,7 @@ export default function NewsDetailPage({ slug }: { slug: string }) {
             <span>Back to News</span>
           </Link>
 
-          <article className="mt-6 rounded-[8px] bg-white p-6 sm:p-10">
+          <article className="discovery-stagger-card mt-6 rounded-[8px] bg-white p-6 sm:p-10">
             <header>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-3">

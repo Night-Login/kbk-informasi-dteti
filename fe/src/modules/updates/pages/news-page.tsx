@@ -216,19 +216,24 @@ export default function NewsPage() {
                   article={featuredArticle}
                   featured
                   preview={preview}
+                  style={{ "--card-index": 0 } as React.CSSProperties}
                 />
               </div>
             )}
 
             {gridArticles.length > 0 && (
               <div className="discovery-news-grid">
-                {gridArticles.map((article) => (
+                {gridArticles.map((article, index) => (
                   <div
                     key={article.id}
                     id={article.slug}
                     className="scroll-mt-24"
                   >
-                    <NewsCard article={article} preview={preview} />
+                    <NewsCard
+                      article={article}
+                      preview={preview}
+                      style={{ "--card-index": index + 1 } as React.CSSProperties}
+                    />
                   </div>
                 ))}
               </div>
